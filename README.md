@@ -132,3 +132,4 @@ La plateforme vise à servir plusieurs types d'utilisateurs :
 *   Documentation des APIs : permettant à n'importe quel développeur de consommer les APIs.
 *   Messages de retour normalisés.
 *   Application développeur tiers : lien avec un service NPM (composants réutilisables).
+test du H
