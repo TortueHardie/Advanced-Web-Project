@@ -1,134 +1,84 @@
+# Turborepo starter
 
-# Plateforme de Restauration en Ligne Distribuée
-### Advanced Web Project (AWP)
-## Introduction
+This Turborepo starter is maintained by the Turborepo core team.
 
-Ce projet représente l'aboutissement de vos compétences acquises en informatique, en mettant en œuvre une plateforme logicielle distribuée pour révolutionner la restauration en ligne. L'objectif principal est de concevoir, développer, déployer, tester et utiliser une plateforme capable de rassembler et de traiter les offres commerciales du secteur de la restauration.
+## Using this example
 
-## Public Cible
+Run the following command:
 
-La plateforme vise à servir plusieurs types d'utilisateurs :
+```sh
+npx create-turbo@latest
+```
 
-*   **Utilisateurs Finaux**: Clients à la recherche de livraison de repas.
-*   **Restaurateurs**: Désirant étendre leur portée et leur clientèle.
-*   **Livreurs**: Indépendants gérant les livraisons.
-*   **Développeurs Tiers**: Intégrant des composants logiciels de la plateforme dans leurs applications.
-*   **Service Commercial**: Gérant les aspects commerciaux et le suivi des clients.
-*   **Service Technique**: Assurant la qualité et la maintenance de la plateforme.
+## What's inside?
 
-## Objectifs
+This Turborepo includes the following packages/apps:
 
-*   Créer une plateforme centralisée pour la gestion des offres de restauration.
-*   Fournir une expérience utilisateur personnalisée et diversifiée.
-*   Développer une solution technique robuste, scalable et adaptée aux besoins de chaque type d'utilisateur.
-*   Simuler les défis d'un projet d'entreprise réel, permettant l'application des compétences acquises au cours des études.
+### Apps and Packages
 
-## Cahier des Charges
+- `docs`: a [Next.js](https://nextjs.org/) app
+- `web`: another [Next.js](https://nextjs.org/) app
+- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
+- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
+- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
 
-### Spécifications Fonctionnelles
+Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
 
-#### Utilisateur Final
+### Utilities
 
-*   Gestion de compte (création, modification, suppression, consultation).
-*   Gestion de commandes (création, modification, suppression, consultation, paiement).
-*   Historique des commandes.
-*   Suivi de livraison en temps réel.
-*   Parrainage d'amis.
-*   Notifications (pop-up).
+This Turborepo has some additional tools already setup for you:
 
-#### Restaurateur
+- [TypeScript](https://www.typescriptlang.org/) for static type checking
+- [ESLint](https://eslint.org/) for code linting
+- [Prettier](https://prettier.io) for code formatting
 
-*   Gestion de compte.
-*   Gestion d'articles (plats, boissons, etc.).
-*   Gestion de menus.
-*   Visualisation et validation des commandes.
-*   Suivi de livraison.
-*   Historique des commandes.
-*   Statistiques.
-*   Parrainage d'autres restaurateurs.
-*   Notifications (pop-up).
+### Build
 
-#### Livreur
+To build all apps and packages, run the following command:
 
-*   Gestion de compte.
-*   Acceptation/refus de livraisons.
-*   Prise en charge et acquittement de la livraison (avec QR code).
-*   Parrainage de livreurs.
-*   Notifications (pop-up).
+```
+cd my-turborepo
+pnpm build
+```
 
-#### Développeur Tiers
+### Develop
 
-*   Gestion de compte.
-*   Utilisation de l'API avec clé de sécurité.
-*   Consultation des composants disponibles.
-*   Téléchargement de composants.
+To develop all apps and packages, run the following command:
 
-#### Service Commercial
+```
+cd my-turborepo
+pnpm dev
+```
 
-*   Gestion des comptes clients (consultation, suspension, modification, suppression).
-*   Tableaux de bord de suivi des commandes en temps réel.
-*   Notifications (pop-up).
+### Remote Caching
 
-#### Service Technique
+> [!TIP]
+> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
 
-*   Ajout/suppression de composants réutilisables.
-*   Consultation des logs de connexion.
-*   Statistiques de performance des serveurs et microservices.
-*   Logs de téléchargement des composants.
-*   Orchestration des routes pour les demandes entrantes.
-*   Déploiement de nouveaux services sans interruption.
-*   Notifications (pop-up).
+Turborepo can use a technique known as [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
 
-### Spécifications d'Architecture
+By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
 
-#### Applications (Livreur, Restaurateur, Client Final, Commercial/Technique)
+```
+cd my-turborepo
+npx turbo login
+```
 
-*   Couche présentation pour l'interface utilisateur.
-*   Couche de composants locaux pour les traitements locaux et l'invocation des services distants.
-*   Couche de communication assurant la sécurité et le respect du protocole de la plateforme.
-*   Applications Commercial/Technique : architecture basée sur des composants graphiques réutilisables et dynamiques.
+This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
 
-#### Plateforme (Middleware)
+Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
 
-*   Architecture hybride (SOA, ESB, Microservices).
-*   Liaison de données sécurisée et asynchrone (orientée message).
-*   Scalabilité pour gérer les montées en charge.
-*   Conteneurisation des modules à forte consommation de ressources.
-*   Point de terminaison sécurisé, interopérable et asynchrone.
-*   Couche services exposant les services de la plateforme.
-*   Contrôleur de résolution vérifiant les autorisations via token.
-*   Proxy pour la récupération des statistiques de performance et le routage des messages.
-*   Microservice/Méta-service gérant les opérations transactionnelles.
-*   Composants spécialisés agrégés par les microservices.
+```
+npx turbo link
+```
 
-#### Données
+## Useful Links
 
-*   Persistance des informations non relationnelles (NoSQL).
-*   Entrepôt pour les sources documentaires.
-*   Stockage des composants réutilisables.
+Learn more about the power of Turborepo:
 
-### Architecture Globale
-
-*   Équilibre entre une architecture orientée service et une architecture orientée microservices.
-
-#### Partie Applicative
-
-*   Front : fonctionnalités de l'application et validation des saisies utilisateur.
-*   Middleware local : traitement local des messages et services spécifiques à l'application.
-*   Proxy : communication avec la plateforme.
-
-#### Partie Plateforme
-
-*   Couche services : endpoint unique, documentation développeur.
-*   Contrôleur de résolution : vérification du type d'application, version, demande, droits utilisateur.
-*   Proxy : communication et load-balancing.
-*   Couche composants (virtualisée) : contrôleur d'exécution transactionnel, plugins, proxy.
-*   Couche data : SGBD (R/NoSQL).
-
-### Autres Spécifications
-
-*   Suivi de livraison : utilisation d'un composant MAP et possibilité de sockets en temps réel.
-*   Stockage des données applicatives : base NoSQL (MongoDB).
-*   Documentation des APIs : permettant à n'importe quel développeur de consommer les APIs.
-*   Messages de retour normalisés.
-*   Application développeur tiers : lien avec un service NPM (composants réutilisables).
+- [Tasks](https://turbo.build/repo/docs/core-concepts/monorepos/running-tasks)
+- [Caching](https://turbo.build/repo/docs/core-concepts/caching)
+- [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching)
+- [Filtering](https://turbo.build/repo/docs/core-concepts/monorepos/filtering)
+- [Configuration Options](https://turbo.build/repo/docs/reference/configuration)
+- [CLI Usage](https://turbo.build/repo/docs/reference/command-line-reference)
