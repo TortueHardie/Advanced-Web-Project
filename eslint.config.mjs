@@ -16,7 +16,7 @@ export default tseslint.config(
     },
     rules: {
       // Style & formatage assouplis
-      'indent': ['warn', 2, 4, { SwitchCase: 1 }], // 2 espaces, flexible sur les switch
+      'indent': ['warn', "tab", { SwitchCase: 1 }], // 2 espaces, flexible sur les switch
       'quotes': ['warn', 'single', { avoidEscape: true }], // Simple quote mais permet les doubles si nécessaire
       'comma-dangle': ['warn', 'always-multiline'],
       'max-statements-per-line': ['warn', { max: 3 }], // Autorise plus d'expressions par ligne
