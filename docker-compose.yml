@@ -1,8 +1,23 @@
-version: '3.8'
 services:
+  traefik:
+    image: traefik:v2.10
+    restart: always
+    command:
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+    ports:
+      - "80:80"     # HTTP
+      - "443:443"   # HTTPS
+      - "8081:8080" # Dashboard Traefik
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"  # Permet à Traefik de détecter les services Docker
+    networks:
+      - web
+
   postgres:
     image: postgres:14
-    container_name: postgres-db
     restart: always
     env_file:
       - .env
@@ -14,30 +29,44 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - web
 
   api-gateway:
     build:
       context: .
       dockerfile: apps/api-gateway/Dockerfile
-    container_name: api-gateway
     depends_on:
       - postgres
     env_file:
       - .env
     environment:
       DATABASE_URL: ${DATABASE_URL_POSTGRES}
-    ports:
-      - "3000:3000"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.api-gateway.rule=Host(`api.localhost`)"
+      - "traefik.http.services.api-gateway.loadbalancer.server.port=3000"
+    deploy:
+      replicas: 3  # Load balancing avec 3 instances
+    networks:
+      - web
 
   frontend:
     build:
       context: .
-      dockerfile: apps/frontend/dockerfile
-    container_name: frontend
+      dockerfile: apps/frontend/Dockerfile
     depends_on:
       - api-gateway
-    ports:
-      - "8080:80"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`frontend.localhost`)"
+      - "traefik.http.services.frontend.loadbalancer.server.port=80"
+    networks:
+      - web
 
 volumes:
   postgres_data:
+
+networks:
+  web:
+    driver: bridge
