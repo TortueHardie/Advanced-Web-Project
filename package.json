@@ -25,5 +25,8 @@
   "description": "",
   "devDependencies": {
     "turbo": "^2.4.4"
+  },
+  "dependencies": {
+    "@nestjs/microservices": "^11.0.11"
   }
 }
