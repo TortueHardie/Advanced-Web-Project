@@ -1,0 +1,23 @@
+# Utilisation de l'image officielle Node.js
+FROM node:18-alpine
+
+# Définir le répertoire de travail
+WORKDIR /app
+
+# Copier uniquement les fichiers essentiels
+COPY package.json package-lock.json ./
+COPY apps/api-gateway ./apps/api-gateway
+COPY packages ./packages
+COPY turbo.json ./
+
+# Installer les dépendances
+RUN npm install
+
+# Construire l'application
+RUN npm run build --workspace=apps/api-gateway
+
+# Exposer le port de l'API Gateway
+EXPOSE 3000
+
+# Démarrer l'application
+CMD ["npm", "run", "start:prod", "--workspace=apps/api-gateway"]
