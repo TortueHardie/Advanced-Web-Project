@@ -50,7 +50,7 @@ services:
   frontend:
     build:
       context: .
-      dockerfile: apps/frontend/Dockerfile
+      dockerfile: apps/frontend/dockerfile
     depends_on:
       - api-gateway
     ports:
