@@ -1,4 +1,4 @@
-version: '3.8'
+
 services:
   postgres:
     image: postgres:14
@@ -14,20 +14,39 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
 
   api-gateway:
     build:
       context: .
-      dockerfile: apps/api-gateway/Dockerfile
+      dockerfile: apps/api-gateway/dockerfile
     container_name: api-gateway
     depends_on:
       - postgres
+      - user-service
     env_file:
       - .env
     environment:
       DATABASE_URL: ${DATABASE_URL_POSTGRES}
     ports:
       - "3000:3000"
+    networks:
+      - app-network
+
+  user-service:
+    build:
+      context: .
+      dockerfile: apps/user-service/dockerfile
+    container_name: user-service
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: ${DATABASE_URL_POSTGRES}
+    ports:
+      - "3001:3001" # Swagger sera accessible ici
+    networks:
+      - app-network
 
   frontend:
     build:
@@ -38,6 +57,12 @@ services:
       - api-gateway
     ports:
       - "8080:80"
+    networks:
+      - app-network
 
 volumes:
   postgres_data:
+
+networks:
+  app-network:
+    driver: bridge

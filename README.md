@@ -4,6 +4,13 @@ Ce projet utilise Docker Compose pour orchestrer plusieurs applications backend 
 
 ## 📌 Commandes utiles
 
+API GATEWAY
+swagger Api Gateway : http://localhost:3000/docs
+
+USER-SEVICE
+swagger service Utilisateurs accès via proxy : http://localhost:3000/api-docs/user
+swagger service Utilisateurs accès direct : http://localhost:3001/docs
+
 ```sh
 # Lancer les services en mode détaché (background)
 docker compose up -d

@@ -1,23 +1,26 @@
 # Utilisation de l'image officielle Node.js
 FROM node:18-alpine
 
-# Définir le répertoire de travail
+# Définir le répertoire de travail principal au niveau du monorepo
 WORKDIR /app
 
-# Copier uniquement les fichiers essentiels
+# Copier uniquement les fichiers essentiels pour éviter un cache inutile
 COPY package.json package-lock.json ./
+COPY turbo.json ./
 COPY apps/user-service ./apps/user-service
 COPY packages ./packages
-COPY turbo.json ./
 
-# Installer les dépendances
+# Installer toutes les dépendances du monorepo
 RUN npm install
 
-# Construire l'application
-RUN npm run build --workspace=apps/user-service
+# 📌 Se déplacer dans le dossier correct du microservice
+WORKDIR /app/apps/user-service
 
-# Exposer le port de du service user
-EXPOSE 3100
+# Construire l'application NestJS
+RUN npm run build
 
-# Démarrer l'application
-CMD ["npm", "run", "start:prod", "--workspace=apps/user-service"]
+# Exposer le bon port (3001 pour Swagger)
+EXPOSE 3001
+
+# Démarrer l'application en mode production
+CMD ["npm", "run", "start:prod"]
