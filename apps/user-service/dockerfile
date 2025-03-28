@@ -13,6 +13,10 @@ COPY packages ./packages
 # Installer toutes les dépendances du monorepo
 RUN npm install
 
+# Générer le client Prisma du package partagé
+WORKDIR /app/packages/prisma
+RUN npx prisma generate --schema=../../packages/prisma/prisma/schema.prisma
+
 # 📌 Se déplacer dans le dossier correct du microservice
 WORKDIR /app/apps/user-service
 
