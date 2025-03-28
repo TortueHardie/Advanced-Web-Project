@@ -12,27 +12,36 @@ async function bootstrap() {
     .setTitle('API Gateway')
     .setDescription('Documentation centralisée des microservices')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
 
-  // 🔹 Proxy Express pour Swagger du User Service
+  // 🔹 Proxy Express pour les services
   const proxyApp = express();
+  
+  // Proxy pour le service utilisateur
   proxyApp.use('/user', createProxyMiddleware({
-    target: 'http://localhost:3001',
+    target: process.env.USER_SERVICE_URL || 'http://user-service:3001',
     changeOrigin: true,
-    pathRewrite: { '^/api-docs/user': '/docs' }
+    pathRewrite: { '^/user': '/' }
+  }));
+
+  // Proxy pour le service d'authentification
+  proxyApp.use('/auth', createProxyMiddleware({
+    target: process.env.AUTH_SERVICE_URL || 'http://auth-service:3001',
+    changeOrigin: true,
+    pathRewrite: { '^/auth': '/' }
   }));
 
   // Ajout du proxy à NestJS
-  app.use('/api-docs', proxyApp);
+  app.use('/api', proxyApp);
 
-  // Démarrer l'application
-  await app.listen(process.env.PORT ?? 3000);
-  console.log(`🚀 API Gateway démarrée sur le port ${process.env.PORT ?? 3000}`);
-  console.log(`📄 Swagger de la Gateway : http://localhost:${process.env.PORT ?? 3000}/docs`);
-  console.log(`📄 Swagger du User Service via Gateway : http://localhost:${process.env.PORT ?? 3000}/api-docs/user`);
+  // Démarrer l'application sur localhost:3000 pour que Nginx puisse y accéder
+  await app.listen(3000, '0.0.0.0');
+  console.log(`🚀 API Gateway démarrée sur le port 3000`);
+  console.log(`📄 Swagger de la Gateway : http://localhost:3000/docs`);
 }
 
 bootstrap().catch((error) => {
