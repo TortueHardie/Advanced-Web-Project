@@ -13,6 +13,25 @@ USER-SEVICE
 swagger service Utilisateurs accès via proxy : http://localhost:3000/api-docs/user
 swagger service Utilisateurs accès direct : http://localhost:3001/docs
 
+## Routes API
+
+### API Gateway
+- `GET /docs` - Documentation Swagger de l'API Gateway
+- Proxy routes:
+  - `/api/user/*` - Redirige vers le service utilisateur
+  - `/api/auth/*` - Redirige vers le service d'authentification
+
+### Service d'Authentification (Auth Service)
+- `POST /auth/login` - Connexion utilisateur
+- `POST /auth/register` - Inscription utilisateur
+- `POST /auth/verify` - Vérification de la validité d'un token JWT
+- `POST /auth/refresh` - Rafraîchissement d'un token expiré
+- `POST /auth/revoke` - Révocation d'un token
+
+### Service Utilisateur (User Service)
+- `GET /docs` - Documentation Swagger du service utilisateur
+- Microservice TCP disponible sur le port 4001
+
 ## Lancer en dev : 
 ```sh
 npm run start 
@@ -50,7 +69,7 @@ docker compose exec <nom_du_service> <commande>
 # Accéder à un shell interactif dans un conteneur
 docker compose exec <nom_du_service> sh  # (ou bash si disponible)
 
-# Mettre à l’échelle un service pour le load balancing
+# Mettre à l'échelle un service pour le load balancing
 docker compose up -d --scale <nom_du_service>=<nombre_instances>
 
 # Nettoyer les images non utilisées
@@ -74,9 +93,9 @@ docker images            # Lister les images locales
 docker rmi <image_id>    # Supprimer une image
 ```
 📦 Volume Docker
-Un volume Docker est un espace de stockage persistant utilisé par les conteneurs. Contrairement aux fichiers stockés dans un conteneur, un volume n’est pas supprimé quand le conteneur est arrêté ou supprimé.
+Un volume Docker est un espace de stockage persistant utilisé par les conteneurs. Contrairement aux fichiers stockés dans un conteneur, un volume n'est pas supprimé quand le conteneur est arrêté ou supprimé.
 
-Il permet de partager des données entre conteneurs et de préserver les données même après l’arrêt des services.
+Il permet de partager des données entre conteneurs et de préserver les données même après l'arrêt des services.
 ```sh
 ###Commandes utiles :
 docker volume create my_volume    # Créer un volume
@@ -85,11 +104,11 @@ docker volume rm my_volume        # Supprimer un volume
 ```
 
 🌐 Réseau Docker
-Un réseau Docker permet aux conteneurs de communiquer entre eux et avec l’extérieur.
+Un réseau Docker permet aux conteneurs de communiquer entre eux et avec l'extérieur.
 
 Types de réseaux :
 bridge (par défaut) : réseau privé entre les conteneurs.
-host : partage le réseau de l’hôte (pas d’isolation).
+host : partage le réseau de l'hôte (pas d'isolation).
 none : pas de réseau (conteneur totalement isolé).
 overlay : pour connecter plusieurs hôtes Docker.
 
@@ -97,12 +116,12 @@ overlay : pour connecter plusieurs hôtes Docker.
 ###Commandes utiles :
 docker network create my_network         # Créer un réseau
 docker network ls                        # Lister les réseaux
-docker network inspect my_network        # Voir les détails d’un réseau
+docker network inspect my_network        # Voir les détails d'un réseau
 docker network rm my_network             # Supprimer un réseau
 ```
 
-📌 Lancer plusieurs instances d’un service (load balancing)
-Docker Compose permet d’exécuter plusieurs instances d’un même service avec --scale, ce qui est utile pour la répartition de charge :
+📌 Lancer plusieurs instances d'un service (load balancing)
+Docker Compose permet d'exécuter plusieurs instances d'un même service avec --scale, ce qui est utile pour la répartition de charge :
 
 Exemple :
 ```sh
@@ -110,7 +129,7 @@ docker compose up -d --scale backend=3 --scale frontend=2
 ```
 Cela lance 3 instances du backend et 2 instances du frontend.
 
-Modifier le nombre d’instances à la volée :
+Modifier le nombre d'instances à la volée :
 
 ```sh
 docker compose up -d --scale backend=5
