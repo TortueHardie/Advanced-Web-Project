@@ -1,28 +1,148 @@
+// schema.prisma
 generator client {
   provider = "prisma-client-js"
-  output   = "../../../node_modules/.prisma/client"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL_POSTGRES")
+  url      = env("DATABASE_URL")
 }
 
 model User {
-  id            String    @id @default(uuid())
-  email         String    @unique
-  username      String    @unique
-  password      String
-  firstName     String?
-  lastName      String?
-  role          Role      @default(USER)
-  isActive      Boolean   @default(true)
-  lastLogin     DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id             Int          @id @default(autoincrement())
+  email          String       @unique
+  password       String
+  firstName      String
+  lastName       String
+  birthDate      DateTime
+  address        String
+  phoneNumber    String?
+  role           Role
+  referralCode   String?      @unique
+  status         UserStatus   @default(ACTIVE)
+  siret          String?      // Pour restaurateurs
+  iban           String?      // Pour restaurateurs
+  ownedRestaurant Restaurant? // Relation one-to-one avec Restaurant
+  orders         Order[]
+  deliveries     Order[]      @relation("DeliveryAssigned")
+  notifications  Notification[]
+  createdAt      DateTime     @default(now())
 }
 
 enum Role {
-  USER
+  CLIENT
+  LIVREUR
+  RESTAURATEUR
   ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+model Restaurant {
+  id             Int           @id @default(autoincrement())
+  name           String
+  city           String
+  deliveryFees   Float
+  description    String
+  status         RestaurantStatus @default(ACTIVE)
+  menus          Menu[]
+  articles       Article[]
+  owner          User?         @relation(fields: [ownerId], references: [id])
+  ownerId        Int?          @unique
+  orders         Order[]
+}
+
+enum RestaurantStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model Menu {
+  id             Int         @id @default(autoincrement())
+  name           String
+  description    String
+  price          Float
+  restaurantId   Int
+  restaurant     Restaurant  @relation(fields: [restaurantId], references: [id])
+  items          Article[]   @relation("MenuItems")
+}
+
+model Article {
+  id             Int         @id @default(autoincrement())
+  name           String
+  description    String
+  price          Float
+  type           String      // Burger, Tacos, Frites...
+  restaurantId   Int
+  restaurant     Restaurant  @relation(fields: [restaurantId], references: [id])
+  menus          Menu[]      @relation("MenuItems")
+  orderItems     OrderItem[]
+}
+
+model Order {
+  id             Int         @id @default(autoincrement())
+  userId         Int
+  restaurantId   Int
+  deliveryAddress String
+  totalAmount    Float
+  deliveryFees   Float
+  serviceFees    Float
+  status         OrderStatus @default(PENDING)
+  paymentMethod  String
+  timestamps     Json
+  user           User        @relation(fields: [userId], references: [id])
+  restaurant     Restaurant  @relation(fields: [restaurantId], references: [id])
+  orderItems     OrderItem[]
+  deliveryPerson User?       @relation("DeliveryAssigned", fields: [deliveryPersonId], references: [id])
+  deliveryPersonId Int?
+  createdAt      DateTime    @default(now())
+}
+
+model OrderItem {
+  id             Int         @id @default(autoincrement())
+  orderId        Int
+  articleId      Int
+  quantity       Int
+  order          Order       @relation(fields: [orderId], references: [id])
+  article        Article     @relation(fields: [articleId], references: [id])
+}
+
+enum OrderStatus {
+  PENDING
+  ACCEPTED
+  IN_PROGRESS
+  READY
+  DELIVERED
+  CANCELED
+}
+
+model Log {
+  id             Int         @id @default(autoincrement())
+  service        String
+  level          String
+  action         String
+  message        String
+  userId         Int?
+  orderId        Int?
+  metadata       Json?
+  timestamp      DateTime    @default(now())
+}
+
+model Notification {
+  id             Int         @id @default(autoincrement())
+  userId         Int
+  type           String      // email / sms / push
+  template       String
+  content        Json
+  sentAt         DateTime    @default(now())
+  user           User        @relation(fields: [userId], references: [id])
+}
+
+model Config {
+  id             Int         @id @default(autoincrement())
+  key            String      @unique
+  value          String
 }
