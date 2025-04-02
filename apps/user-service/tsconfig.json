@@ -16,6 +16,14 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": false,
     "strictBindCallApply": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@advanced-web/prisma": ["../../../packages/prisma/src"],
+      "@advanced-web/prisma/*": ["../../../packages/prisma/src/*"],
+      "@advanced-web/common": ["../../../packages/common/src"],
+      "@advanced-web/common/*": ["../../../packages/common/src/*"],
+      "@advanced-web/database": ["../../../packages/database/src"],
+      "@advanced-web/database/*": ["../../../packages/database/src/*"]
+    }
   }
 }
