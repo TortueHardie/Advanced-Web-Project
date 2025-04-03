@@ -1,0 +1,14 @@
+
+===== TOKENS DE DÉVELOPPEMENT =====
+
+🧑 Token Utilisateur:
+Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsIm5hbWUiOiJUZXN0IFVzZXIiLCJyb2xlIjoidXNlciIsImlhdCI6MTc0MzY2Njg0MCwiZXhwIjoxNzQzNzUzMjQwfQ.DEV_TEST_SIGNATURE
+
+🍴 Token Restaurant:
+Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEwMCwibmFtZSI6IlJlc3RhdXJhbnQgT3duZXIiLCJyb2xlIjoicmVzdGF1cmFudCIsInJlc3RhdXJhbnRJZCI6MSwiaWF0IjoxNzQzNjY2ODQwLCJleHAiOjE3NDM3NTMyNDB9.DEV_TEST_SIGNATURE
+
+👑 Token Admin:
+Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjk5OSwibmFtZSI6IkFkbWluIFVzZXIiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NDM2NjY4NDAsImV4cCI6MTc0Mzc1MzI0MH0.DEV_TEST_SIGNATURE
+
+=================================
+
