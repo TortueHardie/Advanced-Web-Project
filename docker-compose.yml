@@ -57,14 +57,14 @@ services:
     container_name: api-gateway
     depends_on:
       - postgres
-      - user-service
+      # - user-service
       - auth-service
     env_file:
       - .env
     environment:
       DATABASE_URL: ${DATABASE_URL_POSTGRES}
       AUTH_SERVICE_URL: http://auth-service:3001
-      USER_SERVICE_URL: http://user-service:3001
+      # USER_SERVICE_URL: http://user-service:3001
       NODE_ENV: production
     ports:
       - "3000:3000"
@@ -80,24 +80,24 @@ services:
     volumes:
       - api_gateway_logs:/var/log/nginx
 
-  user-service:
-    build:
-      context: .
-      dockerfile: apps/user-service/Dockerfile
-    container_name: user-service
-    restart: unless-stopped
-    depends_on:
-      - postgres
-    environment:
-      DATABASE_URL: ${DATABASE_URL_POSTGRES}
-    networks:
-      - app-network
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3001/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 10s
+  # user-service:
+  #   build:
+  #     context: .
+  #     dockerfile: apps/user-service/Dockerfile
+  #   container_name: user-service
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - postgres
+  #   environment:
+  #     DATABASE_URL: ${DATABASE_URL_POSTGRES}
+  #   networks:
+  #     - app-network
+  #   healthcheck:
+  #     test: ["CMD", "wget", "--spider", "-q", "http://localhost:3001/health"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 3
+  #     start_period: 10s
 
   frontend:
     build:
