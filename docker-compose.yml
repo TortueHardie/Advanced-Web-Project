@@ -111,10 +111,42 @@ services:
       - app-network
     restart: unless-stopped
 
+  mongodb:
+    image: mongo:latest
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - app-network
+
+  log-service:
+    build:
+      context: .
+      dockerfile: apps/log-service/Dockerfile
+    container_name: log-service
+    restart: unless-stopped
+    depends_on:
+      - mongodb
+    environment:
+      MONGODB_URI: mongodb://mongodb:27017/logs
+    ports:
+      - "3002:3002"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3002/api/v1/logs"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
 volumes:
   postgres_data:
   redis_data:
   api_gateway_logs:
+  mongodb_data:
 
 networks:
   app-network:
