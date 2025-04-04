@@ -1,0 +1,58 @@
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.MenuDto = void 0;
+const swagger_1 = require("@nestjs/swagger");
+const article_dto_1 = require("./article.dto");
+class MenuDto {
+    id;
+    name;
+    description;
+    price;
+    restaurantId;
+    items;
+    createdAt;
+    updatedAt;
+}
+exports.MenuDto = MenuDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Identifiant unique du menu' }),
+    __metadata("design:type", Number)
+], MenuDto.prototype, "id", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Nom du menu' }),
+    __metadata("design:type", String)
+], MenuDto.prototype, "name", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Description du menu' }),
+    __metadata("design:type", String)
+], MenuDto.prototype, "description", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Prix du menu' }),
+    __metadata("design:type", Number)
+], MenuDto.prototype, "price", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'ID du restaurant' }),
+    __metadata("design:type", Number)
+], MenuDto.prototype, "restaurantId", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Articles du menu', type: [article_dto_1.ArticleDto] }),
+    __metadata("design:type", Array)
+], MenuDto.prototype, "items", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Date de création' }),
+    __metadata("design:type", Date)
+], MenuDto.prototype, "createdAt", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Date de mise à jour' }),
+    __metadata("design:type", Date)
+], MenuDto.prototype, "updatedAt", void 0);
+//# sourceMappingURL=menu.dto.js.map
