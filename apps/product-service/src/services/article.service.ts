@@ -1,44 +1,119 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { ArticleRepository } from '../repositories/article.repository';
-import { CreateArticleDto, UpdateArticleDto, ArticleDto } from '../dto';
+import { ArticleDto, CreateArticleDto, UpdateArticleDto } from '../dto';
+import { PrismaService } from '@advanced-web/prisma';
 
 @Injectable()
 export class ArticleService {
-  constructor(private readonly articleRepository: ArticleRepository) {}
+  constructor(
+    private readonly articleRepository: ArticleRepository,
+    private readonly prisma: PrismaService,
+  ) {}
 
   async create(createArticleDto: CreateArticleDto): Promise<ArticleDto> {
+    // Vérifier que le restaurant existe
+    const restaurant = await this.prisma.restaurant.findUnique({
+      where: { id: createArticleDto.restaurantId },
+    });
+
+    if (!restaurant) {
+      throw new BadRequestException(`Le restaurant #${createArticleDto.restaurantId} n'existe pas`);
+    }
+
+    // Vérifier que le stock initial est cohérent avec la disponibilité
+    if (createArticleDto.stock === 0 && createArticleDto.isAvailable) {
+      throw new BadRequestException('Un article ne peut pas être disponible avec un stock de 0');
+    }
+
     return this.articleRepository.create(createArticleDto);
   }
 
-  async findAll(restaurantId: number): Promise<ArticleDto[]> {
-    return this.articleRepository.findAll(restaurantId);
+  async findAll(): Promise<ArticleDto[]> {
+    return this.articleRepository.findAll();
   }
 
   async findOne(id: number): Promise<ArticleDto> {
     const article = await this.articleRepository.findOne(id);
     if (!article) {
-      throw new NotFoundException(`Article with ID ${id} not found`);
+      throw new NotFoundException(`L'article #${id} n'existe pas`);
     }
     return article;
   }
 
   async update(id: number, updateArticleDto: UpdateArticleDto): Promise<ArticleDto> {
-    await this.findOne(id);
+    const article = await this.findOne(id);
+
+    // Vérifier que le stock est cohérent avec la disponibilité
+    if (updateArticleDto.stock !== undefined && updateArticleDto.isAvailable !== undefined) {
+      if (updateArticleDto.stock === 0 && updateArticleDto.isAvailable) {
+        throw new BadRequestException('Un article ne peut pas être disponible avec un stock de 0');
+      }
+    } else if (updateArticleDto.stock !== undefined) {
+      if (updateArticleDto.stock === 0 && article.isAvailable) {
+        throw new BadRequestException('Un article ne peut pas être disponible avec un stock de 0');
+      }
+    } else if (updateArticleDto.isAvailable !== undefined) {
+      if (article.stock === 0 && updateArticleDto.isAvailable) {
+        throw new BadRequestException('Un article ne peut pas être disponible avec un stock de 0');
+      }
+    }
+
     return this.articleRepository.update(id, updateArticleDto);
   }
 
   async remove(id: number): Promise<ArticleDto> {
-    await this.findOne(id);
+    const article = await this.findOne(id);
+
+    // Vérifier si l'article est utilisé dans des menus
+    const menus = await this.prisma.menu.findMany({
+      where: {
+        items: {
+          some: {
+            id: article.id
+          }
+        }
+      }
+    });
+
+    if (menus.length > 0) {
+      throw new BadRequestException(`L'article #${id} est utilisé dans ${menus.length} menu(x) et ne peut pas être supprimé`);
+    }
+
     return this.articleRepository.remove(id);
   }
 
+  async findByMenu(menuId: number): Promise<ArticleDto[]> {
+    // Vérifier que le menu existe
+    const menu = await this.prisma.menu.findUnique({
+      where: { id: menuId },
+    });
+
+    if (!menu) {
+      throw new NotFoundException(`Le menu #${menuId} n'existe pas`);
+    }
+
+    return this.articleRepository.findByMenu(menuId);
+  }
+
   async updateStock(id: number, stock: number): Promise<ArticleDto> {
-    await this.findOne(id);
+    const article = await this.findOne(id);
+
+    // Vérifier que le stock est cohérent avec la disponibilité
+    if (stock === 0 && article.isAvailable) {
+      throw new BadRequestException('Un article ne peut pas être disponible avec un stock de 0');
+    }
+
     return this.articleRepository.updateStock(id, stock);
   }
 
   async updateAvailability(id: number, isAvailable: boolean): Promise<ArticleDto> {
-    await this.findOne(id);
+    const article = await this.findOne(id);
+
+    // Vérifier que la disponibilité est cohérente avec le stock
+    if (article.stock === 0 && isAvailable) {
+      throw new BadRequestException('Un article ne peut pas être disponible avec un stock de 0');
+    }
+
     return this.articleRepository.updateAvailability(id, isAvailable);
   }
 } 

@@ -9,8 +9,13 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RestaurantDto = void 0;
+exports.UpdateRestaurantDto = exports.CreateRestaurantDto = exports.RestaurantDto = exports.RestaurantStatus = void 0;
 const swagger_1 = require("@nestjs/swagger");
+var RestaurantStatus;
+(function (RestaurantStatus) {
+    RestaurantStatus["ACTIVE"] = "ACTIVE";
+    RestaurantStatus["INACTIVE"] = "INACTIVE";
+})(RestaurantStatus || (exports.RestaurantStatus = RestaurantStatus = {}));
 class RestaurantDto {
     id;
     name;
@@ -19,12 +24,10 @@ class RestaurantDto {
     description;
     status;
     ownerId;
-    createdAt;
-    updatedAt;
 }
 exports.RestaurantDto = RestaurantDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Identifiant unique du restaurant' }),
+    (0, swagger_1.ApiProperty)({ description: 'ID du restaurant' }),
     __metadata("design:type", Number)
 ], RestaurantDto.prototype, "id", void 0);
 __decorate([
@@ -44,19 +47,67 @@ __decorate([
     __metadata("design:type", String)
 ], RestaurantDto.prototype, "description", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Statut du restaurant', enum: ['ACTIVE', 'INACTIVE'] }),
+    (0, swagger_1.ApiProperty)({ description: 'Statut du restaurant', enum: RestaurantStatus }),
     __metadata("design:type", String)
 ], RestaurantDto.prototype, "status", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'ID du propriétaire du restaurant' }),
+    (0, swagger_1.ApiProperty)({ description: 'ID du propriétaire', required: false }),
     __metadata("design:type", Number)
 ], RestaurantDto.prototype, "ownerId", void 0);
+class CreateRestaurantDto {
+    name;
+    city;
+    deliveryFees;
+    description;
+    ownerId;
+}
+exports.CreateRestaurantDto = CreateRestaurantDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Date de création' }),
-    __metadata("design:type", Date)
-], RestaurantDto.prototype, "createdAt", void 0);
+    (0, swagger_1.ApiProperty)({ description: 'Nom du restaurant' }),
+    __metadata("design:type", String)
+], CreateRestaurantDto.prototype, "name", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Date de mise à jour' }),
-    __metadata("design:type", Date)
-], RestaurantDto.prototype, "updatedAt", void 0);
+    (0, swagger_1.ApiProperty)({ description: 'Ville du restaurant' }),
+    __metadata("design:type", String)
+], CreateRestaurantDto.prototype, "city", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Frais de livraison' }),
+    __metadata("design:type", Number)
+], CreateRestaurantDto.prototype, "deliveryFees", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Description du restaurant' }),
+    __metadata("design:type", String)
+], CreateRestaurantDto.prototype, "description", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'ID du propriétaire', required: false }),
+    __metadata("design:type", Number)
+], CreateRestaurantDto.prototype, "ownerId", void 0);
+class UpdateRestaurantDto {
+    name;
+    city;
+    deliveryFees;
+    description;
+    status;
+}
+exports.UpdateRestaurantDto = UpdateRestaurantDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Nom du restaurant', required: false }),
+    __metadata("design:type", String)
+], UpdateRestaurantDto.prototype, "name", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Ville du restaurant', required: false }),
+    __metadata("design:type", String)
+], UpdateRestaurantDto.prototype, "city", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Frais de livraison', required: false }),
+    __metadata("design:type", Number)
+], UpdateRestaurantDto.prototype, "deliveryFees", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Description du restaurant', required: false }),
+    __metadata("design:type", String)
+], UpdateRestaurantDto.prototype, "description", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Statut du restaurant', enum: RestaurantStatus, required: false }),
+    __metadata("design:type", String)
+], UpdateRestaurantDto.prototype, "status", void 0);
 //# sourceMappingURL=restaurant.dto.js.map

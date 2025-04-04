@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '@advanced-web/prisma/src/prisma.service';
+import { PrismaService } from '@advanced-web/prisma';
 import { CreateArticleDto, UpdateArticleDto } from '../dto';
 
 @Injectable()
@@ -12,10 +12,8 @@ export class ArticleRepository {
     });
   }
 
-  async findAll(restaurantId: number) {
-    return this.prisma.article.findMany({
-      where: { restaurantId },
-    });
+  async findAll() {
+    return this.prisma.article.findMany();
   }
 
   async findOne(id: number) {
@@ -34,6 +32,18 @@ export class ArticleRepository {
   async remove(id: number) {
     return this.prisma.article.delete({
       where: { id },
+    });
+  }
+
+  async findByMenu(menuId: number) {
+    return this.prisma.article.findMany({
+      where: {
+        menus: {
+          some: {
+            id: menuId
+          }
+        }
+      },
     });
   }
 

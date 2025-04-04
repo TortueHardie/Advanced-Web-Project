@@ -1,0 +1,23 @@
+{
+  "name": "@advanced-web/discovery",
+  "version": "1.0.0",
+  "description": "Service de découverte pour les microservices",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.0.1",
+    "@nestjs/core": "^11.0.1",
+    "axios": "^1.6.7",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.7",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.7.3"
+  }
+} 

@@ -16,6 +16,7 @@ exports.MenuController = void 0;
 const common_1 = require("@nestjs/common");
 const menu_service_1 = require("../services/menu.service");
 const dto_1 = require("../dto");
+const swagger_1 = require("@nestjs/swagger");
 let MenuController = class MenuController {
     menuService;
     constructor(menuService) {
@@ -43,6 +44,13 @@ let MenuController = class MenuController {
 exports.MenuController = MenuController;
 __decorate([
     (0, common_1.Post)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Créer un nouveau menu' }),
+    (0, swagger_1.ApiBody)({ type: dto_1.CreateMenuDto }),
+    (0, swagger_1.ApiResponse)({
+        status: 201,
+        description: 'Menu créé avec succès',
+        type: dto_1.MenuDto
+    }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [dto_1.CreateMenuDto]),
@@ -50,6 +58,17 @@ __decorate([
 ], MenuController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Récupérer tous les menus d\'un restaurant' }),
+    (0, swagger_1.ApiQuery)({
+        name: 'restaurantId',
+        description: 'ID du restaurant',
+        type: Number
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Liste des menus récupérée avec succès',
+        type: [dto_1.MenuDto]
+    }),
     __param(0, (0, common_1.Query)('restaurantId', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
@@ -57,6 +76,17 @@ __decorate([
 ], MenuController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Récupérer un menu par son ID' }),
+    (0, swagger_1.ApiParam)({ name: 'id', description: 'ID du menu' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Menu trouvé',
+        type: dto_1.MenuDto
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 404,
+        description: 'Menu non trouvé'
+    }),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
@@ -64,6 +94,18 @@ __decorate([
 ], MenuController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Patch)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Mettre à jour un menu' }),
+    (0, swagger_1.ApiParam)({ name: 'id', description: 'ID du menu' }),
+    (0, swagger_1.ApiBody)({ type: dto_1.UpdateMenuDto }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Menu mis à jour avec succès',
+        type: dto_1.MenuDto
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 404,
+        description: 'Menu non trouvé'
+    }),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -72,6 +114,17 @@ __decorate([
 ], MenuController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Supprimer un menu' }),
+    (0, swagger_1.ApiParam)({ name: 'id', description: 'ID du menu' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Menu supprimé avec succès',
+        type: dto_1.MenuDto
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 404,
+        description: 'Menu non trouvé'
+    }),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
@@ -79,6 +132,29 @@ __decorate([
 ], MenuController.prototype, "remove", null);
 __decorate([
     (0, common_1.Patch)(':id/availability'),
+    (0, swagger_1.ApiOperation)({ summary: 'Mettre à jour la disponibilité d\'un menu' }),
+    (0, swagger_1.ApiParam)({ name: 'id', description: 'ID du menu' }),
+    (0, swagger_1.ApiBody)({
+        schema: {
+            type: 'object',
+            properties: {
+                isAvailable: {
+                    type: 'boolean',
+                    description: 'Nouvelle valeur de disponibilité',
+                    example: true
+                }
+            }
+        }
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Disponibilité du menu mise à jour avec succès',
+        type: dto_1.MenuDto
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 404,
+        description: 'Menu non trouvé'
+    }),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)('isAvailable')),
     __metadata("design:type", Function),
@@ -86,6 +162,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], MenuController.prototype, "updateAvailability", null);
 exports.MenuController = MenuController = __decorate([
+    (0, swagger_1.ApiTags)('Menus'),
     (0, common_1.Controller)('menus'),
     __metadata("design:paramtypes", [menu_service_1.MenuService])
 ], MenuController);

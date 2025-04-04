@@ -11,19 +11,19 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MenuRepository = void 0;
 const common_1 = require("@nestjs/common");
-const prisma_service_1 = require("@advanced-web/prisma/src/prisma.service");
+const prisma_1 = require("@advanced-web/prisma");
 let MenuRepository = class MenuRepository {
     prisma;
     constructor(prisma) {
         this.prisma = prisma;
     }
     async create(data) {
-        const { articleIds, ...menuData } = data;
+        const { itemIds, ...menuData } = data;
         return this.prisma.menu.create({
             data: {
                 ...menuData,
                 items: {
-                    connect: articleIds.map(id => ({ id })),
+                    connect: itemIds.map(id => ({ id })),
                 },
             },
             include: {
@@ -31,9 +31,8 @@ let MenuRepository = class MenuRepository {
             },
         });
     }
-    async findAll(restaurantId) {
+    async findAll() {
         return this.prisma.menu.findMany({
-            where: { restaurantId },
             include: {
                 items: true,
             },
@@ -48,14 +47,16 @@ let MenuRepository = class MenuRepository {
         });
     }
     async update(id, data) {
-        const { articleIds, ...menuData } = data;
+        const { itemIds, ...menuData } = data;
         return this.prisma.menu.update({
             where: { id },
             data: {
                 ...menuData,
-                items: articleIds ? {
-                    set: articleIds.map(id => ({ id })),
-                } : undefined,
+                ...(itemIds && {
+                    items: {
+                        set: itemIds.map(id => ({ id })),
+                    },
+                }),
             },
             include: {
                 items: true,
@@ -65,18 +66,23 @@ let MenuRepository = class MenuRepository {
     async remove(id) {
         return this.prisma.menu.delete({
             where: { id },
+            include: {
+                items: true,
+            },
         });
     }
-    async updateAvailability(id, isAvailable) {
-        return this.prisma.menu.update({
-            where: { id },
-            data: { isAvailable },
+    async findByRestaurant(restaurantId) {
+        return this.prisma.menu.findMany({
+            where: { restaurantId },
+            include: {
+                items: true,
+            },
         });
     }
 };
 exports.MenuRepository = MenuRepository;
 exports.MenuRepository = MenuRepository = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [prisma_1.PrismaService])
 ], MenuRepository);
 //# sourceMappingURL=menu.repository.js.map

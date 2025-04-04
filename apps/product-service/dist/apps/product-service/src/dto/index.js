@@ -15,12 +15,6 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./restaurant.dto"), exports);
-__exportStar(require("./create-restaurant.dto"), exports);
-__exportStar(require("./update-restaurant.dto"), exports);
 __exportStar(require("./menu.dto"), exports);
-__exportStar(require("./create-menu.dto"), exports);
-__exportStar(require("./update-menu.dto"), exports);
 __exportStar(require("./article.dto"), exports);
-__exportStar(require("./create-article.dto"), exports);
-__exportStar(require("./update-article.dto"), exports);
 //# sourceMappingURL=index.js.map

@@ -11,6 +11,7 @@ const common_1 = require("@nestjs/common");
 const restaurant_controller_1 = require("./controllers/restaurant.controller");
 const menu_controller_1 = require("./controllers/menu.controller");
 const article_controller_1 = require("./controllers/article.controller");
+const health_controller_1 = require("./controllers/health.controller");
 const restaurant_service_1 = require("./services/restaurant.service");
 const menu_service_1 = require("./services/menu.service");
 const article_service_1 = require("./services/article.service");
@@ -25,7 +26,12 @@ exports.ProductModule = ProductModule;
 exports.ProductModule = ProductModule = __decorate([
     (0, common_1.Module)({
         imports: [prisma_1.PrismaModule, discovery_1.DiscoveryModule],
-        controllers: [restaurant_controller_1.RestaurantController, menu_controller_1.MenuController, article_controller_1.ArticleController],
+        controllers: [
+            restaurant_controller_1.RestaurantController,
+            menu_controller_1.MenuController,
+            article_controller_1.ArticleController,
+            health_controller_1.HealthController
+        ],
         providers: [
             restaurant_service_1.RestaurantService,
             menu_service_1.MenuService,

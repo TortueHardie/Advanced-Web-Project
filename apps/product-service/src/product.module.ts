@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { RestaurantController } from './controllers/restaurant.controller';
 import { MenuController } from './controllers/menu.controller';
 import { ArticleController } from './controllers/article.controller';
+import { HealthController } from './controllers/health.controller';
 import { RestaurantService } from './services/restaurant.service';
 import { MenuService } from './services/menu.service';
 import { ArticleService } from './services/article.service';
@@ -13,7 +14,12 @@ import { DiscoveryModule } from '@advanced-web/discovery';
 
 @Module({
   imports: [PrismaModule, DiscoveryModule],
-  controllers: [RestaurantController, MenuController, ArticleController],
+  controllers: [
+    RestaurantController,
+    MenuController,
+    ArticleController,
+    HealthController
+  ],
   providers: [
     RestaurantService,
     MenuService,

@@ -5,8 +5,17 @@ export declare class ArticleDto {
     price: number;
     type: string;
     restaurantId: number;
-    stock: number;
-    isAvailable: boolean;
-    createdAt: Date;
-    updatedAt: Date;
+}
+export declare class CreateArticleDto {
+    name: string;
+    description: string;
+    price: number;
+    type: string;
+    restaurantId: number;
+}
+export declare class UpdateArticleDto {
+    name?: string;
+    description?: string;
+    price?: number;
+    type?: string;
 }

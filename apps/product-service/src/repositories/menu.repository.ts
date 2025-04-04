@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '@advanced-web/prisma/src/prisma.service';
+import { PrismaService } from '@advanced-web/prisma';
 import { CreateMenuDto, UpdateMenuDto } from '../dto';
 
 @Injectable()
@@ -7,12 +7,12 @@ export class MenuRepository {
   constructor(private prisma: PrismaService) {}
 
   async create(data: CreateMenuDto) {
-    const { articleIds, ...menuData } = data;
+    const { itemIds, ...menuData } = data;
     return this.prisma.menu.create({
       data: {
         ...menuData,
         items: {
-          connect: articleIds.map(id => ({ id })),
+          connect: itemIds.map(id => ({ id })),
         },
       },
       include: {
@@ -21,9 +21,8 @@ export class MenuRepository {
     });
   }
 
-  async findAll(restaurantId: number) {
+  async findAll() {
     return this.prisma.menu.findMany({
-      where: { restaurantId },
       include: {
         items: true,
       },
@@ -40,14 +39,16 @@ export class MenuRepository {
   }
 
   async update(id: number, data: UpdateMenuDto) {
-    const { articleIds, ...menuData } = data;
+    const { itemIds, ...menuData } = data;
     return this.prisma.menu.update({
       where: { id },
       data: {
         ...menuData,
-        items: articleIds ? {
-          set: articleIds.map(id => ({ id })),
-        } : undefined,
+        ...(itemIds && {
+          items: {
+            set: itemIds.map(id => ({ id })),
+          },
+        }),
       },
       include: {
         items: true,
@@ -58,13 +59,18 @@ export class MenuRepository {
   async remove(id: number) {
     return this.prisma.menu.delete({
       where: { id },
+      include: {
+        items: true,
+      },
     });
   }
 
-  async updateAvailability(id: number, isAvailable: boolean) {
-    return this.prisma.menu.update({
-      where: { id },
-      data: { isAvailable },
+  async findByRestaurant(restaurantId: number) {
+    return this.prisma.menu.findMany({
+      where: { restaurantId },
+      include: {
+        items: true,
+      },
     });
   }
 } 

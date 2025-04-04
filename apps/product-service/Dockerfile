@@ -36,6 +36,6 @@ RUN npm run build --workspace=apps/product-service
 
 WORKDIR /app/apps/product-service
 
-EXPOSE 3001
+EXPOSE 3002
 
 CMD ["npm", "run", "start:prod"] 

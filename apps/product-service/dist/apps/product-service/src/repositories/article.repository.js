@@ -11,7 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ArticleRepository = void 0;
 const common_1 = require("@nestjs/common");
-const prisma_service_1 = require("@advanced-web/prisma/src/prisma.service");
+const prisma_1 = require("@advanced-web/prisma");
 let ArticleRepository = class ArticleRepository {
     prisma;
     constructor(prisma) {
@@ -22,10 +22,8 @@ let ArticleRepository = class ArticleRepository {
             data,
         });
     }
-    async findAll(restaurantId) {
-        return this.prisma.article.findMany({
-            where: { restaurantId },
-        });
+    async findAll() {
+        return this.prisma.article.findMany();
     }
     async findOne(id) {
         return this.prisma.article.findUnique({
@@ -43,22 +41,15 @@ let ArticleRepository = class ArticleRepository {
             where: { id },
         });
     }
-    async updateStock(id, stock) {
-        return this.prisma.article.update({
-            where: { id },
-            data: { stock },
-        });
-    }
-    async updateAvailability(id, isAvailable) {
-        return this.prisma.article.update({
-            where: { id },
-            data: { isAvailable },
+    async findByRestaurant(restaurantId) {
+        return this.prisma.article.findMany({
+            where: { restaurantId },
         });
     }
 };
 exports.ArticleRepository = ArticleRepository;
 exports.ArticleRepository = ArticleRepository = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [prisma_1.PrismaService])
 ], ArticleRepository);
 //# sourceMappingURL=article.repository.js.map

@@ -21,19 +21,20 @@ export class ArticleController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Récupérer tous les articles d\'un restaurant' })
+  @ApiOperation({ summary: 'Récupérer tous les articles d\'un menu' })
   @ApiQuery({ 
-    name: 'restaurantId', 
-    description: 'ID du restaurant',
-    type: Number 
+    name: 'menuId', 
+    description: 'ID du menu',
+    type: Number,
+    required: true
   })
   @ApiResponse({ 
     status: 200, 
     description: 'Liste des articles récupérée avec succès',
     type: [ArticleDto]
   })
-  async findAll(@Query('restaurantId', ParseIntPipe) restaurantId: number): Promise<ArticleDto[]> {
-    return this.articleService.findAll(restaurantId);
+  async findAll(@Query('menuId', ParseIntPipe) menuId: number): Promise<ArticleDto[]> {
+    return this.articleService.findByMenu(menuId);
   }
 
   @Get(':id')

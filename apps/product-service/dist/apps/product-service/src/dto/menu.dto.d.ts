@@ -6,6 +6,17 @@ export declare class MenuDto {
     price: number;
     restaurantId: number;
     items: ArticleDto[];
-    createdAt: Date;
-    updatedAt: Date;
+}
+export declare class CreateMenuDto {
+    name: string;
+    description: string;
+    price: number;
+    restaurantId: number;
+    itemIds: number[];
+}
+export declare class UpdateMenuDto {
+    name?: string;
+    description?: string;
+    price?: number;
+    itemIds?: number[];
 }

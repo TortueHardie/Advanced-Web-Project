@@ -1,11 +1,27 @@
+export declare enum RestaurantStatus {
+    ACTIVE = "ACTIVE",
+    INACTIVE = "INACTIVE"
+}
 export declare class RestaurantDto {
     id: number;
     name: string;
     city: string;
     deliveryFees: number;
     description: string;
-    status: string;
-    ownerId: number;
-    createdAt: Date;
-    updatedAt: Date;
+    status: RestaurantStatus;
+    ownerId?: number;
+}
+export declare class CreateRestaurantDto {
+    name: string;
+    city: string;
+    deliveryFees: number;
+    description: string;
+    ownerId?: number;
+}
+export declare class UpdateRestaurantDto {
+    name?: string;
+    city?: string;
+    deliveryFees?: number;
+    description?: string;
+    status?: RestaurantStatus;
 }

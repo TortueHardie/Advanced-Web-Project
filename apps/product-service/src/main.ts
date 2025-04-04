@@ -4,6 +4,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { DiscoveryService } from '@advanced-web/discovery';
 import { Express } from 'express';
+import { HttpExceptionFilter } from './filters/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(ProductModule);
@@ -16,6 +17,7 @@ async function bootstrap() {
     .addTag('Restaurants')
     .addTag('Menus')
     .addTag('Articles')
+    .addTag('Health')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   
@@ -29,8 +31,15 @@ async function bootstrap() {
   // Exposer l'interface Swagger
   SwaggerModule.setup('api', app, document);
 
-  app.useGlobalPipes(new ValidationPipe());
+  // Configuration globale
+  app.useGlobalPipes(new ValidationPipe({
+    transform: true,
+    whitelist: true,
+    forbidNonWhitelisted: true,
+  }));
+  app.useGlobalFilters(new HttpExceptionFilter());
   app.enableCors();
+
   await app.listen(3002);
 
   // Enregistrement auprès du service de découverte

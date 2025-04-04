@@ -20,13 +20,13 @@ let ArticleService = class ArticleService {
     async create(createArticleDto) {
         return this.articleRepository.create(createArticleDto);
     }
-    async findAll(restaurantId) {
-        return this.articleRepository.findAll(restaurantId);
+    async findAll() {
+        return this.articleRepository.findAll();
     }
     async findOne(id) {
         const article = await this.articleRepository.findOne(id);
         if (!article) {
-            throw new common_1.NotFoundException(`Article with ID ${id} not found`);
+            throw new common_1.NotFoundException(`Article #${id} non trouvé`);
         }
         return article;
     }
@@ -37,6 +37,9 @@ let ArticleService = class ArticleService {
     async remove(id) {
         await this.findOne(id);
         return this.articleRepository.remove(id);
+    }
+    async findByRestaurant(restaurantId) {
+        return this.articleRepository.findByRestaurant(restaurantId);
     }
     async updateStock(id, stock) {
         await this.findOne(id);
