@@ -9,22 +9,37 @@ RUN npm install -g @nestjs/cli
 # Copy root package files and install dependencies
 COPY package*.json ./
 COPY tsconfig*.json ./
-RUN npm install
+COPY turbo.json ./
 
-# Copy prisma package and schema
+# Copier les packages locaux avant l'installation
 COPY ./packages/ ./packages/
 
-# Generate Prisma client
-RUN npx prisma generate --schema=./packages/prisma/prisma/schema.prisma
+# Installer les dépendances à la racine
+RUN npm install
 
 # Copy user-service
 COPY ./apps/user-service ./apps/user-service
 
-# Create directory for PrismaService
+# Installer les dépendances manquantes manuellement dans le service utilisateur
+WORKDIR /usr/src/app/apps/user-service
+RUN npm install @nestjs/swagger bcrypt @types/bcrypt class-validator swagger-ui-express
+
+# Retourner à la racine pour générer Prisma
+WORKDIR /usr/src/app
+
+# Generate Prisma client
+RUN npx prisma generate --schema=./packages/prisma/prisma/schema.prisma
+
+# Modifications du fichier main.ts pour s'assurer que le service écoute sur toutes les interfaces
+RUN sed -i 's/host: '"'"'127.0.0.1'"'"'/host: '"'"'0.0.0.0'"'"'/' ./apps/user-service/src/main.ts
+RUN sed -i 's/await httpApp\.listen(3001)/await httpApp\.listen(3001, "0.0.0.0")/' ./apps/user-service/src/main.ts
+
+# Create directory for PrismaService if not exists
 RUN mkdir -p /usr/src/app/apps/user-service/src/prisma
 
-# Create a modified version of the PrismaService
-RUN echo 'import { Injectable, OnModuleInit, OnModuleDestroy } from "@nestjs/common";\n\
+# Create a modified version of the PrismaService if not exists
+RUN if [ ! -f /usr/src/app/apps/user-service/src/prisma/prisma.service.ts ]; then \
+    echo 'import { Injectable, OnModuleInit, OnModuleDestroy } from "@nestjs/common";\n\
 import { PrismaClient } from "@prisma/client";\n\
 \n\
 @Injectable()\n\
@@ -36,83 +51,20 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
   async onModuleDestroy() {\n\
     await this.$disconnect();\n\
   }\n\
-}' > /usr/src/app/apps/user-service/src/prisma/prisma.service.ts
+}' > /usr/src/app/apps/user-service/src/prisma/prisma.service.ts; \
+fi
 
-# Create an index file to export the service
-RUN echo 'export * from "./prisma.service";' > /usr/src/app/apps/user-service/src/prisma/index.ts
-
-# Create a modified version of the repository that directly uses PrismaClient
-RUN echo 'import { Injectable } from "@nestjs/common";\n\
-import { PrismaClient } from "@prisma/client";\n\
-import { User, Prisma } from "@prisma/client";\n\
-\n\
-@Injectable()\n\
-export class UserRepository {\n\
-  private prisma: PrismaClient;\n\
-\n\
-  constructor() {\n\
-    this.prisma = new PrismaClient();\n\
-  }\n\
-\n\
-  async create(data: Prisma.UserCreateInput): Promise<User> {\n\
-    return this.prisma.user.create({\n\
-      data,\n\
-    });\n\
-  }\n\
-\n\
-  async findAll(): Promise<User[]> {\n\
-    return this.prisma.user.findMany();\n\
-  }\n\
-\n\
-  async findOne(id: number): Promise<User | null> {\n\
-    return this.prisma.user.findUnique({\n\
-      where: { id },\n\
-    });\n\
-  }\n\
-\n\
-  async findByEmail(email: string): Promise<User | null> {\n\
-    return this.prisma.user.findUnique({\n\
-      where: { email },\n\
-    });\n\
-  }\n\
-\n\
-  async update(id: number, data: Prisma.UserUpdateInput): Promise<User> {\n\
-    return this.prisma.user.update({\n\
-      where: { id },\n\
-      data,\n\
-    });\n\
-  }\n\
-\n\
-  async remove(id: number): Promise<User> {\n\
-    return this.prisma.user.delete({\n\
-      where: { id },\n\
-    });\n\
-  }\n\
-\n\
-  async updateLastLogin(id: string | number): Promise<User> {\n\
-    const numericId = typeof id === "string" ? parseInt(id, 10) : id;\n\
-    return this.prisma.user.update({\n\
-      where: { id: numericId },\n\
-      data: {},\n\
-    });\n\
-  }\n\
-}' > /usr/src/app/apps/user-service/src/repositories/user.repository.ts
-
-# Create a simplified app.module.ts file
-RUN echo 'import { Module } from "@nestjs/common";\n\
-import { UserController } from "./controllers/user.controller";\n\
-import { UserService } from "./services/user.service";\n\
-import { UserRepository } from "./repositories/user.repository";\n\
-\n\
-@Module({\n\
-  imports: [],\n\
-  controllers: [UserController],\n\
-  providers: [UserService, UserRepository],\n\
-})\n\
-export class AppModule {}' > /usr/src/app/apps/user-service/src/app.module.ts
+# Create an index file to export the service if not exists
+RUN if [ ! -f /usr/src/app/apps/user-service/src/prisma/index.ts ]; then \
+    echo 'export * from "./prisma.service";' > /usr/src/app/apps/user-service/src/prisma/index.ts; \
+fi
 
 # Change working directory to user-service
 WORKDIR /usr/src/app/apps/user-service
+
+# Exposer le port
+EXPOSE 3001
+EXPOSE 4001
 
 # Run the service
 CMD ["npm", "run", "start:dev"] 

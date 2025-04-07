@@ -20,7 +20,7 @@ export class UserRepository {
     return this.prisma.user.findMany();
   }
 
-  async findOne(id: number): Promise<User | null> {
+  async findOne(id: string): Promise<User | null> {
     return this.prisma.user.findUnique({
       where: { id },
     });
@@ -32,27 +32,23 @@ export class UserRepository {
     });
   }
 
-  async update(id: number, data: Prisma.UserUpdateInput): Promise<User> {
+  async update(id: string, data: Prisma.UserUpdateInput): Promise<User> {
     return this.prisma.user.update({
       where: { id },
       data,
     });
   }
 
-  async remove(id: number): Promise<User> {
+  async remove(id: string): Promise<User> {
     return this.prisma.user.delete({
       where: { id },
     });
   }
 
-  async updateLastLogin(id: string | number): Promise<User> {
-    const numericId = typeof id === 'string' ? parseInt(id, 10) : id;
+  async updateLastLogin(id: string): Promise<User> {
     return this.prisma.user.update({
-      where: { id: numericId },
+      where: { id },
       data: {
-        // Mettre à jour toute donnée nécessaire pour le dernier login
-        // Par exemple, nous pourrions ajouter un champ lastLoginAt dans le schéma
-        // Comme il n'existe pas dans le schéma actuel, nous ne mettons à jour aucun champ spécifique
       }
     });
   }

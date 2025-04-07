@@ -57,7 +57,7 @@ export class UserController {
   @ApiParam({ name: 'id', description: 'ID de l\'utilisateur' })
   @ApiResponse({ status: 200, description: 'Utilisateur trouvé', type: UserDto })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })
-  async findOne(@Param('id', ParseIntPipe) id: number): Promise<UserDto> {
+  async findOne(@Param('id', ParseIntPipe) id: string): Promise<UserDto> {
     return this.userService.findOne(id);
   }
 
@@ -67,7 +67,7 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'Utilisateur mis à jour', type: UserDto })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })
   @ApiResponse({ status: 409, description: 'Email déjà existant' })
-  async update(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto): Promise<UserDto> {
+  async update(@Param('id', ParseIntPipe) id: string, @Body() updateUserDto: UpdateUserDto): Promise<UserDto> {
     return this.userService.update(id, updateUserDto);
   }
 
@@ -77,14 +77,14 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'Utilisateur supprimé', type: UserDto })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })
   @HttpCode(HttpStatus.OK)
-  async remove(@Param('id', ParseIntPipe) id: number): Promise<UserDto> {
+  async remove(@Param('id', ParseIntPipe) id: string): Promise<UserDto> {
     return this.userService.remove(id);
   }
 
   // Méthodes pour communication entre microservices
 
   @MessagePattern({ cmd: 'find_user_by_id' })
-  async findUserById(id: number): Promise<UserDto | null> {
+  async findUserById(id: string): Promise<UserDto | null> {
     try {
       return await this.userService.findOne(id);
     } catch (error) {
@@ -113,13 +113,13 @@ export class UserController {
   }
 
   @MessagePattern({ cmd: 'update_user' })
-  async updateUser(data: { id: number, [key: string]: any }): Promise<UserDto> {
+  async updateUser(data: { id: string, [key: string]: any }): Promise<UserDto> {
     const { id, ...updateUserDto } = data;
     return this.userService.update(id, updateUserDto);
   }
 
   @MessagePattern({ cmd: 'remove_user' })
-  async removeUser(id: number): Promise<UserDto> {
+  async removeUser(id: string): Promise<UserDto> {
     return this.userService.remove(id);
   }
 

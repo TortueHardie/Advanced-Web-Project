@@ -9,7 +9,7 @@ datasource db {
 }
 
 model User {
-  id             Int          @id @default(autoincrement())
+  id             String       @id @default(uuid())
   email          String       @unique
   password       String
   firstName      String
@@ -42,7 +42,7 @@ enum UserStatus {
 }
 
 model Restaurant {
-  id             Int           @id @default(autoincrement())
+  id             String        @id @default(uuid())
   name           String
   city           String
   deliveryFees   Float
@@ -51,7 +51,7 @@ model Restaurant {
   menus          Menu[]
   articles       Article[]
   owner          User?         @relation(fields: [ownerId], references: [id])
-  ownerId        Int?          @unique
+  ownerId        String?       @unique
   orders         Order[]
 }
 
@@ -61,31 +61,31 @@ enum RestaurantStatus {
 }
 
 model Menu {
-  id             Int         @id @default(autoincrement())
+  id             String       @id @default(uuid())
   name           String
   description    String
   price          Float
-  restaurantId   Int
+  restaurantId   String
   restaurant     Restaurant  @relation(fields: [restaurantId], references: [id])
   items          Article[]   @relation("MenuItems")
 }
 
 model Article {
-  id             Int         @id @default(autoincrement())
+  id             String      @id @default(uuid())
   name           String
   description    String
   price          Float
   type           String      // Burger, Tacos, Frites...
-  restaurantId   Int
+  restaurantId   String
   restaurant     Restaurant  @relation(fields: [restaurantId], references: [id])
   menus          Menu[]      @relation("MenuItems")
   orderItems     OrderItem[]
 }
 
 model Order {
-  id             Int         @id @default(autoincrement())
-  userId         Int
-  restaurantId   Int
+  id             String         @id @default(uuid())
+  userId         String
+  restaurantId   String
   deliveryAddress String
   totalAmount    Float
   deliveryFees   Float
@@ -97,14 +97,14 @@ model Order {
   restaurant     Restaurant  @relation(fields: [restaurantId], references: [id])
   orderItems     OrderItem[]
   deliveryPerson User?       @relation("DeliveryAssigned", fields: [deliveryPersonId], references: [id])
-  deliveryPersonId Int?
+  deliveryPersonId String?
   createdAt      DateTime    @default(now())
 }
 
 model OrderItem {
-  id             Int         @id @default(autoincrement())
-  orderId        Int
-  articleId      Int
+  id             String         @id @default(uuid())
+  orderId        String
+  articleId      String
   quantity       Int
   order          Order       @relation(fields: [orderId], references: [id])
   article        Article     @relation(fields: [articleId], references: [id])
@@ -120,20 +120,20 @@ enum OrderStatus {
 }
 
 model Log {
-  id             Int         @id @default(autoincrement())
+  id             String      @id @default(uuid())
   service        String
   level          String
   action         String
   message        String
-  userId         Int?
-  orderId        Int?
+  userId         String?
+  orderId        String?
   metadata       Json?
   timestamp      DateTime    @default(now())
 }
 
 model Notification {
-  id             Int         @id @default(autoincrement())
-  userId         Int
+  id             String      @id @default(uuid())
+  userId         String
   type           String      // email / sms / push
   template       String
   content        Json
@@ -142,7 +142,7 @@ model Notification {
 }
 
 model Config {
-  id             Int         @id @default(autoincrement())
+  id             String      @id @default(uuid())
   key            String      @unique
   value          String
 }

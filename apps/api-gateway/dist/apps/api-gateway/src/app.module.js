@@ -10,11 +10,14 @@ exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const axios_1 = require("@nestjs/axios");
 const config_1 = require("@nestjs/config");
+const core_1 = require("@nestjs/core");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const auth_service_1 = require("./services/auth.service");
 const auth_controller_1 = require("./controllers/auth.controller");
 const user_controller_1 = require("./controllers/user.controller");
+const order_controller_1 = require("./controllers/order.controller");
+const http_exception_filter_1 = require("../../../packages/common/src/error-handling/http-exception.filter");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -26,8 +29,15 @@ exports.AppModule = AppModule = __decorate([
                 isGlobal: true,
             }),
         ],
-        controllers: [app_controller_1.AppController, auth_controller_1.AuthController, user_controller_1.UserController],
-        providers: [app_service_1.AppService, auth_service_1.AuthService],
+        controllers: [app_controller_1.AppController, auth_controller_1.AuthController, user_controller_1.UserController, order_controller_1.OrderController],
+        providers: [
+            app_service_1.AppService,
+            auth_service_1.AuthService,
+            {
+                provide: core_1.APP_FILTER,
+                useClass: http_exception_filter_1.GlobalExceptionFilter,
+            }
+        ],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

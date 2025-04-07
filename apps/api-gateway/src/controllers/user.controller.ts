@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Put, Param, Delete, HttpException, HttpStatus, Headers, UnauthorizedException } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody, ApiBearerAuth, ApiHeader } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 
@@ -62,7 +62,6 @@ export class UserController {
   @Get()
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Récupérer tous les utilisateurs' })
-  @ApiHeader({ name: 'Authorization', description: 'Token JWT (Bearer)', required: true })
   @ApiResponse({ status: 200, description: 'Liste des utilisateurs récupérée' })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
   async findAll(@Headers('authorization') authHeader: string) {
@@ -73,7 +72,6 @@ export class UserController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Récupérer un utilisateur par ID' })
   @ApiParam({ name: 'id', description: 'ID de l\'utilisateur' })
-  @ApiHeader({ name: 'Authorization', description: 'Token JWT (Bearer)', required: true })
   @ApiResponse({ status: 200, description: 'Utilisateur récupéré' })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })
@@ -85,7 +83,6 @@ export class UserController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Mettre à jour un utilisateur' })
   @ApiParam({ name: 'id', description: 'ID de l\'utilisateur' })
-  @ApiHeader({ name: 'Authorization', description: 'Token JWT (Bearer)', required: true })
   @ApiBody({ description: 'Informations à mettre à jour' })
   @ApiResponse({ status: 200, description: 'Utilisateur mis à jour' })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
@@ -98,7 +95,6 @@ export class UserController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Supprimer un utilisateur' })
   @ApiParam({ name: 'id', description: 'ID de l\'utilisateur' })
-  @ApiHeader({ name: 'Authorization', description: 'Token JWT (Bearer)', required: true })
   @ApiResponse({ status: 200, description: 'Utilisateur supprimé' })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })
@@ -119,7 +115,6 @@ export class UserController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Récupérer un utilisateur par email' })
   @ApiParam({ name: 'email', description: 'Email de l\'utilisateur' })
-  @ApiHeader({ name: 'Authorization', description: 'Token JWT (Bearer)', required: true })
   @ApiResponse({ status: 200, description: 'Utilisateur récupéré' })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })
