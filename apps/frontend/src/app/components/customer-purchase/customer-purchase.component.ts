@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RestaurantCardComponent } from '../../restaurant-card/restaurant-card.component';
-import { SearchService } from '../../../services/search.service';
+import { RestaurantCardComponent } from '../restaurant-card/restaurant-card.component';
+import { SearchService } from '../../services/search.service';
 import { Observable, map, of, combineLatest } from 'rxjs';
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
@@ -17,17 +17,17 @@ interface Restaurant {
 }
 
 @Component({
-  selector: 'app-main',
+  selector: 'app-customer-purchase',
   standalone: true,
   imports: [
     CommonModule, 
     RestaurantCardComponent,
     MatIconModule
   ],
-  templateUrl: './main.component.html',
-  styleUrls: ['./main.component.scss']
+  templateUrl: './customer-purchase.component.html',
+  styleUrls: ['./customer-purchase.component.scss']
 })
-export class MainComponent implements OnInit {
+export class CustomerPurchaseComponent implements OnInit {
   restaurants: Restaurant[] = [
     {
       id: '1',

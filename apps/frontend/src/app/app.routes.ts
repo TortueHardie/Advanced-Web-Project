@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { MainComponent } from './components/layout/main/main.component';
+import { CustomerPurchaseComponent } from './components/customer-purchase/customer-purchase.component';
 import { ProfileComponent } from './components/profile/profile.component';
 import { ProfileUpdateComponent } from './components/profile/profile-update/profile-update.component';
 import { OrdersComponent } from './components/orders/orders.component';
@@ -12,17 +12,13 @@ import { RestaurateurItemUpdateComponent } from './components/restaurateur-item-
 import { RestaurateurMenuUpdateComponent } from './components/restaurateur-menu-update/restaurateur-menu-update.component';
 import { StatisticsComponent } from './components/statistics/statistics.component';
 import { RestaurateurOrdersComponent } from './components/restaurateur-orders/restaurateur-orders.component';
+import { LoginComponent } from './pages/login/login.component';
 
 export const routes: Routes = [
-  { path: '', component: MainComponent },
-  { 
-    path: 'login', 
-    loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent)
-  },
-  { 
-    path: 'register', 
-    loadComponent: () => import('./pages/register/register.component').then(m => m.RegisterComponent)
-  },
+  { path: '', component: LoginComponent },
+  { path: 'login', loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent) },
+  { path: 'register', loadComponent: () => import('./pages/register/register.component').then(m => m.RegisterComponent) },
+  { path: 'customer-purchase', component: CustomerPurchaseComponent },
   { path: 'compte', component: ProfileComponent },
   { path: 'compte/modifier', component: ProfileUpdateComponent },
   { path: 'commandes', component: OrdersComponent },
