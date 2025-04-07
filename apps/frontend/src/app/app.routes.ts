@@ -1,0 +1,22 @@
+import { Routes } from '@angular/router';
+import { MainComponent } from './components/layout/main/main.component';
+import { ProfileComponent } from './components/profile/profile.component';
+import { ProfileUpdateComponent } from './components/profile/profile-update/profile-update.component';
+import { OrdersComponent } from './components/orders/orders.component';
+import { OrderViewComponent } from './components/orders/order-view/order-view.component';
+import { CartComponent } from './components/cart/cart.component';
+import { CheckoutComponent } from './components/checkout/checkout.component';
+import { OrderConfirmationComponent } from './components/order-confirmation/order-confirmation.component';
+import { RestaurantDetailComponent } from './components/restaurant-detail/restaurant-detail.component';
+
+export const routes: Routes = [
+  { path: '', component: MainComponent },
+  { path: 'compte', component: ProfileComponent },
+  { path: 'compte/modifier', component: ProfileUpdateComponent },
+  { path: 'commandes', component: OrdersComponent },
+  { path: 'commandes/:id', component: OrderViewComponent },
+  { path: 'checkout', component: CheckoutComponent },
+  { path: 'order-confirmation', component: OrderConfirmationComponent },
+  { path: 'restaurant/:id', component: RestaurantDetailComponent},
+  { path: '**', redirectTo: '' }
+];
