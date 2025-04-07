@@ -11,6 +11,7 @@ import { RestaurantDetailComponent } from './components/restaurant-detail/restau
 import { RestaurateurItemUpdateComponent } from './components/restaurateur-item-update/restaurateur-item-update.component';
 import { RestaurateurMenuUpdateComponent } from './components/restaurateur-menu-update/restaurateur-menu-update.component';
 import { StatisticsComponent } from './components/statistics/statistics.component';
+import { RestaurateurOrdersComponent } from './components/restaurateur-orders/restaurateur-orders.component';
 
 export const routes: Routes = [
   { path: '', component: MainComponent },
@@ -25,6 +26,7 @@ export const routes: Routes = [
   { path: 'restaurateur/article/:id', component: RestaurateurItemUpdateComponent },
   { path: 'restaurateur/menu/nouveau', component: RestaurateurMenuUpdateComponent },
   { path: 'restaurateur/menu/:id', component: RestaurateurMenuUpdateComponent },
+  { path: 'restaurateur/commandes', component: RestaurateurOrdersComponent },
   { path: 'statistics', component: StatisticsComponent },
   { path: '**', redirectTo: '' }
 ];
