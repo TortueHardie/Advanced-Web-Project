@@ -10,6 +10,7 @@ import { OrderConfirmationComponent } from './components/order-confirmation/orde
 import { RestaurantDetailComponent } from './components/restaurant-detail/restaurant-detail.component';
 import { RestaurateurItemUpdateComponent } from './components/restaurateur-item-update/restaurateur-item-update.component';
 import { RestaurateurMenuUpdateComponent } from './components/restaurateur-menu-update/restaurateur-menu-update.component';
+import { StatisticsComponent } from './components/statistics/statistics.component';
 
 export const routes: Routes = [
   { path: '', component: MainComponent },
@@ -24,5 +25,6 @@ export const routes: Routes = [
   { path: 'restaurateur/article/:id', component: RestaurateurItemUpdateComponent },
   { path: 'restaurateur/menu/nouveau', component: RestaurateurMenuUpdateComponent },
   { path: 'restaurateur/menu/:id', component: RestaurateurMenuUpdateComponent },
+  { path: 'statistics', component: StatisticsComponent },
   { path: '**', redirectTo: '' }
 ];
