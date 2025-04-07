@@ -57,14 +57,14 @@ services:
     container_name: api-gateway
     depends_on:
       - postgres
-      - user-service
+      # - user-service
       - auth-service
     env_file:
       - .env
     environment:
       DATABASE_URL: ${DATABASE_URL_POSTGRES}
       AUTH_SERVICE_URL: http://auth-service:3001
-      USER_SERVICE_URL: http://user-service:3001
+      # USER_SERVICE_URL: http://user-service:3001
       NODE_ENV: production
     ports:
       - "3000:3000"
