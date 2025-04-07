@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatSelectModule } from '@angular/material/select';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { Statistics, RevenueDataPoint } from '../../models/statistics.model';
 
@@ -11,13 +12,16 @@ import { Statistics, RevenueDataPoint } from '../../models/statistics.model';
   imports: [
     CommonModule, 
     MatCardModule, 
-    MatSelectModule, 
+    MatSelectModule,
+    MatProgressSpinnerModule,
     NgxChartsModule
   ],
   templateUrl: './statistics.component.html',
-  styleUrls: ['./statistics.component.scss']
+  styleUrls: ['./statistics.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class StatisticsComponent implements OnInit {
+  isLoading = true;
   statistics: Statistics = {
     currentMonth: {
       revenue: 12349.59,
@@ -30,18 +34,12 @@ export class StatisticsComponent implements OnInit {
       { month: 'Mar', revenue: 65000, orders: 550 },
       { month: 'Apr', revenue: 52000, orders: 230 },
       { month: 'May', revenue: 45000, orders: 250 },
-      { month: 'Jun', revenue: 48000, orders: 580 },
-      { month: 'Jul', revenue: 53000, orders: 640 },
-      { month: 'Aug', revenue: 40000, orders: 580 },
-      { month: 'Sep', revenue: 47000, orders: 520 },
-      { month: 'Oct', revenue: 45000, orders: 280 },
-      { month: 'Nov', revenue: 43000, orders: 260 },
-      { month: 'Dec', revenue: 25000, orders: 320 }
+      { month: 'Jun', revenue: 48000, orders: 580 }
     ]
   };
 
   // Chart options
-  view: [number, number] = [800, 400];
+  view: [number, number] = [600, 300];
   showXAxis = true;
   showYAxis = true;
   gradient = false;
@@ -50,7 +48,7 @@ export class StatisticsComponent implements OnInit {
   xAxisLabel = 'Month';
   showYAxisLabel = true;
   yAxisLabel = 'Revenue (€)';
-  timeline = true;
+  timeline = false;
 
   colorScheme: string = 'cool';
 
@@ -74,7 +72,17 @@ export class StatisticsComponent implements OnInit {
     ];
   }
 
-  constructor() {}
+  constructor(private cdr: ChangeDetectorRef) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    // Simulate data loading
+    setTimeout(() => {
+      this.isLoading = false;
+      this.cdr.markForCheck();
+    }, 100);
+  }
+
+  onSelect(event: any) {
+    // Handle selection events
+  }
 } 
