@@ -8,6 +8,8 @@ import { CartComponent } from './components/cart/cart.component';
 import { CheckoutComponent } from './components/checkout/checkout.component';
 import { OrderConfirmationComponent } from './components/order-confirmation/order-confirmation.component';
 import { RestaurantDetailComponent } from './components/restaurant-detail/restaurant-detail.component';
+import { RestaurateurItemUpdateComponent } from './components/restaurateur-item-update/restaurateur-item-update.component';
+import { RestaurateurMenuUpdateComponent } from './components/restaurateur-menu-update/restaurateur-menu-update.component';
 
 export const routes: Routes = [
   { path: '', component: MainComponent },
@@ -17,6 +19,10 @@ export const routes: Routes = [
   { path: 'commandes/:id', component: OrderViewComponent },
   { path: 'checkout', component: CheckoutComponent },
   { path: 'order-confirmation', component: OrderConfirmationComponent },
-  { path: 'restaurant/:id', component: RestaurantDetailComponent},
+  { path: 'restaurant/:id', component: RestaurantDetailComponent },
+  { path: 'restaurateur/article/nouveau', component: RestaurateurItemUpdateComponent },
+  { path: 'restaurateur/article/:id', component: RestaurateurItemUpdateComponent },
+  { path: 'restaurateur/menu/nouveau', component: RestaurateurMenuUpdateComponent },
+  { path: 'restaurateur/menu/:id', component: RestaurateurMenuUpdateComponent },
   { path: '**', redirectTo: '' }
 ];
