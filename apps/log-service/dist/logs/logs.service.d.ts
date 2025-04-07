@@ -9,4 +9,5 @@ export declare class LogsService {
         to?: Date;
         service?: string;
     }): Promise<Log[]>;
+    update(id: string, updateData: Partial<Log>): Promise<Log>;
 }

@@ -45,6 +45,15 @@ let LogsService = class LogsService {
         }
         return this.logModel.find(filter).sort({ timestamp: -1 }).exec();
     }
+    async update(id, updateData) {
+        const updatedLog = await this.logModel
+            .findByIdAndUpdate(id, updateData, { new: true })
+            .exec();
+        if (!updatedLog) {
+            throw new common_1.NotFoundException(`Log with ID "${id}" not found`);
+        }
+        return updatedLog;
+    }
 };
 exports.LogsService = LogsService;
 exports.LogsService = LogsService = __decorate([

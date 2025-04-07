@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Log, LogDocument } from '../schemas/log.schema';
@@ -35,5 +35,17 @@ export class LogsService {
     }
     
     return this.logModel.find(filter).sort({ timestamp: -1 }).exec();
+  }
+
+  async update(id: string, updateData: Partial<Log>): Promise<Log> {
+    const updatedLog = await this.logModel
+      .findByIdAndUpdate(id, updateData, { new: true })
+      .exec();
+    
+    if (!updatedLog) {
+      throw new NotFoundException(`Log with ID "${id}" not found`);
+    }
+    
+    return updatedLog;
   }
 } 

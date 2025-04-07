@@ -14,7 +14,10 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LogsController = void 0;
 const common_1 = require("@nestjs/common");
+const swagger_1 = require("@nestjs/swagger");
 const logs_service_1 = require("./logs.service");
+const log_schema_1 = require("../schemas/log.schema");
+const update_log_dto_1 = require("./dto/update-log.dto");
 let LogsController = class LogsController {
     logsService;
     constructor(logsService) {
@@ -46,10 +49,25 @@ let LogsController = class LogsController {
         }
         return this.logsService.findAll(query);
     }
+    async update(id, updateLogDto) {
+        try {
+            return await this.logsService.update(id, updateLogDto);
+        }
+        catch (error) {
+            if (error instanceof common_1.NotFoundException) {
+                throw error;
+            }
+            throw error;
+        }
+    }
 };
 exports.LogsController = LogsController;
 __decorate([
     (0, common_1.Post)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Créer un nouveau log' }),
+    (0, swagger_1.ApiBody)({ type: log_schema_1.Log, description: 'Données du log à créer' }),
+    (0, swagger_1.ApiResponse)({ status: 201, description: 'Log créé avec succès', type: log_schema_1.Log }),
+    (0, swagger_1.ApiResponse)({ status: 400, description: 'Données invalides' }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
@@ -57,6 +75,8 @@ __decorate([
 ], LogsController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Récupérer tous les logs avec filtrage optionnel' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Liste des logs', type: [log_schema_1.Log] }),
     __param(0, (0, common_1.Query)('from')),
     __param(1, (0, common_1.Query)('to')),
     __param(2, (0, common_1.Query)('service')),
@@ -66,13 +86,30 @@ __decorate([
 ], LogsController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)('export'),
+    (0, swagger_1.ApiOperation)({ summary: 'Exporter les logs avec filtrage optionnel' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Liste des logs exportés', type: [log_schema_1.Log] }),
     __param(0, (0, common_1.Query)('from')),
     __param(1, (0, common_1.Query)('to')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], LogsController.prototype, "exportLogs", null);
+__decorate([
+    (0, common_1.Patch)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Mettre à jour un log par ID' }),
+    (0, swagger_1.ApiParam)({ name: 'id', description: 'ID du log à mettre à jour' }),
+    (0, swagger_1.ApiBody)({ type: update_log_dto_1.UpdateLogDto, description: 'Données à mettre à jour' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Log mis à jour avec succès', type: log_schema_1.Log }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Log non trouvé' }),
+    (0, swagger_1.ApiResponse)({ status: 400, description: 'Données invalides' }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, update_log_dto_1.UpdateLogDto]),
+    __metadata("design:returntype", Promise)
+], LogsController.prototype, "update", null);
 exports.LogsController = LogsController = __decorate([
+    (0, swagger_1.ApiTags)('logs'),
     (0, common_1.Controller)('api/v1/logs'),
     __metadata("design:paramtypes", [logs_service_1.LogsService])
 ], LogsController);
