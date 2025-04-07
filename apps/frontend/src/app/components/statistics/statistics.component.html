@@ -3,9 +3,11 @@
 
   <div class="period-selector">
     <mat-form-field>
-      <mat-select value="current">
+      <mat-label>Période</mat-label>
+      <mat-select [value]="selectedPeriod" (selectionChange)="onPeriodChange($event.value)">
         <mat-option value="current">Ce mois-ci</mat-option>
-        <mat-option value="last">Le mois dernier</mat-option>
+        <mat-option value="last3">3 derniers mois</mat-option>
+        <mat-option value="last6">6 derniers mois</mat-option>
         <mat-option value="year">Cette année</mat-option>
       </mat-select>
     </mat-form-field>
@@ -16,6 +18,7 @@
       <mat-card-content>
         <h2>Chiffre d'affaire</h2>
         <p class="stat-value">+ {{statistics.currentMonth.revenue | number:'1.2-2'}} €</p>
+        <p class="stat-period">{{getPeriodLabel()}}</p>
       </mat-card-content>
     </mat-card>
 
@@ -23,6 +26,7 @@
       <mat-card-content>
         <h2>Nombre de commandes</h2>
         <p class="stat-value">{{statistics.currentMonth.orderCount}}</p>
+        <p class="stat-period">{{getPeriodLabel()}}</p>
       </mat-card-content>
     </mat-card>
 
@@ -30,13 +34,14 @@
       <mat-card-content>
         <h2>Valeur moyenne du ticket</h2>
         <p class="stat-value">{{statistics.currentMonth.averageTicket | number:'1.2-2'}} €</p>
+        <p class="stat-period">{{getPeriodLabel()}}</p>
       </mat-card-content>
     </mat-card>
   </div>
 
   <mat-card class="chart-card">
     <mat-card-content>
-      <h2>Revenue Analysis</h2>
+      <h2>Analyse des revenus</h2>
       <div class="chart-container" *ngIf="!isLoading">
         <ngx-charts-line-chart
           [results]="chartData"
