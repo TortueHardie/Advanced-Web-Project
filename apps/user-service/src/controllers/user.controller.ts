@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Delete, Put, HttpCode, HttpStatus, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Put, HttpCode, HttpStatus, NotFoundException, ParseIntPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { UserService } from '../services/user.service';
 import { CreateUserDto, UpdateUserDto, UserDto } from '../dto';
@@ -13,7 +13,7 @@ export class UserController {
   @ApiOperation({ summary: 'Créer un nouvel utilisateur' })
   @ApiResponse({ status: 201, description: 'Utilisateur créé avec succès', type: UserDto })
   @ApiResponse({ status: 400, description: 'Données invalides' })
-  @ApiResponse({ status: 409, description: 'Email ou nom d\'utilisateur déjà existant' })
+  @ApiResponse({ status: 409, description: 'Email déjà existant' })
   async create(@Body() createUserDto: CreateUserDto): Promise<UserDto> {
     return this.userService.create(createUserDto);
   }
@@ -30,7 +30,7 @@ export class UserController {
   @ApiParam({ name: 'id', description: 'ID de l\'utilisateur' })
   @ApiResponse({ status: 200, description: 'Utilisateur trouvé', type: UserDto })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })
-  async findOne(@Param('id') id: string): Promise<UserDto> {
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<UserDto> {
     return this.userService.findOne(id);
   }
 
@@ -39,8 +39,8 @@ export class UserController {
   @ApiParam({ name: 'id', description: 'ID de l\'utilisateur' })
   @ApiResponse({ status: 200, description: 'Utilisateur mis à jour', type: UserDto })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })
-  @ApiResponse({ status: 409, description: 'Email ou nom d\'utilisateur déjà existant' })
-  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto): Promise<UserDto> {
+  @ApiResponse({ status: 409, description: 'Email déjà existant' })
+  async update(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto): Promise<UserDto> {
     return this.userService.update(id, updateUserDto);
   }
 
@@ -50,14 +50,14 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'Utilisateur supprimé', type: UserDto })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })
   @HttpCode(HttpStatus.OK)
-  async remove(@Param('id') id: string): Promise<UserDto> {
+  async remove(@Param('id', ParseIntPipe) id: number): Promise<UserDto> {
     return this.userService.remove(id);
   }
 
   // Méthodes pour communication entre microservices
 
   @MessagePattern({ cmd: 'find_user_by_id' })
-  async findUserById(id: string): Promise<UserDto | null> {
+  async findUserById(id: number): Promise<UserDto | null> {
     try {
       return await this.userService.findOne(id);
     } catch (error) {
@@ -86,19 +86,14 @@ export class UserController {
   }
 
   @MessagePattern({ cmd: 'update_user' })
-  async updateUser(data: { id: string, [key: string]: any }): Promise<UserDto> {
+  async updateUser(data: { id: number, [key: string]: any }): Promise<UserDto> {
     const { id, ...updateUserDto } = data;
     return this.userService.update(id, updateUserDto);
   }
 
   @MessagePattern({ cmd: 'remove_user' })
-  async removeUser(id: string): Promise<UserDto> {
+  async removeUser(id: number): Promise<UserDto> {
     return this.userService.remove(id);
-  }
-
-  @MessagePattern({ cmd: 'update_last_login' })
-  async updateLastLogin(id: string): Promise<UserDto> {
-    return this.userService.updateLastLogin(id);
   }
 
   @MessagePattern({ cmd: 'create_user' })

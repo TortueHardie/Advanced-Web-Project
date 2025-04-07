@@ -2,14 +2,30 @@ import { Injectable, NotFoundException, ConflictException } from '@nestjs/common
 import { CreateUserDto, UpdateUserDto, UserDto } from '../dto';
 import { UserRepository } from '../repositories/user.repository';
 import * as bcrypt from 'bcrypt';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
 
-  private excludePassword(user: any): UserDto {
+  private excludePassword(user: User): UserDto {
     const { password, ...userWithoutPassword } = user;
-    return userWithoutPassword;
+    const userDto: UserDto = {
+      id: userWithoutPassword.id,
+      email: userWithoutPassword.email,
+      firstName: userWithoutPassword.firstName,
+      lastName: userWithoutPassword.lastName,
+      birthDate: userWithoutPassword.birthDate,
+      address: userWithoutPassword.address,
+      phoneNumber: userWithoutPassword.phoneNumber || undefined,
+      role: userWithoutPassword.role,
+      referralCode: userWithoutPassword.referralCode || undefined,
+      status: userWithoutPassword.status,
+      siret: userWithoutPassword.siret || undefined,
+      iban: userWithoutPassword.iban || undefined,
+      createdAt: userWithoutPassword.createdAt,
+    };
+    return userDto;
   }
 
   async create(createUserDto: CreateUserDto): Promise<UserDto> {
@@ -19,19 +35,16 @@ export class UserService {
       throw new ConflictException('Email already exists');
     }
 
-    // Vérifier si le nom d'utilisateur existe déjà
-    const usernameExists = await this.userRepository.findByUsername(createUserDto.username);
-    if (usernameExists) {
-      throw new ConflictException('Username already exists');
-    }
-
     // Hasher le mot de passe
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
 
-    // Créer l'utilisateur avec le mot de passe hashé
+    // Créer l'utilisateur avec le mot de passe hashé et les champs requis
     const user = await this.userRepository.create({
       ...createUserDto,
       password: hashedPassword,
+      birthDate: new Date(createUserDto.birthDate),
+      role: createUserDto.role,
+      address: createUserDto.address,
     });
 
     return this.excludePassword(user);
@@ -42,7 +55,7 @@ export class UserService {
     return users.map(user => this.excludePassword(user));
   }
 
-  async findOne(id: string): Promise<UserDto> {
+  async findOne(id: number): Promise<UserDto> {
     const user = await this.userRepository.findOne(id);
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
@@ -58,7 +71,7 @@ export class UserService {
     return this.excludePassword(user);
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto): Promise<UserDto> {
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<UserDto> {
     // Vérifier si l'utilisateur existe
     await this.findOne(id);
 
@@ -72,14 +85,6 @@ export class UserService {
       }
     }
 
-    // Si le nom d'utilisateur est mis à jour, vérifier s'il existe déjà
-    if (updateUserDto.username) {
-      const usernameExists = await this.userRepository.findByUsername(updateUserDto.username);
-      if (usernameExists && usernameExists.id !== id) {
-        throw new ConflictException('Username already exists');
-      }
-    }
-
     // Hasher le mot de passe si présent
     if (updateUserDto.password) {
       updatedFields.password = await bcrypt.hash(updateUserDto.password, 10);
@@ -89,7 +94,7 @@ export class UserService {
     return this.excludePassword(updatedUser);
   }
 
-  async remove(id: string): Promise<UserDto> {
+  async remove(id: number): Promise<UserDto> {
     // Vérifier si l'utilisateur existe
     await this.findOne(id);
 

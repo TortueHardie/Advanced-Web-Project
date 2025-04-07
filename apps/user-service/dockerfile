@@ -61,5 +61,5 @@ RUN npm install --omit=dev
 # Exposer le port du service
 EXPOSE 3001
 
-# Démarrer l'application
-CMD ["node", "dist/src/main.js"]
+# Démarrer l'application avec find pour résoudre le bon chemin
+CMD ["sh", "-c", "find /app -name 'main.js' | xargs echo 'Found main.js at:' && node $(find /app -name 'main.js' | head -1)"]
