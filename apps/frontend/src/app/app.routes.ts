@@ -31,6 +31,6 @@ export const routes: Routes = [
   { path: 'restaurateur/menu/nouveau', component: RestaurateurMenuUpdateComponent },
   { path: 'restaurateur/menu/:id', component: RestaurateurMenuUpdateComponent },
   { path: 'restaurateur/commandes', component: RestaurateurOrdersComponent },
-  { path: 'statistics', component: StatisticsComponent },
+  { path: 'restaurateur/statistiques', component: StatisticsComponent },
   { path: '**', redirectTo: '' }
 ];
