@@ -11,7 +11,8 @@ build/
 # Environment
 .env
 .env.local
-.env.*.local
+.env.*
+!.env.example
 
 # Logs
 logs/
@@ -27,3 +28,21 @@ npm-debug.log*
 # OS
 .DS_Store
 Thumbs.db 
+
+# Tests
+/coverage
+/.nyc_output
+
+# Generated Prisma files
+/prisma/migrations/
+/prisma/generated/
+/prisma/*.db
+/prisma/*.db-journal
+
+# Cache
+.eslintcache
+.cache/
+.npm/
+
+# Nest.js
+.nest/ 
