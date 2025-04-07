@@ -65,6 +65,10 @@
     gap: 8px;
     min-width: 200px;
     justify-content: flex-end;
+
+    button[routerLink="/login"] {
+      color: black;
+    }
   }
 
   /* Mobile styles */
