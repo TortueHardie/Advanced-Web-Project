@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '@advanced-web/prisma/src/prisma.service';
+import { PrismaService } from '@advanced-web/prisma';
 import { CreateRestaurantDto, UpdateRestaurantDto } from '../dto';
 
 @Injectable()
@@ -24,6 +24,16 @@ export class RestaurantRepository {
   async findOne(id: number) {
     return this.prisma.restaurant.findUnique({
       where: { id },
+      include: {
+        menus: true,
+        articles: true,
+      },
+    });
+  }
+
+  async findByName(name: string) {
+    return this.prisma.restaurant.findFirst({
+      where: { name },
       include: {
         menus: true,
         articles: true,

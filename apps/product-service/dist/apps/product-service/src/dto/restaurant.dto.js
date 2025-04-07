@@ -11,6 +11,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UpdateRestaurantDto = exports.CreateRestaurantDto = exports.RestaurantDto = exports.RestaurantStatus = void 0;
 const swagger_1 = require("@nestjs/swagger");
+const menu_dto_1 = require("./menu.dto");
+const article_dto_1 = require("./article.dto");
 var RestaurantStatus;
 (function (RestaurantStatus) {
     RestaurantStatus["ACTIVE"] = "ACTIVE";
@@ -24,6 +26,8 @@ class RestaurantDto {
     description;
     status;
     ownerId;
+    menus;
+    articles;
 }
 exports.RestaurantDto = RestaurantDto;
 __decorate([
@@ -54,6 +58,14 @@ __decorate([
     (0, swagger_1.ApiProperty)({ description: 'ID du propriétaire', required: false }),
     __metadata("design:type", Number)
 ], RestaurantDto.prototype, "ownerId", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Menus du restaurant', type: [menu_dto_1.MenuDto], required: false }),
+    __metadata("design:type", Array)
+], RestaurantDto.prototype, "menus", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Articles du restaurant', type: [article_dto_1.ArticleDto], required: false }),
+    __metadata("design:type", Array)
+], RestaurantDto.prototype, "articles", void 0);
 class CreateRestaurantDto {
     name;
     city;

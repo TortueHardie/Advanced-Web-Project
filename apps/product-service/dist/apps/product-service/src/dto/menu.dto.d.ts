@@ -6,6 +6,7 @@ export declare class MenuDto {
     price: number;
     restaurantId: number;
     items: ArticleDto[];
+    isAvailable: boolean;
 }
 export declare class CreateMenuDto {
     name: string;
@@ -13,10 +14,12 @@ export declare class CreateMenuDto {
     price: number;
     restaurantId: number;
     itemIds: number[];
+    isAvailable?: boolean;
 }
 export declare class UpdateMenuDto {
     name?: string;
     description?: string;
     price?: number;
     itemIds?: number[];
+    isAvailable?: boolean;
 }

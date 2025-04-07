@@ -18,29 +18,46 @@ let MenuService = class MenuService {
         this.menuRepository = menuRepository;
     }
     async create(createMenuDto) {
-        return this.menuRepository.create(createMenuDto);
+        const menu = await this.menuRepository.create(createMenuDto);
+        return this.mapToDto(menu);
     }
     async findAll(restaurantId) {
-        return this.menuRepository.findAll(restaurantId);
+        let menus;
+        if (restaurantId) {
+            menus = await this.menuRepository.findByRestaurant(restaurantId);
+        }
+        else {
+            menus = await this.menuRepository.findAll();
+        }
+        return menus.map(menu => this.mapToDto(menu));
     }
     async findOne(id) {
         const menu = await this.menuRepository.findOne(id);
         if (!menu) {
             throw new common_1.NotFoundException(`Menu with ID ${id} not found`);
         }
-        return menu;
+        return this.mapToDto(menu);
     }
     async update(id, updateMenuDto) {
         await this.findOne(id);
-        return this.menuRepository.update(id, updateMenuDto);
+        const menu = await this.menuRepository.update(id, updateMenuDto);
+        return this.mapToDto(menu);
     }
     async remove(id) {
         await this.findOne(id);
-        return this.menuRepository.remove(id);
+        const menu = await this.menuRepository.remove(id);
+        return this.mapToDto(menu);
     }
     async updateAvailability(id, isAvailable) {
         await this.findOne(id);
-        return this.menuRepository.updateAvailability(id, isAvailable);
+        const menu = await this.menuRepository.update(id, { isAvailable });
+        return this.mapToDto(menu);
+    }
+    mapToDto(menu) {
+        return {
+            ...menu,
+            isAvailable: menu.isAvailable ?? true
+        };
     }
 };
 exports.MenuService = MenuService;

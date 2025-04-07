@@ -19,6 +19,9 @@ export class MenuDto {
 
   @ApiProperty({ description: 'Articles inclus dans le menu', type: [ArticleDto] })
   items: ArticleDto[];
+
+  @ApiProperty({ description: 'Disponibilité du menu' })
+  isAvailable: boolean;
 }
 
 export class CreateMenuDto {
@@ -36,6 +39,9 @@ export class CreateMenuDto {
 
   @ApiProperty({ description: 'IDs des articles à inclure dans le menu', type: [Number] })
   itemIds: number[];
+
+  @ApiProperty({ description: 'Disponibilité du menu', default: true })
+  isAvailable?: boolean;
 }
 
 export class UpdateMenuDto {
@@ -50,4 +56,7 @@ export class UpdateMenuDto {
 
   @ApiProperty({ description: 'IDs des articles à inclure dans le menu', type: [Number], required: false })
   itemIds?: number[];
+
+  @ApiProperty({ description: 'Disponibilité du menu', required: false })
+  isAvailable?: boolean;
 } 

@@ -18,29 +18,55 @@ let RestaurantService = class RestaurantService {
         this.restaurantRepository = restaurantRepository;
     }
     async create(createRestaurantDto) {
-        return this.restaurantRepository.create(createRestaurantDto);
+        try {
+            const restaurant = await this.restaurantRepository.create(createRestaurantDto);
+            return this.mapToDto(restaurant);
+        }
+        catch (error) {
+            throw new common_1.BadRequestException('Failed to create restaurant', error);
+        }
     }
     async findAll() {
-        return this.restaurantRepository.findAll();
+        const restaurants = await this.restaurantRepository.findAll();
+        return restaurants.map(restaurant => this.mapToDto(restaurant));
     }
     async findOne(id) {
         const restaurant = await this.restaurantRepository.findOne(id);
         if (!restaurant) {
             throw new common_1.NotFoundException(`Restaurant with ID ${id} not found`);
         }
-        return restaurant;
+        return this.mapToDto(restaurant);
     }
     async update(id, updateRestaurantDto) {
         await this.findOne(id);
-        return this.restaurantRepository.update(id, updateRestaurantDto);
+        const restaurant = await this.restaurantRepository.update(id, updateRestaurantDto);
+        return this.mapToDto(restaurant);
     }
     async remove(id) {
         await this.findOne(id);
-        return this.restaurantRepository.remove(id);
+        const restaurant = await this.restaurantRepository.remove(id);
+        return this.mapToDto(restaurant);
     }
     async findMenus(restaurantId) {
         await this.findOne(restaurantId);
-        return this.restaurantRepository.findMenus(restaurantId);
+        const menus = await this.restaurantRepository.findMenus(restaurantId);
+        return menus.map(menu => ({
+            ...menu,
+            isAvailable: true
+        }));
+    }
+    mapToDto(restaurant) {
+        return {
+            id: restaurant.id,
+            name: restaurant.name,
+            description: restaurant.description,
+            city: restaurant.city,
+            deliveryFees: restaurant.deliveryFees,
+            status: restaurant.status,
+            ownerId: restaurant.ownerId,
+            menus: restaurant.menus,
+            articles: restaurant.articles
+        };
     }
 };
 exports.RestaurantService = RestaurantService;

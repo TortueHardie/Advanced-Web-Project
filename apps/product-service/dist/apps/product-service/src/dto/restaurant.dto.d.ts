@@ -1,3 +1,5 @@
+import { MenuDto } from './menu.dto';
+import { ArticleDto } from './article.dto';
 export declare enum RestaurantStatus {
     ACTIVE = "ACTIVE",
     INACTIVE = "INACTIVE"
@@ -10,6 +12,8 @@ export declare class RestaurantDto {
     description: string;
     status: RestaurantStatus;
     ownerId?: number;
+    menus?: MenuDto[];
+    articles?: ArticleDto[];
 }
 export declare class CreateRestaurantDto {
     name: string;

@@ -13,14 +13,40 @@ async function bootstrap() {
     .setDescription('Documentation centralisée des microservices')
     .setVersion('1.0')
     .addBearerAuth()
+    .addTag('Restaurants', 'Gestion des restaurants')
+    .addTag('Menus', 'Gestion des menus')
+    .addTag('Articles', 'Gestion des articles')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('docs', app, document);
+  SwaggerModule.setup('docs', app, document, {
+    customSiteTitle: 'Advanced Web Project API',
+    customfavIcon: 'https://nestjs.com/img/favicon.png',
+    customJs: [
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-bundle.min.js',
+    ],
+    customCssUrl: [
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.min.css',
+    ],
+    swaggerOptions: {
+      persistAuthorization: true,
+      docExpansion: 'none',
+      filter: true,
+      showExtensions: true,
+      showCommonExtensions: true,
+      deepLinking: true,
+      displayRequestDuration: true,
+    },
+  });
 
   // 🔹 Proxy Express pour les services
   const proxyApp = express();
   
+  // Endpoint de santé
+  proxyApp.get('/health', (req, res) => {
+    res.status(200).json({ status: 'ok' });
+  });
+
   // Proxy pour le service utilisateur
   proxyApp.use('/user', createProxyMiddleware({
     target: process.env.USER_SERVICE_URL || 'http://user-service:3001',
@@ -33,6 +59,13 @@ async function bootstrap() {
     target: process.env.AUTH_SERVICE_URL || 'http://auth-service:3001',
     changeOrigin: true,
     pathRewrite: { '^/auth': '/' }
+  }));
+
+  // Proxy pour le service de produits
+  proxyApp.use('/product', createProxyMiddleware({
+    target: process.env.PRODUCT_SERVICE_URL || 'http://product-service:3002',
+    changeOrigin: true,
+    pathRewrite: { '^/product': '/' }
   }));
 
   // Ajout du proxy à NestJS

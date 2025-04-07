@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UpdateRestaurantDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
+const client_1 = require("@prisma/client");
 class UpdateRestaurantDto {
     name;
     city;
@@ -45,8 +46,8 @@ __decorate([
     __metadata("design:type", String)
 ], UpdateRestaurantDto.prototype, "description", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Statut du restaurant', enum: ['ACTIVE', 'INACTIVE'], required: false }),
-    (0, class_validator_1.IsString)(),
+    (0, swagger_1.ApiProperty)({ description: 'Statut du restaurant', enum: client_1.RestaurantStatus, required: false }),
+    (0, class_validator_1.IsEnum)(client_1.RestaurantStatus),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], UpdateRestaurantDto.prototype, "status", void 0);

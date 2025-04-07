@@ -23,6 +23,9 @@ async function bootstrap() {
         res.setHeader('Content-Type', 'application/json');
         res.send(document);
     });
+    expressApp.get('/health', (req, res) => {
+        res.status(200).json({ status: 'ok' });
+    });
     swagger_1.SwaggerModule.setup('api', app, document);
     app.useGlobalPipes(new common_1.ValidationPipe({
         transform: true,

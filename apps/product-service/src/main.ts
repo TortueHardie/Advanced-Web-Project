@@ -27,6 +27,11 @@ async function bootstrap() {
     res.setHeader('Content-Type', 'application/json');
     res.send(document);
   });
+
+  // Endpoint de santé
+  expressApp.get('/health', (req, res) => {
+    res.status(200).json({ status: 'ok' });
+  });
   
   // Exposer l'interface Swagger
   SwaggerModule.setup('api', app, document);
@@ -34,8 +39,8 @@ async function bootstrap() {
   // Configuration globale
   app.useGlobalPipes(new ValidationPipe({
     transform: true,
-    whitelist: true,
-    forbidNonWhitelisted: true,
+    whitelist: false,
+    forbidNonWhitelisted: false,
   }));
   app.useGlobalFilters(new HttpExceptionFilter());
   app.enableCors();

@@ -41,9 +41,27 @@ let ArticleRepository = class ArticleRepository {
             where: { id },
         });
     }
-    async findByRestaurant(restaurantId) {
+    async findByMenu(menuId) {
         return this.prisma.article.findMany({
-            where: { restaurantId },
+            where: {
+                menus: {
+                    some: {
+                        id: menuId
+                    }
+                }
+            },
+        });
+    }
+    async updateStock(id, stock) {
+        return this.prisma.article.update({
+            where: { id },
+            data: { stock },
+        });
+    }
+    async updateAvailability(id, isAvailable) {
+        return this.prisma.article.update({
+            where: { id },
+            data: { isAvailable },
         });
     }
 };

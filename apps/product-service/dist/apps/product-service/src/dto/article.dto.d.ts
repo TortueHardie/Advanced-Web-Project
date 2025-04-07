@@ -5,6 +5,8 @@ export declare class ArticleDto {
     price: number;
     type: string;
     restaurantId: number;
+    stock: number;
+    isAvailable: boolean;
 }
 export declare class CreateArticleDto {
     name: string;
@@ -12,10 +14,14 @@ export declare class CreateArticleDto {
     price: number;
     type: string;
     restaurantId: number;
+    stock: number;
+    isAvailable: boolean;
 }
 export declare class UpdateArticleDto {
     name?: string;
     description?: string;
     price?: number;
     type?: string;
+    stock?: number;
+    isAvailable?: boolean;
 }

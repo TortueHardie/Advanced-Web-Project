@@ -12,12 +12,24 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ArticleService = void 0;
 const common_1 = require("@nestjs/common");
 const article_repository_1 = require("../repositories/article.repository");
+const prisma_1 = require("@advanced-web/prisma");
 let ArticleService = class ArticleService {
     articleRepository;
-    constructor(articleRepository) {
+    prisma;
+    constructor(articleRepository, prisma) {
         this.articleRepository = articleRepository;
+        this.prisma = prisma;
     }
     async create(createArticleDto) {
+        const restaurant = await this.prisma.restaurant.findUnique({
+            where: { id: createArticleDto.restaurantId },
+        });
+        if (!restaurant) {
+            throw new common_1.BadRequestException(`Le restaurant #${createArticleDto.restaurantId} n'existe pas`);
+        }
+        if (createArticleDto.stock === 0 && createArticleDto.isAvailable) {
+            throw new common_1.BadRequestException('Un article ne peut pas être disponible avec un stock de 0');
+        }
         return this.articleRepository.create(createArticleDto);
     }
     async findAll() {
@@ -26,33 +38,73 @@ let ArticleService = class ArticleService {
     async findOne(id) {
         const article = await this.articleRepository.findOne(id);
         if (!article) {
-            throw new common_1.NotFoundException(`Article #${id} non trouvé`);
+            throw new common_1.NotFoundException(`L'article #${id} n'existe pas`);
         }
         return article;
     }
     async update(id, updateArticleDto) {
-        await this.findOne(id);
+        const article = await this.findOne(id);
+        if (updateArticleDto.stock !== undefined && updateArticleDto.isAvailable !== undefined) {
+            if (updateArticleDto.stock === 0 && updateArticleDto.isAvailable) {
+                throw new common_1.BadRequestException('Un article ne peut pas être disponible avec un stock de 0');
+            }
+        }
+        else if (updateArticleDto.stock !== undefined) {
+            if (updateArticleDto.stock === 0 && article.isAvailable) {
+                throw new common_1.BadRequestException('Un article ne peut pas être disponible avec un stock de 0');
+            }
+        }
+        else if (updateArticleDto.isAvailable !== undefined) {
+            if (article.stock === 0 && updateArticleDto.isAvailable) {
+                throw new common_1.BadRequestException('Un article ne peut pas être disponible avec un stock de 0');
+            }
+        }
         return this.articleRepository.update(id, updateArticleDto);
     }
     async remove(id) {
-        await this.findOne(id);
+        const article = await this.findOne(id);
+        const menus = await this.prisma.menu.findMany({
+            where: {
+                items: {
+                    some: {
+                        id: article.id
+                    }
+                }
+            }
+        });
+        if (menus.length > 0) {
+            throw new common_1.BadRequestException(`L'article #${id} est utilisé dans ${menus.length} menu(x) et ne peut pas être supprimé`);
+        }
         return this.articleRepository.remove(id);
     }
-    async findByRestaurant(restaurantId) {
-        return this.articleRepository.findByRestaurant(restaurantId);
+    async findByMenu(menuId) {
+        const menu = await this.prisma.menu.findUnique({
+            where: { id: menuId },
+        });
+        if (!menu) {
+            throw new common_1.NotFoundException(`Le menu #${menuId} n'existe pas`);
+        }
+        return this.articleRepository.findByMenu(menuId);
     }
     async updateStock(id, stock) {
-        await this.findOne(id);
+        const article = await this.findOne(id);
+        if (stock === 0 && article.isAvailable) {
+            throw new common_1.BadRequestException('Un article ne peut pas être disponible avec un stock de 0');
+        }
         return this.articleRepository.updateStock(id, stock);
     }
     async updateAvailability(id, isAvailable) {
-        await this.findOne(id);
+        const article = await this.findOne(id);
+        if (article.stock === 0 && isAvailable) {
+            throw new common_1.BadRequestException('Un article ne peut pas être disponible avec un stock de 0');
+        }
         return this.articleRepository.updateAvailability(id, isAvailable);
     }
 };
 exports.ArticleService = ArticleService;
 exports.ArticleService = ArticleService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [article_repository_1.ArticleRepository])
+    __metadata("design:paramtypes", [article_repository_1.ArticleRepository,
+        prisma_1.PrismaService])
 ], ArticleService);
 //# sourceMappingURL=article.service.js.map

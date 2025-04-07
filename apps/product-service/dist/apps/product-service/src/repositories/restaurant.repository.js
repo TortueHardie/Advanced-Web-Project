@@ -11,7 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RestaurantRepository = void 0;
 const common_1 = require("@nestjs/common");
-const prisma_service_1 = require("@advanced-web/prisma/src/prisma.service");
+const prisma_1 = require("@advanced-web/prisma");
 let RestaurantRepository = class RestaurantRepository {
     prisma;
     constructor(prisma) {
@@ -62,6 +62,6 @@ let RestaurantRepository = class RestaurantRepository {
 exports.RestaurantRepository = RestaurantRepository;
 exports.RestaurantRepository = RestaurantRepository = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [prisma_1.PrismaService])
 ], RestaurantRepository);
 //# sourceMappingURL=restaurant.repository.js.map

@@ -1,7 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import { authRouter } from './routes/auth.routes';
 import { errorHandler } from './middleware/error.middleware';
@@ -23,6 +22,11 @@ app.use(express.json());
 //   max: 100 // limite chaque IP à 100 requêtes par fenêtre
 // });
 // app.use(limiter);
+
+// Endpoint de santé
+app.get('/auth/health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
 
 // Routes
 app.use('/auth', authRouter);

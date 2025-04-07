@@ -19,6 +19,7 @@ class MenuDto {
     price;
     restaurantId;
     items;
+    isAvailable;
 }
 exports.MenuDto = MenuDto;
 __decorate([
@@ -45,12 +46,17 @@ __decorate([
     (0, swagger_1.ApiProperty)({ description: 'Articles inclus dans le menu', type: [article_dto_1.ArticleDto] }),
     __metadata("design:type", Array)
 ], MenuDto.prototype, "items", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Disponibilité du menu' }),
+    __metadata("design:type", Boolean)
+], MenuDto.prototype, "isAvailable", void 0);
 class CreateMenuDto {
     name;
     description;
     price;
     restaurantId;
     itemIds;
+    isAvailable;
 }
 exports.CreateMenuDto = CreateMenuDto;
 __decorate([
@@ -73,11 +79,16 @@ __decorate([
     (0, swagger_1.ApiProperty)({ description: 'IDs des articles à inclure dans le menu', type: [Number] }),
     __metadata("design:type", Array)
 ], CreateMenuDto.prototype, "itemIds", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Disponibilité du menu', default: true }),
+    __metadata("design:type", Boolean)
+], CreateMenuDto.prototype, "isAvailable", void 0);
 class UpdateMenuDto {
     name;
     description;
     price;
     itemIds;
+    isAvailable;
 }
 exports.UpdateMenuDto = UpdateMenuDto;
 __decorate([
@@ -96,4 +107,8 @@ __decorate([
     (0, swagger_1.ApiProperty)({ description: 'IDs des articles à inclure dans le menu', type: [Number], required: false }),
     __metadata("design:type", Array)
 ], UpdateMenuDto.prototype, "itemIds", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Disponibilité du menu', required: false }),
+    __metadata("design:type", Boolean)
+], UpdateMenuDto.prototype, "isAvailable", void 0);
 //# sourceMappingURL=menu.dto.js.map

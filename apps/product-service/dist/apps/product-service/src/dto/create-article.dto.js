@@ -20,55 +20,81 @@ class CreateArticleDto {
     restaurantId;
     stock;
     isAvailable;
-    menuId;
 }
 exports.CreateArticleDto = CreateArticleDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Nom de l\'article', example: 'Burger Classique' }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Nom de l\'article',
+        example: 'Burger Classique',
+        minLength: 2,
+        maxLength: 100
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.Length)(2, 100),
     __metadata("design:type", String)
 ], CreateArticleDto.prototype, "name", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Description de l\'article', example: 'Un burger traditionnel avec salade, tomate et oignon' }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Description de l\'article',
+        example: 'Un burger traditionnel avec salade, tomate et oignon',
+        maxLength: 500
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.Length)(0, 500),
     __metadata("design:type", String)
 ], CreateArticleDto.prototype, "description", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Prix de l\'article', example: 8.99 }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Prix de l\'article en euros',
+        example: 8.99,
+        minimum: 0,
+        maximum: 1000
+    }),
     (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.Min)(0),
+    (0, class_validator_1.Max)(1000),
     __metadata("design:type", Number)
 ], CreateArticleDto.prototype, "price", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Type d\'article', example: 'Burger' }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Type d\'article (ex: Burger, Tacos, Frites...)',
+        example: 'Burger',
+        minLength: 2,
+        maxLength: 50
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.Length)(2, 50),
     __metadata("design:type", String)
 ], CreateArticleDto.prototype, "type", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'ID du restaurant', example: 1 }),
+    (0, swagger_1.ApiProperty)({
+        description: 'ID du restaurant auquel l\'article appartient',
+        example: 1
+    }),
     (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", Number)
 ], CreateArticleDto.prototype, "restaurantId", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Stock initial', example: 100 }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Stock initial de l\'article',
+        example: 100,
+        minimum: 0
+    }),
     (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.Min)(0),
     __metadata("design:type", Number)
 ], CreateArticleDto.prototype, "stock", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Disponibilité initiale', example: true }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Disponibilité initiale de l\'article',
+        example: true
+    }),
     (0, class_validator_1.IsBoolean)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", Boolean)
 ], CreateArticleDto.prototype, "isAvailable", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ description: 'ID du menu', example: 1 }),
-    (0, class_validator_1.IsNumber)(),
-    (0, class_validator_1.IsNotEmpty)(),
-    __metadata("design:type", Number)
-], CreateArticleDto.prototype, "menuId", void 0);
 //# sourceMappingURL=create-article.dto.js.map

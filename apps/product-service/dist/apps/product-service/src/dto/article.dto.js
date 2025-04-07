@@ -18,6 +18,8 @@ class ArticleDto {
     price;
     type;
     restaurantId;
+    stock;
+    isAvailable;
 }
 exports.ArticleDto = ArticleDto;
 __decorate([
@@ -44,12 +46,22 @@ __decorate([
     (0, swagger_1.ApiProperty)({ description: 'ID du restaurant' }),
     __metadata("design:type", Number)
 ], ArticleDto.prototype, "restaurantId", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Stock actuel de l\'article' }),
+    __metadata("design:type", Number)
+], ArticleDto.prototype, "stock", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Disponibilité de l\'article' }),
+    __metadata("design:type", Boolean)
+], ArticleDto.prototype, "isAvailable", void 0);
 class CreateArticleDto {
     name;
     description;
     price;
     type;
     restaurantId;
+    stock;
+    isAvailable;
 }
 exports.CreateArticleDto = CreateArticleDto;
 __decorate([
@@ -72,11 +84,21 @@ __decorate([
     (0, swagger_1.ApiProperty)({ description: 'ID du restaurant' }),
     __metadata("design:type", Number)
 ], CreateArticleDto.prototype, "restaurantId", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Stock initial de l\'article' }),
+    __metadata("design:type", Number)
+], CreateArticleDto.prototype, "stock", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Disponibilité initiale de l\'article' }),
+    __metadata("design:type", Boolean)
+], CreateArticleDto.prototype, "isAvailable", void 0);
 class UpdateArticleDto {
     name;
     description;
     price;
     type;
+    stock;
+    isAvailable;
 }
 exports.UpdateArticleDto = UpdateArticleDto;
 __decorate([
@@ -95,4 +117,12 @@ __decorate([
     (0, swagger_1.ApiProperty)({ description: 'Type de l\'article (Burger, Tacos, Frites...)', required: false }),
     __metadata("design:type", String)
 ], UpdateArticleDto.prototype, "type", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Stock de l\'article', required: false }),
+    __metadata("design:type", Number)
+], UpdateArticleDto.prototype, "stock", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Disponibilité de l\'article', required: false }),
+    __metadata("design:type", Boolean)
+], UpdateArticleDto.prototype, "isAvailable", void 0);
 //# sourceMappingURL=article.dto.js.map

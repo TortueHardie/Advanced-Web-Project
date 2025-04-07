@@ -4,51 +4,83 @@ export declare class ArticleRepository {
     private prisma;
     constructor(prisma: PrismaService);
     create(data: CreateArticleDto): Promise<{
-        description: string;
-        type: string;
         id: number;
         name: string;
+        description: string;
         price: number;
+        isAvailable: boolean;
         restaurantId: number;
+        type: string;
+        stock: number;
     }>;
     findAll(): Promise<{
-        description: string;
-        type: string;
         id: number;
         name: string;
+        description: string;
         price: number;
+        isAvailable: boolean;
         restaurantId: number;
+        type: string;
+        stock: number;
     }[]>;
     findOne(id: number): Promise<{
-        description: string;
-        type: string;
         id: number;
         name: string;
+        description: string;
         price: number;
+        isAvailable: boolean;
         restaurantId: number;
+        type: string;
+        stock: number;
     } | null>;
     update(id: number, data: UpdateArticleDto): Promise<{
-        description: string;
-        type: string;
         id: number;
         name: string;
+        description: string;
         price: number;
+        isAvailable: boolean;
         restaurantId: number;
+        type: string;
+        stock: number;
     }>;
     remove(id: number): Promise<{
-        description: string;
-        type: string;
         id: number;
         name: string;
+        description: string;
         price: number;
+        isAvailable: boolean;
         restaurantId: number;
+        type: string;
+        stock: number;
     }>;
-    findByRestaurant(restaurantId: number): Promise<{
-        description: string;
-        type: string;
+    findByMenu(menuId: number): Promise<{
         id: number;
         name: string;
+        description: string;
         price: number;
+        isAvailable: boolean;
         restaurantId: number;
+        type: string;
+        stock: number;
     }[]>;
+    updateStock(id: number, stock: number): Promise<{
+        id: number;
+        name: string;
+        description: string;
+        price: number;
+        isAvailable: boolean;
+        restaurantId: number;
+        type: string;
+        stock: number;
+    }>;
+    updateAvailability(id: number, isAvailable: boolean): Promise<{
+        id: number;
+        name: string;
+        description: string;
+        price: number;
+        isAvailable: boolean;
+        restaurantId: number;
+        type: string;
+        stock: number;
+    }>;
 }

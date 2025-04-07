@@ -6,5 +6,4 @@ export declare class CreateArticleDto {
     restaurantId: number;
     stock: number;
     isAvailable: boolean;
-    menuId: number;
 }

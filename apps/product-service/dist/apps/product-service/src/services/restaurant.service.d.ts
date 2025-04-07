@@ -8,20 +8,23 @@ export declare class RestaurantService {
     findOne(id: number): Promise<RestaurantDto>;
     update(id: number, updateRestaurantDto: UpdateRestaurantDto): Promise<RestaurantDto>;
     remove(id: number): Promise<RestaurantDto>;
-    findMenus(restaurantId: number): Promise<({
+    findMenus(restaurantId: number): Promise<{
+        isAvailable: boolean;
         items: {
-            description: string;
-            type: string;
             id: number;
             name: string;
+            description: string;
             price: number;
+            isAvailable: boolean;
             restaurantId: number;
+            type: string;
+            stock: number;
         }[];
-    } & {
-        description: string;
         id: number;
         name: string;
+        description: string;
         price: number;
         restaurantId: number;
-    })[]>;
+    }[]>;
+    private mapToDto;
 }

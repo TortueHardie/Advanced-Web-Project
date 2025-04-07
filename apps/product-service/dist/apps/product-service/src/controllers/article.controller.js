@@ -25,8 +25,8 @@ let ArticleController = class ArticleController {
     async create(createArticleDto) {
         return this.articleService.create(createArticleDto);
     }
-    async findAll(restaurantId) {
-        return this.articleService.findAll(restaurantId);
+    async findAll(menuId) {
+        return this.articleService.findByMenu(menuId);
     }
     async findOne(id) {
         return this.articleService.findOne(id);
@@ -61,18 +61,19 @@ __decorate([
 ], ArticleController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
-    (0, swagger_1.ApiOperation)({ summary: 'Récupérer tous les articles d\'un restaurant' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Récupérer tous les articles d\'un menu' }),
     (0, swagger_1.ApiQuery)({
-        name: 'restaurantId',
-        description: 'ID du restaurant',
-        type: Number
+        name: 'menuId',
+        description: 'ID du menu',
+        type: Number,
+        required: true
     }),
     (0, swagger_1.ApiResponse)({
         status: 200,
         description: 'Liste des articles récupérée avec succès',
         type: [dto_1.ArticleDto]
     }),
-    __param(0, (0, common_1.Query)('restaurantId', common_1.ParseIntPipe)),
+    __param(0, (0, common_1.Query)('menuId', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
