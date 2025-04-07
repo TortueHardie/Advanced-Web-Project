@@ -1,6 +1,6 @@
 <mat-toolbar color="primary">
     <div class="left-section">
-      <button mat-icon-button (click)="menuClick.emit()">
+      <button mat-icon-button (click)="menuClick.emit()" *ngIf="!isLoginPage || isLoggedIn">
         <mat-icon>menu</mat-icon>
       </button>
       <div class="logo-container">
@@ -10,7 +10,7 @@
     </div>
     
     <!-- Desktop Search -->
-    <div class="search-container desktop-only">
+    <div class="search-container desktop-only" *ngIf="!isLoginPage || isLoggedIn">
       <mat-form-field appearance="outline" class="address-field">
         <mat-icon matPrefix>location_on</mat-icon>
         <input 
@@ -32,7 +32,7 @@
     </div>
 
     <!-- Desktop Actions -->
-    <div class="right-section desktop-only">
+    <div class="right-section desktop-only" *ngIf="!isLoginPage || isLoggedIn">
       <button mat-icon-button (click)="cartClick.emit()">
         <mat-icon>shopping_cart</mat-icon>
         <span class="cart-badge" *ngIf="hasCartItems">{{totalCartItems}}</span>
@@ -50,7 +50,7 @@
     </div>
 
     <!-- Mobile Actions -->
-    <div class="right-section mobile-only">
+    <div class="right-section mobile-only" *ngIf="!isLoginPage || isLoggedIn">
       <button mat-icon-button [matMenuTriggerFor]="mobileMenu">
         <mat-icon>search</mat-icon>
       </button>
@@ -72,7 +72,7 @@
   </mat-toolbar>
 
   <!-- Mobile Menu -->
-  <mat-menu #mobileMenu="matMenu" class="mobile-menu">
+  <mat-menu #mobileMenu="matMenu" class="mobile-menu" *ngIf="!isLoginPage || isLoggedIn">
     <div class="mobile-search-container">
       <mat-form-field appearance="outline" class="mobile-address-field">
         <mat-icon matPrefix>location_on</mat-icon>
@@ -96,7 +96,7 @@
   </mat-menu>
 
   <!-- Notification Menu -->
-  <mat-menu #notificationMenu="matMenu" class="notification-menu">
+  <mat-menu #notificationMenu="matMenu" class="notification-menu" *ngIf="!isLoginPage || isLoggedIn">
     <div class="notification-header">
       <h3>Notifications ({{notifications.length}})</h3>
     </div>
@@ -116,7 +116,7 @@
   </mat-menu>
 
   <!-- User Menu -->
-  <mat-menu #userMenu="matMenu" class="user-menu">
+  <mat-menu #userMenu="matMenu" class="user-menu" *ngIf="!isLoginPage || isLoggedIn">
     <div class="user-info" *ngIf="currentUser">
       <p class="user-name">{{currentUser.firstName}} {{currentUser.lastName}}</p>
       <p class="user-email">{{currentUser.email}}</p>
