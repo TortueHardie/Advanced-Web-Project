@@ -13,7 +13,7 @@ import { RestaurateurMenuUpdateComponent } from './components/restaurateur-menu-
 import { StatisticsComponent } from './components/statistics/statistics.component';
 import { RestaurateurOrdersComponent } from './components/restaurateur-orders/restaurateur-orders.component';
 import { LoginComponent } from './pages/login/login.component';
-
+import { RestaurateurMenuManagementComponent } from './components/restaurateur-menu-management/restaurateur-menu-management.component';
 export const routes: Routes = [
   { path: '', component: LoginComponent },
   { path: 'login', loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent) },
@@ -30,6 +30,7 @@ export const routes: Routes = [
   { path: 'restaurateur/article/:id', component: RestaurateurItemUpdateComponent },
   { path: 'restaurateur/menu/nouveau', component: RestaurateurMenuUpdateComponent },
   { path: 'restaurateur/menu/:id', component: RestaurateurMenuUpdateComponent },
+  { path: 'restaurateur/menu-management', component: RestaurateurMenuManagementComponent },
   { path: 'restaurateur/commandes', component: RestaurateurOrdersComponent },
   { path: 'restaurateur/statistiques', component: StatisticsComponent },
   { path: '**', redirectTo: '' }
