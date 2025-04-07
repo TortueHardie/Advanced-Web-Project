@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Put, Patch, Headers, UnauthorizedException, NotFoundException, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Patch, Headers, UnauthorizedException, NotFoundException, ForbiddenException, HttpCode, HttpStatus } from '@nestjs/common';
 import { OrderService } from '../services/order.service';
 import { CreateOrderDto } from '../dto/create-order.dto';
 import { UpdateOrderStatusDto } from '../dto/update-order-status.dto';
@@ -12,11 +12,13 @@ import { OrderCreatedDto, OrderSummaryDto, OrderDetailDto, MessageResponseDto, A
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
-  // This is a mock auth implementation
-  // In a real app, you would use a proper auth guard
+  /**
+   * Extracts user ID from authorization token
+   * @param authHeader Authorization header
+   * @returns User ID extracted from token
+   */
   private getUserIdFromToken(authHeader: string): number {
     // For development and testing, allow requests without an auth header
-    // This is NOT recommended for production
     if (!authHeader) {
       console.warn('No authorization header provided - using default user ID for development');
       return 1; // Default user ID for development
@@ -47,6 +49,11 @@ export class OrderController {
     }
   }
 
+  /**
+   * Checks if user has admin role
+   * @param authHeader Authorization header
+   * @returns True if user has admin role, false otherwise
+   */
   private isAdmin(authHeader: string): boolean {
     if (!authHeader) return false;
     
@@ -73,6 +80,11 @@ export class OrderController {
     }
   }
 
+  /**
+   * Checks if user has restaurant role
+   * @param authHeader Authorization header
+   * @returns True if user has restaurant role, false otherwise
+   */
   private isRestaurant(authHeader: string): boolean {
     if (!authHeader) return false;
     
@@ -99,6 +111,12 @@ export class OrderController {
     }
   }
 
+  /**
+   * Create a new order
+   * @param headers Request headers
+   * @param createOrderDto Order details
+   * @returns Created order summary
+   */
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiBearerAuth('Authorization')
@@ -112,19 +130,18 @@ export class OrderController {
     @Headers() headers: any,
     @Body() createOrderDto: CreateOrderDto,
   ) {
-    // Debug the headers received
-    console.log('Headers received:', headers);
-    
     // Extract authorization headers (can be in different formats)
     const authHeader = headers.authorization || headers.Authorization;
-    console.log('Auth header found:', authHeader);
-    
     const userId = this.getUserIdFromToken(authHeader);
-    console.log('User ID extracted:', userId);
     
     return this.orderService.createOrder(userId, createOrderDto);
   }
 
+  /**
+   * Get orders for the authenticated user
+   * @param auth Authorization header
+   * @returns List of user's orders
+   */
   @Get('me')
   @HttpCode(HttpStatus.OK)
   @ApiBearerAuth('Authorization')
@@ -137,6 +154,11 @@ export class OrderController {
     return this.orderService.getUserOrders(userId);
   }
   
+  /**
+   * Get all orders (admin/restaurant only)
+   * @param auth Authorization header
+   * @returns List of all orders
+   */
   @Get('admin')
   @HttpCode(HttpStatus.OK)
   @ApiBearerAuth('Authorization')
@@ -154,6 +176,12 @@ export class OrderController {
     return this.orderService.getAdminOrders();
   }
 
+  /**
+   * Get order details
+   * @param auth Authorization header
+   * @param orderId Order ID
+   * @returns Order details
+   */
   @Get(':orderId')
   @HttpCode(HttpStatus.OK)
   @ApiBearerAuth('Authorization')
@@ -171,7 +199,6 @@ export class OrderController {
     const userId = this.getUserIdFromToken(auth);
     const order = await this.orderService.getOrderById(userId, parseInt(orderId, 10));
     
-    // Format response to match API spec
     return {
       orderId: order.orderId,
       restaurantName: order.restaurantName,
@@ -192,6 +219,12 @@ export class OrderController {
     };
   }
 
+  /**
+   * Cancel an order
+   * @param auth Authorization header
+   * @param orderId Order ID
+   * @returns Cancellation confirmation
+   */
   @Put(':orderId/cancel')
   @HttpCode(HttpStatus.OK)
   @ApiBearerAuth('Authorization')
@@ -211,6 +244,13 @@ export class OrderController {
     return this.orderService.cancelOrder(userId, parseInt(orderId, 10));
   }
 
+  /**
+   * Update order status (admin/restaurant only)
+   * @param auth Authorization header
+   * @param orderId Order ID
+   * @param updateOrderStatusDto New status
+   * @returns Status update confirmation
+   */
   @Patch(':orderId/status')
   @HttpCode(HttpStatus.OK)
   @ApiBearerAuth('Authorization')
@@ -239,8 +279,11 @@ export class OrderController {
     );
   }
 
-  // Methods for microservice communication
-
+  /**
+   * Create order (microservice)
+   * @param data Order data
+   * @returns Created order
+   */
   @MessagePattern({ cmd: 'create_order' })
   @ApiTags('Microservice')
   @ApiOperation({ summary: 'Create order (microservice)', description: 'Internal microservice method for creating orders' })

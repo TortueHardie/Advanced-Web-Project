@@ -32,13 +32,16 @@ async function bootstrap() {
     AppModule,
     {
       transport: Transport.TCP,
-      options: { host: '127.0.0.1', port: 4002 }, // Using port 4002 for order service
+      options: {
+        host: process.env.HOST || '0.0.0.0',
+        port: parseInt(process.env.MICROSERVICE_PORT || '4002'),
+      },
     },
   );
   microservice.listen();
-  console.log('🚀 Microservice Order démarré sur TCP (port 4002)');
+  console.log(`🚀 Microservice Order démarré sur TCP (port ${process.env.MICROSERVICE_PORT || '4002'})`);
 
-  // 🔹 Instance HTTP pour Swagger
+  // 🔹 Instance HTTP pour Swagger et API
   const httpApp = await NestFactory.create(AppModule);
   httpApp.enableCors();
   
@@ -57,8 +60,10 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(httpApp, swaggerConfig, swaggerDocumentOptions);
   SwaggerModule.setup('docs', httpApp, document, swaggerSetupOptions);
 
-  await httpApp.listen(3002); // Serveur HTTP pour Swagger
-  console.log('📄 Swagger order-service disponible sur http://localhost:3002/docs');
+  const httpPort = process.env.PORT || 3003;
+  await httpApp.listen(httpPort);
+  console.log(`📄 Swagger order-service disponible sur http://localhost:${httpPort}/docs`);
+  console.log(`🌐 API order-service disponible sur http://localhost:${httpPort}`);
   
   // Afficher les tokens de développement si on est en mode développement
   if (process.env.NODE_ENV !== 'production') {

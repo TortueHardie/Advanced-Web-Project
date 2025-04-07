@@ -59,12 +59,14 @@ services:
       - postgres
       - user-service
       - auth-service
+      - order-service
     env_file:
       - .env
     environment:
       DATABASE_URL: ${DATABASE_URL_POSTGRES}
       AUTH_SERVICE_URL: http://auth-service:3001
       USER_SERVICE_URL: http://user-service:3001
+      ORDER_SERVICE_URL: http://order-service:3003
       NODE_ENV: production
     ports:
       - "3000:3000"
@@ -94,6 +96,31 @@ services:
       - app-network
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:3001/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  order-service:
+    build:
+      context: .
+      dockerfile: apps/order-service/Dockerfile
+    container_name: order-service
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL_POSTGRES: postgresql://${DATABASE_USER_POSTGRES}:${DATABASE_MDP_POSTGRES}@postgres:5432/${DATABASE_NAME_POSTGRES}?schema=public
+      PRODUCT_SERVICE_HOST: product-service
+      PRODUCT_SERVICE_PORT: 3002
+    ports:
+      - "3003:3003"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3003/health"]
       interval: 10s
       timeout: 5s
       retries: 3

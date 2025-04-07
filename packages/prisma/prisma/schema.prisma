@@ -20,9 +20,55 @@ model User {
   lastLogin     DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  orders        Order[]
 }
 
 enum Role {
   USER
   ADMIN
+}
+
+model Order {
+  id              String          @id @default(uuid())
+  orderId         Int             @unique @default(autoincrement())
+  userId          String
+  user            User            @relation(fields: [userId], references: [id])
+  restaurantId    Int
+  restaurantName  String?
+  deliveryAddress String
+  paymentMethod   String
+  status          OrderStatus     @default(PENDING)
+  totalAmount     Float
+  deliveryFees    Float
+  serviceFees     Float
+  createdAt       DateTime        @default(now())
+  acceptedAt      DateTime?
+  inProgressAt    DateTime?
+  readyAt         DateTime?
+  deliveredAt     DateTime?
+  canceledAt      DateTime?
+  items           OrderItem[]
+
+  @@map("order")
+}
+
+model OrderItem {
+  id          String    @id @default(uuid())
+  orderId     String
+  order       Order     @relation(fields: [orderId], references: [id])
+  productId   Int
+  quantity    Int
+  unitPrice   Float
+  name        String?
+  
+  @@map("order_item")
+}
+
+enum OrderStatus {
+  PENDING
+  ACCEPTED
+  IN_PROGRESS
+  READY
+  DELIVERED
+  CANCELED
 }

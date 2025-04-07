@@ -2,46 +2,73 @@ import { Injectable } from '@nestjs/common';
 import { CreateOrderDto } from '../dto/create-order.dto';
 import { Order, OrderItem } from '../interfaces/order.interface';
 import { OrderStatus } from '../dto/update-order-status.dto';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class OrderRepository {
-  constructor() {}
+  constructor(private prisma: PrismaService) {}
 
   /**
    * Creates a new order in the database
    * @param userId The ID of the user placing the order
-   * @param createOrderDto The order details
+   * @param createOrderDto The order details with enriched properties
    * @param totalAmount The calculated total amount
    * @returns The created order
    */
-  async createOrder(userId: number, createOrderDto: CreateOrderDto, totalAmount: number): Promise<Order> {
-    // This is a mocked implementation
-    const orderId = Math.floor(Math.random() * 10000);
+  async createOrder(userId: number, createOrderDto: any, totalAmount: number): Promise<Order> {
+    // Convert numeric userId to string for Prisma
+    const userIdStr = String(userId);
     
-    const now = new Date();
+    // Calculate service fee as 30% of subtotal
+    const subtotal = totalAmount - 2.0; // Subtract delivery fee
+    const serviceFees = subtotal * 0.3;
     
-    // Mock order creation
-    return {
-      orderId,
-      userId,
-      restaurantId: createOrderDto.restaurantId,
-      restaurantName: 'Restaurant Name', // In real app, fetch from restaurant service
-      items: createOrderDto.items.map((item) => ({
-        productId: item.productId,
-        quantity: item.quantity,
-        name: `Product ${item.productId}`, // In real app, fetch from product service
-        unitPrice: 0, // In real app, fetch from product service
-      })),
-      deliveryAddress: createOrderDto.deliveryAddress,
-      paymentMethod: createOrderDto.paymentMethod,
-      status: OrderStatus.PENDING,
-      totalAmount,
-      deliveryFees: 2.0, // Mock value, would be calculated
-      serviceFees: totalAmount * 0.3, // 30% service fee
-      timestamps: {
-        createdAt: now,
+    // First, check if the user exists, and create a placeholder one if not
+    const existingUser = await this.prisma.user.findUnique({
+      where: { id: userIdStr },
+    });
+
+    if (!existingUser) {
+      // Create a placeholder user to satisfy the foreign key constraint
+      await this.prisma.user.create({
+        data: {
+          id: userIdStr,
+          email: `user_${userId}@example.com`,
+          username: `user_${userId}`,
+          password: 'placeholder',
+          role: 'USER'
+        }
+      });
+      console.log(`Created placeholder user with ID ${userIdStr}`);
+    }
+    
+    // Create the order with timestamps
+    const createdOrder = await this.prisma.order.create({
+      data: {
+        userId: userIdStr,
+        restaurantId: createOrderDto.restaurantId,
+        restaurantName: createOrderDto.restaurantName || `Restaurant ${createOrderDto.restaurantId}`,
+        deliveryAddress: createOrderDto.deliveryAddress,
+        paymentMethod: createOrderDto.paymentMethod,
+        totalAmount: totalAmount,
+        deliveryFees: 2.0, // This could be calculated based on distance
+        serviceFees: serviceFees,
+        items: {
+          create: createOrderDto.items.map(item => ({
+            productId: item.productId,
+            quantity: item.quantity,
+            unitPrice: item.unitPrice || 0,
+            name: item.name || `Product ${item.productId}`,
+          })),
+        },
       },
-    };
+      include: {
+        items: true,
+      },
+    });
+
+    // Format the response to match the Order interface
+    return this.mapPrismaOrderToOrderInterface(createdOrder);
   }
 
   /**
@@ -50,25 +77,22 @@ export class OrderRepository {
    * @returns List of the user's orders
    */
   async getUserOrders(userId: number): Promise<Order[]> {
-    // Mock retrieving user orders
-    return [
-      {
-        orderId: 1245,
-        userId,
-        restaurantId: 1,
-        restaurantName: 'GoMiam',
-        items: [],
-        deliveryAddress: '24 Le Paquebot',
-        paymentMethod: 'card',
-        status: OrderStatus.IN_PROGRESS,
-        totalAmount: 23.0,
-        deliveryFees: 2.0,
-        serviceFees: 6.0,
-        timestamps: {
-          createdAt: new Date('2025-03-21T08:23:24Z'),
-        },
+    // Convert numeric userId to string for Prisma
+    const userIdStr = String(userId);
+
+    const orders = await this.prisma.order.findMany({
+      where: {
+        userId: userIdStr,
       },
-    ];
+      include: {
+        items: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return orders.map(order => this.mapPrismaOrderToOrderInterface(order));
   }
 
   /**
@@ -77,30 +101,20 @@ export class OrderRepository {
    * @returns The order or null if not found
    */
   async getOrderById(orderId: number): Promise<Order | null> {
-    // Mock retrieving a specific order
-    if (orderId === 1245) {
-      return {
-        orderId: 1245,
-        userId: 1,
-        restaurantId: 1,
-        restaurantName: 'GoMiam',
-        items: [
-          { productId: 1, quantity: 2, name: 'Kebab', unitPrice: 7.5 },
-          { productId: 2, quantity: 1, name: 'Cola', unitPrice: 2.0 },
-        ],
-        deliveryAddress: '24 Le Paquebot',
-        paymentMethod: 'card',
-        status: OrderStatus.ACCEPTED,
-        totalAmount: 23.0,
-        deliveryFees: 2.0,
-        serviceFees: 6.0,
-        timestamps: {
-          createdAt: new Date('2025-03-21T08:23:24Z'),
-          acceptedAt: new Date('2025-03-21T08:25:00Z'),
-        },
-      };
+    const order = await this.prisma.order.findUnique({
+      where: {
+        orderId: orderId,
+      },
+      include: {
+        items: true,
+      },
+    });
+
+    if (!order) {
+      return null;
     }
-    return null;
+
+    return this.mapPrismaOrderToOrderInterface(order);
   }
 
   /**
@@ -109,8 +123,21 @@ export class OrderRepository {
    * @returns True if the operation was successful
    */
   async cancelOrder(orderId: number): Promise<boolean> {
-    // Mock implementation
-    return true;
+    try {
+      await this.prisma.order.update({
+        where: {
+          orderId: orderId,
+        },
+        data: {
+          status: 'CANCELED',
+          canceledAt: new Date(),
+        },
+      });
+      return true;
+    } catch (error) {
+      console.error(`Error canceling order ${orderId}:`, error);
+      return false;
+    }
   }
 
   /**
@@ -120,8 +147,49 @@ export class OrderRepository {
    * @returns True if the operation was successful
    */
   async updateOrderStatus(orderId: number, status: OrderStatus): Promise<boolean> {
-    // Mock implementation
-    return true;
+    try {
+      const timestampField = this.getTimestampFieldForStatus(status);
+      
+      // Convert status to uppercase for database (Prisma enum)
+      let dbStatus = status;
+      
+      // Map from lowercase API enum values to uppercase DB enum values
+      const statusMapping = {
+        'pending': 'PENDING',
+        'accepted': 'ACCEPTED',
+        'in_progress': 'IN_PROGRESS',
+        'ready': 'READY',
+        'delivered': 'DELIVERED',
+        'canceled': 'CANCELED'
+      };
+      
+      if (statusMapping[status]) {
+        dbStatus = statusMapping[status] as OrderStatus;
+      }
+      
+      console.log(`Converting status from ${status} to ${dbStatus} for database`);
+      
+      const updateData: any = {
+        status: dbStatus,
+      };
+      
+      // Add timestamp if applicable
+      if (timestampField) {
+        updateData[timestampField] = new Date();
+      }
+      
+      await this.prisma.order.update({
+        where: {
+          orderId: orderId,
+        },
+        data: updateData,
+      });
+      
+      return true;
+    } catch (error) {
+      console.error(`Error updating order ${orderId} status:`, error);
+      return false;
+    }
   }
 
   /**
@@ -129,25 +197,17 @@ export class OrderRepository {
    * @returns List of all orders
    */
   async getAdminOrders(): Promise<Order[]> {
-    // Mock retrieving all orders for admin/restaurant
-    return [
-      {
-        orderId: 1245,
-        userId: 1,
-        restaurantId: 1,
-        restaurantName: 'GoMiam',
-        items: [],
-        deliveryAddress: '24 Le Paquebot',
-        paymentMethod: 'card',
-        status: OrderStatus.IN_PROGRESS,
-        totalAmount: 23.0,
-        deliveryFees: 2.0,
-        serviceFees: 6.0,
-        timestamps: {
-          createdAt: new Date('2025-03-21T08:23:24Z'),
-        },
+    const orders = await this.prisma.order.findMany({
+      include: {
+        items: true,
+        user: true,
       },
-    ];
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return orders.map(order => this.mapPrismaOrderToOrderInterface(order));
   }
 
   /**
@@ -165,5 +225,39 @@ export class OrderRepository {
     };
     
     return statusToTimestampMap[status] || null;
+  }
+
+  /**
+   * Maps Prisma Order entity to Order interface
+   * @param prismaOrder The Prisma Order entity with relations
+   * @returns Order object matching the interface
+   */
+  private mapPrismaOrderToOrderInterface(prismaOrder: any): Order {
+    return {
+      orderId: prismaOrder.orderId,
+      userId: Number(prismaOrder.userId),
+      restaurantId: prismaOrder.restaurantId,
+      restaurantName: prismaOrder.restaurantName || `Restaurant ${prismaOrder.restaurantId}`,
+      items: prismaOrder.items.map((item: any) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        name: item.name || `Product ${item.productId}`,
+        unitPrice: item.unitPrice || 0,
+      })),
+      deliveryAddress: prismaOrder.deliveryAddress,
+      paymentMethod: prismaOrder.paymentMethod,
+      status: prismaOrder.status as OrderStatus,
+      totalAmount: prismaOrder.totalAmount,
+      deliveryFees: prismaOrder.deliveryFees,
+      serviceFees: prismaOrder.serviceFees,
+      timestamps: {
+        createdAt: prismaOrder.createdAt,
+        acceptedAt: prismaOrder.acceptedAt,
+        inProgressAt: prismaOrder.inProgressAt,
+        readyAt: prismaOrder.readyAt,
+        deliveredAt: prismaOrder.deliveredAt,
+        canceledAt: prismaOrder.canceledAt,
+      },
+    };
   }
 } 
