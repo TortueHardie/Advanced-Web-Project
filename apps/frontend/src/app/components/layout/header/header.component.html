@@ -41,12 +41,6 @@
         <mat-icon>notifications</mat-icon>
         <span class="notification-badge" *ngIf="hasNotifications">{{notifications.length}}</span>
       </button>
-      <button mat-icon-button [matMenuTriggerFor]="userMenu" *ngIf="isLoggedIn">
-        <mat-icon>account_circle</mat-icon>
-      </button>
-      <button mat-button routerLink="/login" *ngIf="!isLoggedIn">
-        Connexion
-      </button>
     </div>
 
     <!-- Mobile Actions -->
@@ -61,12 +55,6 @@
       <button mat-icon-button [matMenuTriggerFor]="notificationMenu">
         <mat-icon>notifications</mat-icon>
         <span class="notification-badge" *ngIf="hasNotifications">{{notifications.length}}</span>
-      </button>
-      <button mat-icon-button [matMenuTriggerFor]="userMenu" *ngIf="isLoggedIn">
-        <mat-icon>account_circle</mat-icon>
-      </button>
-      <button mat-button routerLink="/login" *ngIf="!isLoggedIn">
-        Connexion
       </button>
     </div>
   </mat-toolbar>
@@ -113,24 +101,4 @@
         <p>Aucune notification</p>
       </div>
     </div>
-  </mat-menu>
-
-  <!-- User Menu -->
-  <mat-menu #userMenu="matMenu" class="user-menu" *ngIf="!isLoginPage || isLoggedIn">
-    <div class="user-info" *ngIf="currentUser">
-      <p class="user-name">{{currentUser.firstName}} {{currentUser.lastName}}</p>
-      <p class="user-email">{{currentUser.email}}</p>
-    </div>
-    <button mat-menu-item routerLink="/compte">
-      <mat-icon>person</mat-icon>
-      <span>Mon profil</span>
-    </button>
-    <button mat-menu-item routerLink="/commandes">
-      <mat-icon>receipt</mat-icon>
-      <span>Mes commandes</span>
-    </button>
-    <button mat-menu-item (click)="logout()">
-      <mat-icon>logout</mat-icon>
-      <span>Déconnexion</span>
-    </button>
   </mat-menu>

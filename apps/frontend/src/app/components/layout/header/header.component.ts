@@ -50,8 +50,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private notificationService: NotificationService,
     private cartService: CartService,
     private authService: AuthService,
-    private router: Router,
-    private route: ActivatedRoute
+    private router: Router
   ) {
     this.notificationSubscription = this.notificationService.notifications$
       .subscribe(notifications => {
@@ -104,8 +103,5 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.searchService.updateCityTerm(term);
   }
 
-  logout(): void {
-    this.authService.logout();
-    this.router.navigate(['/login']);
-  }
+
 }
