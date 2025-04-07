@@ -18,6 +18,33 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
 
+  @Post('validate')
+  @ApiOperation({ summary: 'Valider les identifiants d\'un utilisateur' })
+  @ApiResponse({ status: 200, description: 'Identifiants valides', schema: { 
+    properties: { 
+      valid: { type: 'boolean' },
+      userId: { type: 'string' }
+    } 
+  }})
+  @ApiResponse({ status: 401, description: 'Identifiants invalides' })
+  async validateUser(@Body() credentials: { email: string, password: string }): Promise<{ valid: boolean, userId?: string }> {
+    try {
+      const validationResult = await this.userService.validateCredentials(credentials.email, credentials.password);
+      return { valid: true, userId: validationResult.id.toString() };
+    } catch (error) {
+      return { valid: false };
+    }
+  }
+
+  @Get('by-email/:email')
+  @ApiOperation({ summary: 'Récupérer un utilisateur par email' })
+  @ApiParam({ name: 'email', description: 'Email de l\'utilisateur' })
+  @ApiResponse({ status: 200, description: 'Utilisateur trouvé', type: UserDto })
+  @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })
+  async findByEmail(@Param('email') email: string): Promise<UserDto> {
+    return this.userService.findByEmail(email);
+  }
+
   @Get()
   @ApiOperation({ summary: 'Récupérer tous les utilisateurs' })
   @ApiResponse({ status: 200, description: 'Liste des utilisateurs', type: [UserDto] })

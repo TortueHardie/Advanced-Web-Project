@@ -22,16 +22,16 @@
   },
   "dependencies": {
     "@advanced-web/prisma": "*",
-    "@nestjs/common": "^11.0.1",
-    "@nestjs/core": "^11.0.1",
+    "@nestjs/common": "^9.0.0",
+    "@nestjs/core": "^9.0.0",
     "@nestjs/microservices": "^11.0.11",
-    "@nestjs/platform-express": "^11.0.1",
-    "@nestjs/swagger": "^11.0.6",
-    "@prisma/client": "^5.6.0",
+    "@nestjs/platform-express": "^9.0.0",
+    "@nestjs/swagger": "^7.3.0",
+    "@prisma/client": "^5.10.2",
     "bcrypt": "^5.1.1",
     "class-validator": "^0.14.0",
-    "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^7.2.0",
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {

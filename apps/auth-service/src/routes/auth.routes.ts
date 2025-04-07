@@ -8,6 +8,9 @@ import { randomInt, randomUUID } from 'crypto';
 const router = Router();
 const USER_SERVICE_URL = process.env.USER_SERVICE_URL || 'http://user-service:3001';
 
+// Debug: Logs at startup
+logger.info(`Auth routes initialized with USER_SERVICE_URL: ${USER_SERVICE_URL}`);
+
 // Types pour les réponses API
 interface ValidateUserResponse {
   valid: boolean;
@@ -93,11 +96,16 @@ router.post('/login', async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Email et mot de passe requis' });
     }
     
+    logger.info(`Tentative de connexion pour l'email: ${email}`);
+    logger.info(`Appel au service utilisateur: ${USER_SERVICE_URL}/users/validate`);
+    
     // Appel au service utilisateur pour vérifier les identifiants
     const response = await axios.post<ValidateUserResponse>(`${USER_SERVICE_URL}/users/validate`, { 
       email, 
       password 
     });
+    
+    logger.info(`Réponse du service utilisateur: ${JSON.stringify(response.data)}`);
     
     if (!response.data.valid) {
       return res.status(401).json({ message: 'Identifiants invalides' });
@@ -111,8 +119,16 @@ router.post('/login', async (req: Request, res: Response) => {
       ...tokens,
       userId
     });
-  } catch (error) {
+  } catch (error: any) {
     logger.error('Erreur lors de la connexion:', error);
+    
+    // Log plus détaillé pour les erreurs de connexion au service utilisateur
+    if (error.code === 'ECONNREFUSED') {
+      logger.error(`Impossible de se connecter au service utilisateur: ${USER_SERVICE_URL}`);
+    } else if (error.response) {
+      logger.error(`Réponse d'erreur du service utilisateur: ${error.response.status} - ${JSON.stringify(error.response.data)}`);
+    }
+    
     res.status(500).json({ message: 'Erreur serveur' });
   }
 });
@@ -126,23 +142,31 @@ router.post('/register', async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Email, mot de passe et nom requis' });
     }
     
+    logger.info(`Tentative d'inscription pour l'email: ${email}`);
+    
     // Vérifier si l'utilisateur existe déjà
     try {
+      logger.info(`Vérification si l'email existe: ${USER_SERVICE_URL}/users/by-email/${email}`);
       await axios.get(`${USER_SERVICE_URL}/users/by-email/${email}`);
       return res.status(409).json({ message: 'Un utilisateur avec cet email existe déjà' });
     } catch (error: any) {
       // Si l'erreur est 404, c'est que l'utilisateur n'existe pas, on peut continuer
       if (error.response?.status !== 404) {
+        logger.error(`Erreur lors de la vérification de l'email: ${error.message}`);
         throw error;
       }
+      logger.info(`Email disponible, création de l'utilisateur`);
     }
     
     // Créer l'utilisateur dans le service utilisateur
+    logger.info(`Création de l'utilisateur: ${USER_SERVICE_URL}/users`);
     const response = await axios.post<UserResponse>(`${USER_SERVICE_URL}/users`, {
       email,
       password,
       name
     });
+    
+    logger.info(`Utilisateur créé avec succès, ID: ${response.data.id}`);
     
     const userId = response.data.id;
     const tokens = JWTService.generateTokens(userId);
@@ -154,6 +178,14 @@ router.post('/register', async (req: Request, res: Response) => {
     });
   } catch (error) {
     logger.error('Erreur lors de l\'inscription:', error);
+    
+    // Log plus détaillé pour les erreurs de connexion au service utilisateur
+    if (error.code === 'ECONNREFUSED') {
+      logger.error(`Impossible de se connecter au service utilisateur: ${USER_SERVICE_URL}`);
+    } else if (error.response) {
+      logger.error(`Réponse d'erreur du service utilisateur: ${error.response.status} - ${JSON.stringify(error.response.data)}`);
+    }
+    
     res.status(500).json({ message: 'Erreur serveur' });
   }
 });
