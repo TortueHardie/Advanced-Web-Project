@@ -10,6 +10,8 @@ import { MatMenuModule } from '@angular/material/menu';
 import { SearchService } from '../../../services/search.service';
 import { NotificationService, Notification } from '../../../services/notification.service';
 import { CartService } from '../../../services/cart.service';
+import { AuthService } from '../../../services/auth.service';
+import { Router, RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -23,7 +25,8 @@ import { Subscription } from 'rxjs';
     MatInputModule,
     MatFormFieldModule,
     FormsModule,
-    MatMenuModule
+    MatMenuModule,
+    RouterModule
   ],
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss']
@@ -41,7 +44,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
   constructor(
     private searchService: SearchService,
     private notificationService: NotificationService,
-    private cartService: CartService
+    private cartService: CartService,
+    private authService: AuthService,
+    private router: Router
   ) {
     this.notificationSubscription = this.notificationService.notifications$
       .subscribe(notifications => {
@@ -74,11 +79,24 @@ export class HeaderComponent implements OnInit, OnDestroy {
     return this.totalCartItems > 0;
   }
 
+  get isLoggedIn(): boolean {
+    return this.authService.isLoggedIn;
+  }
+
+  get currentUser(): any {
+    return this.authService.currentUser;
+  }
+
   onSearchChange(term: string) {
     this.searchService.updateSearchTerm(term);
   }
 
   onCityChange(term: string) {
     this.searchService.updateCityTerm(term);
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
 }

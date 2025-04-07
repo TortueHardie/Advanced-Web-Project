@@ -3,7 +3,10 @@
       <button mat-icon-button (click)="menuClick.emit()">
         <mat-icon>menu</mat-icon>
       </button>
-      <span class="logo">Pop-Eat</span>
+      <div class="logo-container">
+        <img src="assets/images/logo-pop-eat.png" alt="Pop-Eat Logo" class="header-logo">
+        <span class="logo">Pop-Eat</span>
+      </div>
     </div>
     
     <!-- Desktop Search -->
@@ -12,7 +15,7 @@
         <mat-icon matPrefix>location_on</mat-icon>
         <input 
           matInput 
-          placeholder="Ville" 
+          placeholder="Entrez votre ville" 
           [(ngModel)]="cityTerm"
           (ngModelChange)="onCityChange($event)"
         />
@@ -21,7 +24,7 @@
         <mat-icon matPrefix>search</mat-icon>
         <input 
           matInput 
-          placeholder="Rechercher dans Pop-Eat" 
+          placeholder="Rechercher un restaurant, un plat..." 
           [(ngModel)]="searchTerm"
           (ngModelChange)="onSearchChange($event)"
         />
@@ -38,6 +41,12 @@
         <mat-icon>notifications</mat-icon>
         <span class="notification-badge" *ngIf="hasNotifications">{{notifications.length}}</span>
       </button>
+      <button mat-icon-button [matMenuTriggerFor]="userMenu" *ngIf="isLoggedIn">
+        <mat-icon>account_circle</mat-icon>
+      </button>
+      <button mat-button routerLink="/login" *ngIf="!isLoggedIn">
+        Connexion
+      </button>
     </div>
 
     <!-- Mobile Actions -->
@@ -53,6 +62,12 @@
         <mat-icon>notifications</mat-icon>
         <span class="notification-badge" *ngIf="hasNotifications">{{notifications.length}}</span>
       </button>
+      <button mat-icon-button [matMenuTriggerFor]="userMenu" *ngIf="isLoggedIn">
+        <mat-icon>account_circle</mat-icon>
+      </button>
+      <button mat-button routerLink="/login" *ngIf="!isLoggedIn">
+        Connexion
+      </button>
     </div>
   </mat-toolbar>
 
@@ -63,7 +78,7 @@
         <mat-icon matPrefix>location_on</mat-icon>
         <input 
           matInput 
-          placeholder="Ville" 
+          placeholder="Entrez votre ville" 
           [(ngModel)]="cityTerm"
           (ngModelChange)="onCityChange($event)"
         />
@@ -72,7 +87,7 @@
         <mat-icon matPrefix>search</mat-icon>
         <input 
           matInput 
-          placeholder="Rechercher" 
+          placeholder="Rechercher un restaurant, un plat..." 
           [(ngModel)]="searchTerm"
           (ngModelChange)="onSearchChange($event)"
         />
@@ -98,4 +113,24 @@
         <p>Aucune notification</p>
       </div>
     </div>
+  </mat-menu>
+
+  <!-- User Menu -->
+  <mat-menu #userMenu="matMenu" class="user-menu">
+    <div class="user-info" *ngIf="currentUser">
+      <p class="user-name">{{currentUser.firstName}} {{currentUser.lastName}}</p>
+      <p class="user-email">{{currentUser.email}}</p>
+    </div>
+    <button mat-menu-item routerLink="/compte">
+      <mat-icon>person</mat-icon>
+      <span>Mon profil</span>
+    </button>
+    <button mat-menu-item routerLink="/commandes">
+      <mat-icon>receipt</mat-icon>
+      <span>Mes commandes</span>
+    </button>
+    <button mat-menu-item (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      <span>Déconnexion</span>
+    </button>
   </mat-menu>
