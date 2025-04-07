@@ -94,18 +94,16 @@ router.post('/login', async (req: Request, res: Response) => {
     }
     
     // Appel au service utilisateur pour vérifier les identifiants
-    // const response = await axios.post<ValidateUserResponse>(`${USER_SERVICE_URL}/users/validate`, { 
-    //   email, 
-    //   password 
-    // });
+    const response = await axios.post<ValidateUserResponse>(`${USER_SERVICE_URL}/users/validate`, { 
+      email, 
+      password 
+    });
     
-    // if (!response.data.valid) {
-    //   return res.status(401).json({ message: 'Identifiants invalides' });
-    // }
+    if (!response.data.valid) {
+      return res.status(401).json({ message: 'Identifiants invalides' });
+    }
     
-     // simulation car la route n'est pas encore crée dans le user-service 
-    // const userId = response.data.id;
-    const userId = randomUUID();
+    const userId = response.data.userId;
     const tokens = JWTService.generateTokens(userId);
     
     res.json({ 
@@ -128,26 +126,25 @@ router.post('/register', async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Email, mot de passe et nom requis' });
     }
     
-    // // Vérifier si l'utilisateur existe déjà
-    // try {
-    //   await axios.get(`${USER_SERVICE_URL}/users/by-email/${email}`);
-    //   return res.status(409).json({ message: 'Un utilisateur avec cet email existe déjà' });
-    // } catch (error: any) {
-    //   // Si l'erreur est 404, c'est que l'utilisateur n'existe pas, on peut continuer
-    //   if (error.response?.status !== 404) {
-    //     throw error;
-    //   }
-    // }
+    // Vérifier si l'utilisateur existe déjà
+    try {
+      await axios.get(`${USER_SERVICE_URL}/users/by-email/${email}`);
+      return res.status(409).json({ message: 'Un utilisateur avec cet email existe déjà' });
+    } catch (error: any) {
+      // Si l'erreur est 404, c'est que l'utilisateur n'existe pas, on peut continuer
+      if (error.response?.status !== 404) {
+        throw error;
+      }
+    }
     
     // Créer l'utilisateur dans le service utilisateur
-    // const response = await axios.post<UserResponse>(`${USER_SERVICE_URL}/users`, {
-    //   email,
-    //   password,
-    //   name
-    // });
-    // simulation car la route n'est pas encore crée dans le user-service 
-    // const userId = response.data.id;
-    const userId = randomUUID();
+    const response = await axios.post<UserResponse>(`${USER_SERVICE_URL}/users`, {
+      email,
+      password,
+      name
+    });
+    
+    const userId = response.data.id;
     const tokens = JWTService.generateTokens(userId);
     
     res.status(201).json({

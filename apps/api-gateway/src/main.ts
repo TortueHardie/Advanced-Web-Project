@@ -1,42 +1,40 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import * as express from 'express';
-import { createProxyMiddleware } from 'http-proxy-middleware';
+// import * as express from 'express';
+// import { createProxyMiddleware } from 'http-proxy-middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Configuration CORS
+  app.enableCors({
+    origin: true, // Permet toutes les origines en développement
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+    allowedHeaders: 'Authorization,Content-Type,Accept',
+  });
 
   // 🔹 Swagger pour la Gateway
   const config = new DocumentBuilder()
     .setTitle('API Gateway')
     .setDescription('Documentation centralisée des microservices')
     .setVersion('1.0')
-    .addBearerAuth()
+    .addBearerAuth({
+      type: 'http',
+      scheme: 'bearer',
+      bearerFormat: 'JWT',
+      in: 'header',
+    })
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
 
-  // 🔹 Proxy Express pour les services
-  const proxyApp = express();
-  
-  // Proxy pour le service utilisateur
-  proxyApp.use('/user', createProxyMiddleware({
-    target: process.env.USER_SERVICE_URL || 'http://user-service:3001',
-    changeOrigin: true,
-    pathRewrite: { '^/user': '/' }
-  }));
-
-  // Proxy pour le service d'authentification
-  proxyApp.use('/auth', createProxyMiddleware({
-    target: process.env.AUTH_SERVICE_URL || 'http://auth-service:3001',
-    changeOrigin: true,
-    pathRewrite: { '^/auth': '/' }
-  }));
-
-  // Ajout du proxy à NestJS
-  app.use('/api', proxyApp);
+  // 🔹 Le routage est maintenant entièrement géré par NGINX
+  // Les proxys Express ont été supprimés pour éviter les redondances et
+  // les incohérences potentielles dans la configuration de sécurité.
+  // Toutes les routes sont configurées dans le fichier nginx.conf
 
   // Démarrer l'application sur localhost:3000 pour que Nginx puisse y accéder
   await app.listen(3000, '0.0.0.0');

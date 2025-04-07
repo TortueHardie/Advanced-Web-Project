@@ -8,6 +8,9 @@ RUN apt-get update && \
     apt-get install -y build-essential python3 && \
     rm -rf /var/lib/apt/lists/*
 
+# Installer NestJS CLI globalement
+RUN npm install -g @nestjs/cli
+
 # Copier les fichiers essentiels pour l'installation
 # Copier package.json de la racine et du microservice
 COPY package.json ./
@@ -25,5 +28,5 @@ RUN npm install --legacy-peer-deps
 # Exposer le port du service
 EXPOSE 3000
 
-# Démarrer l'application en mode développement
-CMD ["npm", "run", "start:dev"] 
+# Utiliser ts-node-dev directement au lieu de npm run pour éviter l'erreur de module non trouvé
+CMD ["npx", "ts-node-dev", "--respawn", "--transpile-only", "src/main.ts"] 

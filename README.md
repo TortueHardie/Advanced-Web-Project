@@ -14,21 +14,54 @@ swagger service Utilisateurs accès direct : http://localhost:3001/docs
 ## Routes API
 
 ### API Gateway
-- `GET /docs` - Documentation Swagger de l'API Gateway
-- Proxy routes:
-  - `/api/user/*` - Redirige vers le service utilisateur
-  - `/api/auth/*` - Redirige vers le service d'authentification
+- `GET /docs` - Documentation Swagger centralisée de l'API Gateway
 
-### Service d'Authentification (Auth Service)
+### Authentification (Auth Service)
 - `POST /auth/login` - Connexion utilisateur
 - `POST /auth/register` - Inscription utilisateur
 - `POST /auth/verify` - Vérification de la validité d'un token JWT
 - `POST /auth/refresh` - Rafraîchissement d'un token expiré
 - `POST /auth/revoke` - Révocation d'un token
 
-### Service Utilisateur (User Service)
-- `GET /docs` - Documentation Swagger du service utilisateur
-- Microservice TCP disponible sur le port 4001
+### Utilisateurs (User Service)
+- `POST /users` - Créer un nouvel utilisateur
+- `GET /users` - Récupérer tous les utilisateurs (authentification requise)
+- `GET /users/:id` - Récupérer un utilisateur par ID (authentification requise)
+- `PUT /users/:id` - Mettre à jour un utilisateur (authentification requise)
+- `DELETE /users/:id` - Supprimer un utilisateur (authentification requise)
+- `POST /users/validate` - Valider les identifiants utilisateur (utilisé par le service d'authentification)
+- `GET /users/by-email/:email` - Récupérer un utilisateur par email (authentification requise)
+
+### Commandes (Order Service)
+- `POST /orders` - Créer une nouvelle commande (authentification requise)
+- `GET /orders/me` - Récupérer les commandes de l'utilisateur connecté (authentification requise)
+- `GET /orders/admin` - Récupérer toutes les commandes (rôle admin/restaurant requis)
+- `GET /orders/:orderId` - Récupérer les détails d'une commande (authentification requise)
+- `PUT /orders/:orderId/cancel` - Annuler une commande (authentification requise)
+
+### Logs (Log Service)
+- `GET /health` - Vérifier l'état du service de logs
+- `POST /logs` - Enregistrer un nouveau message de log
+- `GET /logs` - Récupérer les messages de logs (pagination supportée)
+
+## Authentification et Autorisation
+
+Le système utilise l'authentification par JWT (JSON Web Tokens) :
+
+1. **Obtention d'un token** :
+   - Créez un compte avec `/auth/register` ou connectez-vous avec `/auth/login`
+   - Ces endpoints vous renverront un `accessToken` et un `refreshToken`
+
+2. **Utilisation des routes protégées** :
+   - Incluez le header `Authorization: Bearer {votre_access_token}` dans vos requêtes
+   - Toutes les routes des services utilisateur et commandes (sauf la création d'utilisateur) nécessitent une authentification
+
+3. **Rafraîchissement d'un token expiré** :
+   - Lorsque votre `accessToken` expire (après 15 minutes), utilisez `/auth/refresh` avec votre `refreshToken`
+   - Vous recevrez une nouvelle paire de tokens
+
+4. **Révocation d'un token** :
+   - Pour la déconnexion sécurisée, utilisez `/auth/revoke` avec votre `accessToken`
 
 ## Lancer en dev : 
 ```sh
@@ -298,58 +331,3 @@ Cette erreur se produit quand les fichiers de configuration TypeScript ne sont p
      - ./apps/service-name:/usr/src/app/apps/service-name
      - /usr/src/app/apps/service-name/node_modules # Anonymous volume pour ne pas écraser node_modules
    ```
-
-3. Après modification, reconstruisez les images: `.\rebuild.bat`
-
-#### Performance lente sur Windows
-
-Les volumes Docker peuvent être lents sur Windows sans WSL2. Recommandations:
-
-1. Activez WSL2 pour Docker Desktop
-2. Utilisez la commande `--performance-mode=max` si disponible
-3. Alternativement, exécutez uniquement le microservice sur lequel vous travaillez
-
-### Comment ça fonctionne
-
-1. Les conteneurs Docker utilisent des Dockerfiles spécifiques au développement (`Dockerfile.dev`)
-2. Le code source de chaque microservice est monté comme un volume dans le conteneur correspondant
-3. Les dépendances sont installées dans le conteneur avec support pour les packages locaux
-4. Chaque service utilise le script `npm run start:dev` qui surveille les changements de fichiers
-5. Quand vous modifiez un fichier source, le service détecte le changement et redémarre automatiquement
-
-### Considérations architecturales
-
-1. **Base de données partagée**: Actuellement, tous les services utilisent la même base PostgreSQL
-   - Avantages: Simplicité, cohérence des données
-   - Inconvénients: Couplage entre services, risque de conflits
-
-2. **Communication entre services**: 
-   - Via l'API Gateway pour les requêtes externes
-   - Directement entre services via le réseau Docker pour les communications internes
-
-3. **Scalabilité**:
-   - Chaque service peut être mis à l'échelle indépendamment
-   - L'API Gateway gère le routing vers les instances disponibles
-
-## Résumé des améliorations DevOps
-
-Notre configuration Docker pour le développement offre plusieurs avantages:
-
-1. **Hot-reload unifié pour tous les microservices**:
-   - Modification du code en temps réel sans rebuild
-   - Support complet de TypeScript avec recompilation automatique
-
-2. **Support des dépendances locales**:
-   - Gestion correcte des packages monorepo comme `@advanced-web/prisma`
-   - Partage efficace de code entre les services
-
-3. **Flexibilité de développement**:
-   - Scripts de facilité (`dev.bat`, `rebuild.bat`)
-   - Chaque microservice fonctionne de manière isolée mais interconnectée
-   - Documentation complète pour le dépannage
-
-4. **Compatibilité multi-plateformes**:
-   - Optimisations pour Windows avec notes sur WSL2
-   - Scripts équivalents pour Linux/macOS
-
-Pour toute question ou problème supplémentaire, consultez la documentation officielle de Docker et NestJS, ou ouvrez une issue dans le dépôt du projet.

@@ -53,7 +53,7 @@ services:
       - ./apps/auth-service/nest-cli.json:/usr/src/app/apps/auth-service/nest-cli.json
       - ./packages:/usr/src/app/packages
     ports:
-      - "3001:3001"
+      - "3005:3001"
 
   api-gateway:
     build:

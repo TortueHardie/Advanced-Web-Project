@@ -111,10 +111,30 @@ services:
       - app-network
     restart: unless-stopped
 
+  log-service:
+    build:
+      context: .
+      dockerfile: apps/log-service/Dockerfile
+    container_name: log-service
+    restart: unless-stopped
+    ports:
+      - "3004:3004"
+    volumes:
+      - log_service_data:/app/logs
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3004/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
 volumes:
   postgres_data:
   redis_data:
   api_gateway_logs:
+  log_service_data:
 
 networks:
   app-network:
