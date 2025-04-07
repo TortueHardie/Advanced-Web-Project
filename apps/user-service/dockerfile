@@ -30,8 +30,8 @@ COPY apps/user-service/tsconfig.build.json ./
 COPY apps/user-service/nest-cli.json ./
 
 # Modifier les imports pour pointer vers le service Prisma local
-RUN find ./src -type f -name "*.ts" -exec sed -i 's|\.\./\.\./\.\./packages/prisma/src/prisma\.service|./src/prisma/prisma\.service|g' {} \;
-RUN find ./src -type f -name "*.ts" -exec sed -i 's|\.\./\.\./\.\./\.\./packages/prisma/src/prisma\.service|./src/prisma/prisma\.service|g' {} \;
+RUN find ./src -type f -name "*.ts" -exec sed -i 's|\.\./\.\./\.\./packages/prisma/src/prisma\.service|\.\.\/src\/prisma\/prisma\.service|g' {} \;
+RUN find ./src -type f -name "*.ts" -exec sed -i 's|\.\./\.\./\.\./\.\./packages/prisma/src/prisma\.service|\.\.\/src\/prisma\/prisma\.service|g' {} \;
 
 # Générer le client Prisma
 RUN npx prisma generate
