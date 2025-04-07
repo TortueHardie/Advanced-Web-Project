@@ -11,7 +11,7 @@ services:
       POSTGRES_PASSWORD: ${DATABASE_MDP_POSTGRES}
       POSTGRES_DB: ${DATABASE_NAME_POSTGRES}
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -21,7 +21,7 @@ services:
     image: redis:alpine
     restart: always
     ports:
-      - "6379:6379"
+      - "127.0.0.1:6379:6379"
     volumes:
       - redis_data:/data
     networks:
@@ -52,8 +52,6 @@ services:
       - ./apps/auth-service/tsconfig.build.json:/usr/src/app/apps/auth-service/tsconfig.build.json
       - ./apps/auth-service/nest-cli.json:/usr/src/app/apps/auth-service/nest-cli.json
       - ./packages:/usr/src/app/packages
-    ports:
-      - "3005:3001"
 
   api-gateway:
     build:
@@ -103,8 +101,6 @@ services:
       - ./apps/user-service/tsconfig.build.json:/usr/src/app/apps/user-service/tsconfig.build.json
       - ./apps/user-service/nest-cli.json:/usr/src/app/apps/user-service/nest-cli.json
       - ./packages:/usr/src/app/packages
-    ports:
-      - "4002:3001"
 
   log-service:
     build:
@@ -122,8 +118,6 @@ services:
       - ./apps/log-service/tsconfig.build.json:/usr/src/app/apps/log-service/tsconfig.build.json
       - ./apps/log-service/nest-cli.json:/usr/src/app/apps/log-service/nest-cli.json
       - ./packages:/usr/src/app/packages
-    ports:
-      - "3003:3003"
 
   order-service:
     build:
@@ -144,8 +138,6 @@ services:
       - ./apps/order-service/tsconfig.build.json:/usr/src/app/apps/order-service/tsconfig.build.json
       - ./apps/order-service/nest-cli.json:/usr/src/app/apps/order-service/nest-cli.json
       - ./packages:/usr/src/app/packages
-    ports:
-      - "3002:3002"
 
   frontend:
     build:
