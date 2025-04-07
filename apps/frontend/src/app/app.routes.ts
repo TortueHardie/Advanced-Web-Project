@@ -14,10 +14,14 @@ import { StatisticsComponent } from './components/statistics/statistics.componen
 import { RestaurateurOrdersComponent } from './components/restaurateur-orders/restaurateur-orders.component';
 import { LoginComponent } from './pages/login/login.component';
 import { RestaurateurMenuManagementComponent } from './components/restaurateur-menu-management/restaurateur-menu-management.component';
+import { RestaurateurProfileComponent } from './components/restaurateur-profile/restaurateur-profile.component';
+import { RestaurateurProfileUpdateComponent } from './components/restaurateur-profile/restaurateur-profile-update/restaurateur-profile-update.component';
+
 export const routes: Routes = [
   { path: '', component: LoginComponent },
   { path: 'login', loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent) },
   { path: 'register', loadComponent: () => import('./pages/register/register.component').then(m => m.RegisterComponent) },
+  // Customer
   { path: 'customer-purchase', component: CustomerPurchaseComponent },
   { path: 'compte', component: ProfileComponent },
   { path: 'compte/modifier', component: ProfileUpdateComponent },
@@ -26,11 +30,14 @@ export const routes: Routes = [
   { path: 'checkout', component: CheckoutComponent },
   { path: 'order-confirmation', component: OrderConfirmationComponent },
   { path: 'restaurant/:id', component: RestaurantDetailComponent },
+  // Restaurateur
+  { path: 'restaurateur/compte', component: RestaurateurProfileComponent },
+  { path: 'restaurateur/compte/modifier', component: RestaurateurProfileUpdateComponent },
+  { path: 'restaurateur/menu-management', component: RestaurateurMenuManagementComponent },
   { path: 'restaurateur/article/nouveau', component: RestaurateurItemUpdateComponent },
   { path: 'restaurateur/article/:id', component: RestaurateurItemUpdateComponent },
   { path: 'restaurateur/menu/nouveau', component: RestaurateurMenuUpdateComponent },
   { path: 'restaurateur/menu/:id', component: RestaurateurMenuUpdateComponent },
-  { path: 'restaurateur/menu-management', component: RestaurateurMenuManagementComponent },
   { path: 'restaurateur/commandes', component: RestaurateurOrdersComponent },
   { path: 'restaurateur/statistiques', component: StatisticsComponent },
   { path: '**', redirectTo: '' }
