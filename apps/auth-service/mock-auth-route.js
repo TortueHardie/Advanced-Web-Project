@@ -3,7 +3,7 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const app = express();
-const PORT = 3050;
+const PORT = 3030;
 
 // Configuration
 const JWT_SECRET = 'test-secret-key';
@@ -24,7 +24,6 @@ const users = [
 
 // Routes
 app.get('/health', (req, res) => {
-  console.log('Route /health appelée');
   res.json({ status: 'ok', service: 'mock-auth-service' });
 });
 
@@ -63,7 +62,6 @@ const verifyToken = (token) => {
 
 // Routes d'authentification
 app.post('/auth/login', (req, res) => {
-  console.log('Route /auth/login appelée');
   const { email, password } = req.body;
   
   if (!email || !password) {
@@ -86,10 +84,10 @@ app.post('/auth/login', (req, res) => {
 
 app.post('/auth/register', (req, res) => {
   console.log('Route /auth/register appelée');
-  const { email, password, name } = req.body;
+  const { email, password, lastName } = req.body;
   
-  if (!email || !password || !name) {
-    return res.status(400).json({ message: 'Email, mot de passe et nom requis' });
+  if (!email || !password || !lastName) {
+    return res.status(400).json({ message: 'Email, mot de passe, nom requissss' });
   }
   
   if (users.some(u => u.email === email)) {
@@ -97,7 +95,7 @@ app.post('/auth/register', (req, res) => {
   }
   
   const newUserId = (users.length + 1).toString();
-  users.push({ id: newUserId, email, password, name });
+  users.push({ id: newUserId, email, password, lastName });
   
   const tokens = generateTokens(newUserId);
   
@@ -109,7 +107,6 @@ app.post('/auth/register', (req, res) => {
 });
 
 app.post('/auth/verify', extractToken, (req, res) => {
-  console.log('Route /auth/verify appelée');
   const isValid = verifyToken(req.token);
   if (!isValid) {
     return res.status(401).json({ message: 'Token invalide ou expiré' });
@@ -118,7 +115,6 @@ app.post('/auth/verify', extractToken, (req, res) => {
 });
 
 app.post('/auth/refresh', (req, res) => {
-  console.log('Route /auth/refresh appelée');
   const { refreshToken } = req.body;
   if (!refreshToken) {
     return res.status(400).json({ message: 'Refresh token manquant' });
@@ -134,37 +130,19 @@ app.post('/auth/refresh', (req, res) => {
 });
 
 app.post('/auth/revoke', extractToken, (req, res) => {
-  console.log('Route /auth/revoke appelée');
   revokedTokens.add(req.token);
   res.json({ message: 'Token révoqué avec succès' });
 });
 
-// Gestion des erreurs
-app.use((err, req, res, next) => {
-  console.error('Erreur:', err.stack);
-  res.status(500).json({ error: 'Erreur interne du serveur', message: err.message });
-});
-
 // Démarrage du serveur
-try {
-  const server = app.listen(PORT, () => {
-    console.log(`Service d'authentification mock démarré sur le port ${PORT}`);
-    console.log(`URL: http://localhost:${PORT}`);
-    console.log('Routes disponibles:');
-    console.log('- GET /health');
-    console.log('- POST /auth/login');
-    console.log('- POST /auth/register');
-    console.log('- POST /auth/verify');
-    console.log('- POST /auth/refresh');
-    console.log('- POST /auth/revoke');
-  });
-
-  server.on('error', (err) => {
-    console.error('Erreur lors du démarrage du serveur:', err);
-    if (err.code === 'EADDRINUSE') {
-      console.error(`Le port ${PORT} est déjà utilisé. Essayez un autre port.`);
-    }
-  });
-} catch (error) {
-  console.error('Erreur fatale lors du démarrage du serveur:', error);
-} 
+app.listen(PORT, () => {
+  console.log(`Service d'authentification mock démarré sur le port ${PORT}`);
+  console.log(`URL: http://localhost:${PORT}`);
+  console.log('Routes disponibles:');
+  console.log('- GET /health');
+  console.log('- POST /auth/login');
+  console.log('- POST /auth/register');
+  console.log('- POST /auth/verify');
+  console.log('- POST /auth/refresh');
+  console.log('- POST /auth/revoke');
+}); 

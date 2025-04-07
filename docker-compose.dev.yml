@@ -92,6 +92,7 @@ services:
     depends_on:
       - postgres
     environment:
+      DATABASE_URL_POSTGRES: ${DATABASE_URL_POSTGRES}
       DATABASE_URL: ${DATABASE_URL_POSTGRES}
       NODE_ENV: development
     networks:
@@ -103,7 +104,7 @@ services:
       - ./apps/user-service/nest-cli.json:/usr/src/app/apps/user-service/nest-cli.json
       - ./packages:/usr/src/app/packages
     ports:
-      - "3001:3001"
+      - "4002:3001"
 
   log-service:
     build:
