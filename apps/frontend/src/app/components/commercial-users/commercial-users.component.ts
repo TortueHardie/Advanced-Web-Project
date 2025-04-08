@@ -391,11 +391,12 @@ export class CommercialUsersComponent implements OnInit {
         this.users[index] = updatedUser;
       } else {
         // Add new user
-        this.users.push(updatedUser);
+        this.users = [...this.users, updatedUser]; // Create new array to trigger change detection
       }
       
-      this.selectedUser = updatedUser;
+      this.selectedUser = null; // Clear selection after save
       this.isEditing = false;
+      this.userForm.reset(); // Reset form after save
     }
   }
 
