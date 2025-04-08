@@ -1,0 +1,103 @@
+services:
+  # En environnement de production, aucun service interne n'est exposé
+  # Nous n'exposons que l'API Gateway et le frontend
+  
+  api-gateway:
+    # Configuration optimisée pour la production
+    environment:
+      NODE_ENV: production
+    restart: always
+    volumes:
+      - api_gateway_logs:/var/log/nginx
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    # Configuration des healthchecks plus stricte en production
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  # Services internes - non accessibles directement
+  user-service:
+    environment:
+      NODE_ENV: production
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 256M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  auth-service:
+    environment:
+      NODE_ENV: production
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 256M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+  
+  # Base de données et autres services - renforcement de la sécurité
+  postgres:
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    secrets:
+      - postgres_password
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+  
+  redis:
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}", "--appendonly", "yes"]
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 128M
+
+  # Frontend optimisé pour la production
+  frontend:
+    environment:
+      NODE_ENV: production
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 256M
+
+# Définition des secrets pour les données sensibles
+secrets:
+  postgres_password:
+    file: ./.secrets/postgres_password.txt 

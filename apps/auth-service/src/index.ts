@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 import { authRouter } from './routes/auth.routes';
+import { healthRouter } from './routes/health.routes';
 import { errorHandler } from './middleware/error.middleware';
 import { logger } from './utils/logger';
 
@@ -30,10 +31,12 @@ app.get('/auth/health', (req, res) => {
 
 // Routes
 app.use('/auth', authRouter);
+app.use('/health', healthRouter);
 
 // Middleware de gestion des erreurs
 app.use(errorHandler);
 
 app.listen(PORT, () => {
   logger.info(`Service d'authentification démarré sur le port ${PORT}`);
+  logger.info(`Variables d'environnement: REDIS_HOST=${process.env.REDIS_HOST}, USER_SERVICE_URL=${process.env.USER_SERVICE_URL}`);
 }); 
