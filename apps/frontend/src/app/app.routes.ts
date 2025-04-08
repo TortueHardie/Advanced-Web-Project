@@ -14,6 +14,7 @@ import { LoginComponent } from './pages/login/login.component';
 import { RestaurateurMenuManagementComponent } from './components/restaurateur-menu-management/restaurateur-menu-management.component';
 import { RestaurateurProfileComponent } from './components/restaurateur-profile/restaurateur-profile.component';
 import { RestaurateurProfileUpdateComponent } from './components/restaurateur-profile/restaurateur-profile-update/restaurateur-profile-update.component';
+import { DelivererOrdersComponent } from './components/deliverer-orders/deliverer-orders.component';
 
 export const routes: Routes = [
   { path: '', component: LoginComponent },
@@ -34,5 +35,7 @@ export const routes: Routes = [
   { path: 'restaurateur/menu-management', component: RestaurateurMenuManagementComponent },
   { path: 'restaurateur/commandes', component: RestaurateurOrdersComponent },
   { path: 'restaurateur/statistiques', component: StatisticsComponent },
+  // Deliverer
+  { path: 'deliverer/commandes', component: DelivererOrdersComponent },
   { path: '**', redirectTo: '' }
 ];
