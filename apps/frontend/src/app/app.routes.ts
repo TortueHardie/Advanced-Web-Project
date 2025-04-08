@@ -15,6 +15,7 @@ import { RestaurateurMenuManagementComponent } from './components/restaurateur-m
 import { RestaurateurProfileComponent } from './components/restaurateur-profile/restaurateur-profile.component';
 import { RestaurateurProfileUpdateComponent } from './components/restaurateur-profile/restaurateur-profile-update/restaurateur-profile-update.component';
 import { DelivererOrdersComponent } from './components/deliverer-orders/deliverer-orders.component';
+import { DelivererProfileComponent } from './components/deliverer-profile/deliverer-profile.component';
 
 export const routes: Routes = [
   { path: '', component: LoginComponent },
@@ -36,6 +37,7 @@ export const routes: Routes = [
   { path: 'restaurateur/commandes', component: RestaurateurOrdersComponent },
   { path: 'restaurateur/statistiques', component: StatisticsComponent },
   // Deliverer
+  { path: 'deliverer/compte', component: DelivererProfileComponent },
   { path: 'deliverer/commandes', component: DelivererOrdersComponent },
   { path: '**', redirectTo: '' }
 ];
