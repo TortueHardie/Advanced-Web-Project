@@ -10,8 +10,8 @@ export interface Restaurant {
 export interface Menu {
     id: string;
     name: string;
+    description?: string;
     price: number;
-    description: string;
     image?: string;
     items: MenuItem[];
 }
@@ -19,8 +19,8 @@ export interface Menu {
 export interface MenuItem {
     id: string;
     name: string;
+    description?: string;
     price: number;
-    description: string;
     image?: string;
     options?: MenuItemOption[];
 }

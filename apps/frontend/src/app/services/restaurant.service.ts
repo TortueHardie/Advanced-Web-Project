@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import { Restaurant, Menu, MenuItem } from '../models/restaurant.model';
 
 @Injectable({
@@ -62,6 +62,8 @@ export class RestaurantService {
 
   private restaurantSubject = new BehaviorSubject<Restaurant>(this.restaurant);
 
+  constructor() {}
+
   getRestaurant(): Observable<Restaurant> {
     return this.restaurantSubject.asObservable();
   }
@@ -105,6 +107,18 @@ export class RestaurantService {
 
   deleteArticle(articleId: string): void {
     this.restaurant.articles = this.restaurant.articles.filter(a => a.id !== articleId);
+    this.restaurantSubject.next(this.restaurant);
+  }
+
+  createMenu(menu: Menu): void {
+    menu.id = Date.now().toString();
+    this.restaurant.menus.push(menu);
+    this.restaurantSubject.next(this.restaurant);
+  }
+
+  createArticle(article: MenuItem): void {
+    article.id = Date.now().toString();
+    this.restaurant.articles.push(article);
     this.restaurantSubject.next(this.restaurant);
   }
 } 
