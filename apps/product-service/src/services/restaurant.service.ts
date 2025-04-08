@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { RestaurantRepository } from '../repositories/restaurant.repository';
-import { CreateRestaurantDto, UpdateRestaurantDto, RestaurantDto } from '../dto';
+import { CreateRestaurantDto, UpdateRestaurantDto, RestaurantDto, MenuDto } from '../dto';
 import {
   RestaurantNotFoundException,
   RestaurantAlreadyExistsException,
@@ -17,7 +17,7 @@ export class RestaurantService {
       // Vérifier si un restaurant avec le même nom existe déjà
       const existingRestaurant = await this.restaurantRepository.findByName(createRestaurantDto.name);
       if (existingRestaurant) {
-        throw new RestaurantAlreadyExistsException(createRestaurantDto.name);
+        throw new RestaurantAlreadyExistsException();
       }
 
       const restaurant = await this.restaurantRepository.create(createRestaurantDto);
@@ -26,7 +26,7 @@ export class RestaurantService {
       if (error instanceof RestaurantAlreadyExistsException) {
         throw error;
       }
-      throw new RestaurantOperationFailedException('création', error);
+      throw new RestaurantOperationFailedException('Création du restaurant échouée');
     }
   }
 
@@ -35,7 +35,7 @@ export class RestaurantService {
       const restaurants = await this.restaurantRepository.findAll();
       return restaurants.map(restaurant => this.mapToDto(restaurant));
     } catch (error) {
-      throw new RestaurantOperationFailedException('récupération de la liste', error);
+      throw new RestaurantOperationFailedException('Récupération des restaurants échouée');
     }
   }
 
@@ -43,14 +43,14 @@ export class RestaurantService {
     try {
       const restaurant = await this.restaurantRepository.findOne(id);
       if (!restaurant) {
-        throw new RestaurantNotFoundException(id);
+        throw new RestaurantNotFoundException();
       }
       return this.mapToDto(restaurant);
     } catch (error) {
       if (error instanceof RestaurantNotFoundException) {
         throw error;
       }
-      throw new RestaurantOperationFailedException('récupération', error);
+      throw new RestaurantOperationFailedException('Récupération du restaurant échouée');
     }
   }
 
@@ -63,7 +63,7 @@ export class RestaurantService {
       if (updateRestaurantDto.name) {
         const existingRestaurant = await this.restaurantRepository.findByName(updateRestaurantDto.name);
         if (existingRestaurant && existingRestaurant.id !== id) {
-          throw new RestaurantAlreadyExistsException(updateRestaurantDto.name);
+          throw new RestaurantAlreadyExistsException();
         }
       }
 
@@ -74,7 +74,7 @@ export class RestaurantService {
           error instanceof RestaurantAlreadyExistsException) {
         throw error;
       }
-      throw new RestaurantOperationFailedException('mise à jour', error);
+      throw new RestaurantOperationFailedException('Mise à jour du restaurant échouée');
     }
   }
 
@@ -88,11 +88,11 @@ export class RestaurantService {
       if (error instanceof RestaurantNotFoundException) {
         throw error;
       }
-      throw new RestaurantOperationFailedException('suppression', error);
+      throw new RestaurantOperationFailedException('Suppression du restaurant échouée');
     }
   }
 
-  async findMenus(restaurantId: string) {
+  async findMenus(restaurantId: string): Promise<MenuDto[]> {
     try {
       // Vérifier si le restaurant existe
       await this.findOne(restaurantId);
@@ -105,7 +105,7 @@ export class RestaurantService {
       if (error instanceof RestaurantNotFoundException) {
         throw error;
       }
-      throw new RestaurantOperationFailedException('récupération des menus', error);
+      throw new RestaurantOperationFailedException('Récupération des menus échouée');
     }
   }
 

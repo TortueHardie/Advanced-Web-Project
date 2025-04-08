@@ -6,7 +6,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 COPY packages/prisma/package*.json ./packages/prisma/
 COPY packages/discovery/package*.json ./packages/discovery/
-COPY apps/product-service/package*.json ./apps/product-service/
+COPY apps/delivery-service/package*.json ./apps/delivery-service/
 
 # Install dependencies
 RUN npm ci
@@ -14,7 +14,7 @@ RUN npm ci
 # Copy source code
 COPY packages/prisma ./packages/prisma
 COPY packages/discovery ./packages/discovery
-COPY apps/product-service ./apps/product-service
+COPY apps/delivery-service ./apps/delivery-service
 COPY tsconfig.json ./
 COPY tsconfig.build.json ./
 
@@ -22,7 +22,7 @@ COPY tsconfig.build.json ./
 RUN cd packages/prisma && npx prisma generate
 
 # Build application
-RUN npm run build product-service
+RUN npm run build delivery-service
 
 FROM node:18-alpine As production
 
@@ -35,7 +35,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 COPY packages/prisma/package*.json ./packages/prisma/
 COPY packages/discovery/package*.json ./packages/discovery/
-COPY apps/product-service/package*.json ./apps/product-service/
+COPY apps/delivery-service/package*.json ./apps/delivery-service/
 
 # Install only production dependencies
 RUN npm ci --only=production
@@ -47,8 +47,8 @@ COPY --from=development /usr/src/app/packages/discovery/dist ./packages/discover
 COPY --from=development /usr/src/app/node_modules/.prisma ./node_modules/.prisma
 
 # Configure environment and expose port
-ENV PORT=3002
+ENV PORT=3003
 EXPOSE ${PORT}
 
 # Start the application
-CMD ["node", "dist/apps/product-service/main"] 
+CMD ["node", "dist/apps/delivery-service/main"] 

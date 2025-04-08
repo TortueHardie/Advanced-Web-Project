@@ -1,3 +1,61 @@
 node_modules/
 /apps/frontend/.vscode
 .env
+/dist
+
+# Frontend      
+/apps/frontend/node_modules
+/apps/frontend/.next
+/apps/frontend/.env
+/apps/frontend/.env.local
+/apps/frontend/.env.development.local
+/apps/frontend/.env.test.local
+
+# Api Gateway
+/apps/api-gateway/node_modules
+/apps/api-gateway/dist
+/apps/api-gateway/.env
+/apps/api-gateway/.env.local
+/apps/api-gateway/.env.development.local
+/apps/api-gateway/.env.test.local
+
+# User Service
+/apps/user-service/node_modules
+/apps/user-service/dist
+/apps/user-service/.env
+/apps/user-service/.env.local
+/apps/user-service/.env.development.local
+/apps/user-service/.env.test.local
+
+# Product Service
+/apps/product-service/node_modules
+/apps/product-service/dist
+/apps/product-service/.env
+/apps/product-service/.env.local
+/apps/product-service/.env.development.local
+/apps/product-service/.env.test.local
+
+# Delivery Service
+/apps/delivery-service/node_modules
+/apps/delivery-service/dist
+/apps/delivery-service/.env
+/apps/delivery-service/.env.local
+/apps/delivery-service/.env.development.local
+/apps/delivery-service/.env.test.local
+
+# Order Service
+/apps/order-service/node_modules
+/apps/order-service/dist
+/apps/order-service/.env
+/apps/order-service/.env.local
+/apps/order-service/.env.development.local
+/apps/order-service/.env.test.local
+
+# Logger Service
+/apps/logger-service/node_modules
+/apps/logger-service/dist
+/apps/logger-service/.env
+/apps/logger-service/.env.local
+/apps/logger-service/.env.development.local
+/apps/logger-service/.env.test.local
+

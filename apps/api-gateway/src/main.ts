@@ -1,71 +1,66 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-// import * as express from 'express';
-// import { createProxyMiddleware } from 'http-proxy-middleware';
+import { ValidationPipe } from '@nestjs/common';
+import { HttpExceptionFilter } from './filters/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Configuration CORS
-  app.enableCors({
-    origin: true, // Permet toutes les origines en développement
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    credentials: true,
-    allowedHeaders: 'Authorization,Content-Type,Accept',
-  });
+  // Configuration globale
+  app.useGlobalPipes(new ValidationPipe({
+    transform: true,
+    whitelist: false,
+    forbidNonWhitelisted: false,
+  }));
+  app.useGlobalFilters(new HttpExceptionFilter());
+  app.enableCors();
 
-  // 🔹 Swagger pour la Gateway - Configuration améliorée
+  // Configuration Swagger
   const config = new DocumentBuilder()
-    .setTitle('API Gateway')
-    .setDescription('Documentation centralisée des microservices')
+    .setTitle('API Gateway - Service Central')
+    .setDescription(`
+      Point d'entrée unique pour l'ensemble des microservices de l'application.
+      
+      ## Services disponibles
+      
+      - **User Service** : Gestion des utilisateurs et de l'authentification
+      - **Product Service** : Gestion des restaurants, menus et articles
+      - **Delivery Service** : Gestion des livraisons de commandes
+      - **Order Service** : Traitement des commandes
+      
+      ## Authentification
+      
+      L'API utilise l'authentification par JWT (JSON Web Token). 
+      Pour les routes protégées, vous devez fournir un token dans l'en-tête Authorization.
+    `)
     .setVersion('1.0')
-    .addTag('Auth', 'Endpoints d\'authentification')
-    .addTag('Users', 'Gestion des utilisateurs')
-    .addTag('Orders', 'Gestion des commandes')
-    .addTag('Products', 'Gestion des restaurants, menus et articles')
-    .addTag('Delivery', 'Gestion des livraisons')
     .addBearerAuth(
       {
         type: 'http',
         scheme: 'bearer',
         bearerFormat: 'JWT',
         name: 'Authorization',
-        description: 'Entrez votre token JWT ici',
+        description: 'Entrez votre token JWT',
         in: 'header',
       },
-      'access-token', // Identifiant unique pour ce schéma de sécurité
+      'access-token',
     )
-    .addServer('http://localhost:3000', 'Serveur de développement')
-    .addServer('https://api.votredomaine.com', 'Serveur de production')
+    .addTag('Auth', 'Authentification')
+    .addTag('Users', 'Gestion des utilisateurs')
+    .addTag('Products', 'Gestion des restaurants, menus et articles')
+    .addTag('Delivery', 'Gestion des livraisons')
+    .addTag('Orders', 'Gestion des commandes')
     .build();
-
-  const document = SwaggerModule.createDocument(app, config, {
-    deepScanRoutes: true,
-    ignoreGlobalPrefix: false,
-  });
   
-  SwaggerModule.setup('docs', app, document, {
-    swaggerOptions: {
-      persistAuthorization: true,
-      docExpansion: 'none',
-      filter: true,
-      tagsSorter: 'alpha',
-      operationsSorter: 'alpha',
-    },
-  });
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('docs', app, document);
 
-  // 🔹 Le routage est maintenant entièrement géré par NGINX
-  // Les proxys Express ont été supprimés pour éviter les redondances et
-  // les incohérences potentielles dans la configuration de sécurité.
-  // Toutes les routes sont configurées dans le fichier nginx.conf
-
-  // Démarrer l'application sur localhost:3000 pour que Nginx puisse y accéder
-  await app.listen(3000, '0.0.0.0');
-  console.log(`🚀 API Gateway démarrée sur le port 3000`);
-  console.log(`📄 Swagger de la Gateway : http://localhost:3000/docs`);
+  await app.listen(3000);
+  console.log(`🚀 API Gateway démarré sur: ${await app.getUrl()}`);
+  console.log(`📄 Documentation disponible sur: ${await app.getUrl()}/docs`);
 }
 
-bootstrap().catch((error) => {
-  console.error('❌ Erreur au démarrage de la Gateway :', error);
+bootstrap().catch(error => {
+  console.error('❌ Erreur au démarrage de l\'API Gateway:', error);
 });

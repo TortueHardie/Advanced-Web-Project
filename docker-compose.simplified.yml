@@ -62,7 +62,7 @@ services:
       - user-service
       - auth-service
       - product-service
-      - location-service
+      - delivery-service
     env_file:
       - .env
     environment:
@@ -70,7 +70,7 @@ services:
       AUTH_SERVICE_URL: http://auth-service:3001
       USER_SERVICE_URL: http://user-service:3001
       PRODUCT_SERVICE_URL: http://product-service:3002
-      LOCATION_SERVICE_URL: http://location-service:3003
+      DELIVERY_SERVICE_URL: http://delivery-service:3003
       NODE_ENV: development
     ports:
       - "3000:3000"
@@ -122,11 +122,11 @@ services:
       - /usr/src/app/apps/product-service/node_modules
       - ./packages:/usr/src/app/packages
 
-  location-service:
+  delivery-service:
     build:
       context: .
-      dockerfile: apps/location-service/Dockerfile.dev
-    container_name: location-service-dev
+      dockerfile: apps/delivery-service/Dockerfile.dev
+    container_name: delivery-service-dev
     restart: unless-stopped
     depends_on:
       - postgres
@@ -137,8 +137,8 @@ services:
       - internal-network
     volumes:
       # Monter tout le dossier du microservice sauf node_modules
-      - ./apps/location-service:/usr/src/app/apps/location-service
-      - /usr/src/app/apps/location-service/node_modules
+      - ./apps/delivery-service:/usr/src/app/apps/delivery-service
+      - /usr/src/app/apps/delivery-service/node_modules
       - ./packages:/usr/src/app/packages
 
   log-service:

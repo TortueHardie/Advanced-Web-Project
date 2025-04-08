@@ -3,50 +3,56 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@nestjs/core");
 const app_module_1 = require("./app.module");
 const swagger_1 = require("@nestjs/swagger");
+const common_1 = require("@nestjs/common");
+const http_exception_filter_1 = require("./filters/http-exception.filter");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
-    app.enableCors({
-        origin: true,
-        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-        credentials: true,
-        allowedHeaders: 'Authorization,Content-Type,Accept',
-    });
+    app.useGlobalPipes(new common_1.ValidationPipe({
+        transform: true,
+        whitelist: false,
+        forbidNonWhitelisted: false,
+    }));
+    app.useGlobalFilters(new http_exception_filter_1.HttpExceptionFilter());
+    app.enableCors();
     const config = new swagger_1.DocumentBuilder()
-        .setTitle('API Gateway')
-        .setDescription('Documentation centralisée des microservices')
+        .setTitle('API Gateway - Service Central')
+        .setDescription(`
+      Point d'entrée unique pour l'ensemble des microservices de l'application.
+      
+      ## Services disponibles
+      
+      - **User Service** : Gestion des utilisateurs et de l'authentification
+      - **Product Service** : Gestion des restaurants, menus et articles
+      - **Delivery Service** : Gestion des livraisons de commandes
+      - **Order Service** : Traitement des commandes
+      
+      ## Authentification
+      
+      L'API utilise l'authentification par JWT (JSON Web Token). 
+      Pour les routes protégées, vous devez fournir un token dans l'en-tête Authorization.
+    `)
         .setVersion('1.0')
-        .addTag('Auth', 'Endpoints d\'authentification')
-        .addTag('Users', 'Gestion des utilisateurs')
-        .addTag('Orders', 'Gestion des commandes')
         .addBearerAuth({
         type: 'http',
         scheme: 'bearer',
         bearerFormat: 'JWT',
         name: 'Authorization',
-        description: 'Entrez votre token JWT ici',
+        description: 'Entrez votre token JWT',
         in: 'header',
     }, 'access-token')
-        .addServer('http://localhost:3000', 'Serveur de développement')
-        .addServer('https://api.votredomaine.com', 'Serveur de production')
+        .addTag('Auth', 'Authentification')
+        .addTag('Users', 'Gestion des utilisateurs')
+        .addTag('Products', 'Gestion des restaurants, menus et articles')
+        .addTag('Delivery', 'Gestion des livraisons')
+        .addTag('Orders', 'Gestion des commandes')
         .build();
-    const document = swagger_1.SwaggerModule.createDocument(app, config, {
-        deepScanRoutes: true,
-        ignoreGlobalPrefix: false,
-    });
-    swagger_1.SwaggerModule.setup('docs', app, document, {
-        swaggerOptions: {
-            persistAuthorization: true,
-            docExpansion: 'none',
-            filter: true,
-            tagsSorter: 'alpha',
-            operationsSorter: 'alpha',
-        },
-    });
-    await app.listen(3000, '0.0.0.0');
-    console.log(`🚀 API Gateway démarrée sur le port 3000`);
-    console.log(`📄 Swagger de la Gateway : http://localhost:3000/docs`);
+    const document = swagger_1.SwaggerModule.createDocument(app, config);
+    swagger_1.SwaggerModule.setup('docs', app, document);
+    await app.listen(3000);
+    console.log(`🚀 API Gateway démarré sur: ${await app.getUrl()}`);
+    console.log(`📄 Documentation disponible sur: ${await app.getUrl()}/docs`);
 }
-bootstrap().catch((error) => {
-    console.error('❌ Erreur au démarrage de la Gateway :', error);
+bootstrap().catch(error => {
+    console.error('❌ Erreur au démarrage de l\'API Gateway:', error);
 });
 //# sourceMappingURL=main.js.map

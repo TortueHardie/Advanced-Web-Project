@@ -45,6 +45,63 @@ services:
       retries: 3
       start_period: 15s
 
+  product-service:
+    environment:
+      NODE_ENV: production
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 256M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3002/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  delivery-service:
+    environment:
+      NODE_ENV: production
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 256M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3003/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  order-service:
+    environment:
+      NODE_ENV: production
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 256M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3004/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
   auth-service:
     environment:
       NODE_ENV: production
@@ -100,4 +157,7 @@ services:
 # Définition des secrets pour les données sensibles
 secrets:
   postgres_password:
-    file: ./.secrets/postgres_password.txt 
+    file: ./.secrets/postgres_password.txt
+
+volumes:
+  api_gateway_logs: 

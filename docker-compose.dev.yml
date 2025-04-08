@@ -63,7 +63,7 @@ services:
       - user-service
       - auth-service
       - product-service
-      - location-service
+      - delivery-service
     env_file:
       - .env
     environment:
@@ -71,7 +71,7 @@ services:
       AUTH_SERVICE_URL: http://auth-service:3001
       USER_SERVICE_URL: http://user-service:3001
       PRODUCT_SERVICE_URL: http://product-service:3002
-      LOCATION_SERVICE_URL: http://location-service:3003
+      DELIVERY_SERVICE_URL: http://delivery-service:3003
       NODE_ENV: development
     ports:
       - "3000:3000"
@@ -127,11 +127,11 @@ services:
       - ./apps/product-service/nest-cli.json:/usr/src/app/apps/product-service/nest-cli.json
       - ./packages:/usr/src/app/packages
 
-  location-service:
+  delivery-service:
     build:
       context: .
-      dockerfile: apps/location-service/Dockerfile.dev
-    container_name: location-service-dev
+      dockerfile: apps/delivery-service/Dockerfile.dev
+    container_name: delivery-service-dev
     restart: unless-stopped
     depends_on:
       - postgres
@@ -141,10 +141,10 @@ services:
     networks:
       - internal-network
     volumes:
-      - ./apps/location-service/src:/usr/src/app/apps/location-service/src
-      - ./apps/location-service/tsconfig.json:/usr/src/app/apps/location-service/tsconfig.json
-      - ./apps/location-service/tsconfig.build.json:/usr/src/app/apps/location-service/tsconfig.build.json
-      - ./apps/location-service/nest-cli.json:/usr/src/app/apps/location-service/nest-cli.json
+      - ./apps/delivery-service/src:/usr/src/app/apps/delivery-service/src
+      - ./apps/delivery-service/tsconfig.json:/usr/src/app/apps/delivery-service/tsconfig.json
+      - ./apps/delivery-service/tsconfig.build.json:/usr/src/app/apps/delivery-service/tsconfig.build.json
+      - ./apps/delivery-service/nest-cli.json:/usr/src/app/apps/delivery-service/nest-cli.json
       - ./packages:/usr/src/app/packages
 
   log-service:
