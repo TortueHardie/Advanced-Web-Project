@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength, IsEnum, IsDateString } from 'class-validator';
+import { Role } from '@prisma/client';
 
 export class CreateUserDto {
   @ApiProperty({ description: 'Email de l\'utilisateur', example: 'user@example.com' })
@@ -7,24 +8,54 @@ export class CreateUserDto {
   @IsNotEmpty()
   email: string;
 
-  @ApiProperty({ description: 'Nom d\'utilisateur unique', example: 'john_doe' })
-  @IsString()
-  @IsNotEmpty()
-  username: string;
-
   @ApiProperty({ description: 'Mot de passe', example: 'password123', minLength: 8 })
   @IsString()
   @IsNotEmpty()
   @MinLength(8)
   password: string;
 
-  @ApiProperty({ description: 'Prénom', example: 'John', required: false })
+  @ApiProperty({ description: 'Prénom', example: 'John' })
   @IsString()
-  @IsOptional()
-  firstName?: string;
+  @IsNotEmpty()
+  firstName: string;
 
-  @ApiProperty({ description: 'Nom', example: 'Doe', required: false })
+  @ApiProperty({ description: 'Nom', example: 'Doe' })
+  @IsString()
+  @IsNotEmpty()
+  lastName: string;
+
+  @ApiProperty({ description: 'Date de naissance', example: '1990-01-01' })
+  @IsDateString()
+  @IsNotEmpty()
+  birthDate: string;
+
+  @ApiProperty({ description: 'Adresse', example: '123 rue Example' })
+  @IsString()
+  @IsNotEmpty()
+  address: string;
+
+  @ApiProperty({ description: 'Numéro de téléphone', example: '+33123456789', required: false })
   @IsString()
   @IsOptional()
-  lastName?: string;
+  phoneNumber?: string;
+
+  @ApiProperty({ description: 'Rôle de l\'utilisateur', enum: Role })
+  @IsEnum(Role)
+  @IsNotEmpty()
+  role: Role;
+
+  @ApiProperty({ description: 'Code de parrainage', required: false })
+  @IsString()
+  @IsOptional()
+  referralCode?: string;
+
+  @ApiProperty({ description: 'Numéro SIRET (pour restaurateurs)', required: false })
+  @IsString()
+  @IsOptional()
+  siret?: string;
+
+  @ApiProperty({ description: 'IBAN (pour restaurateurs)', required: false })
+  @IsString()
+  @IsOptional()
+  iban?: string;
 } 

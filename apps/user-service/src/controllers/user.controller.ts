@@ -13,9 +13,36 @@ export class UserController {
   @ApiOperation({ summary: 'Créer un nouvel utilisateur' })
   @ApiResponse({ status: 201, description: 'Utilisateur créé avec succès', type: UserDto })
   @ApiResponse({ status: 400, description: 'Données invalides' })
-  @ApiResponse({ status: 409, description: 'Email ou nom d\'utilisateur déjà existant' })
+  @ApiResponse({ status: 409, description: 'Email déjà existant' })
   async create(@Body() createUserDto: CreateUserDto): Promise<UserDto> {
     return this.userService.create(createUserDto);
+  }
+
+  @Post('validate')
+  @ApiOperation({ summary: 'Valider les identifiants d\'un utilisateur' })
+  @ApiResponse({ status: 200, description: 'Identifiants valides', schema: { 
+    properties: { 
+      valid: { type: 'boolean' },
+      userId: { type: 'string' }
+    } 
+  }})
+  @ApiResponse({ status: 401, description: 'Identifiants invalides' })
+  async validateUser(@Body() credentials: { email: string, password: string }): Promise<{ valid: boolean, userId?: string }> {
+    try {
+      const validationResult = await this.userService.validateCredentials(credentials.email, credentials.password);
+      return { valid: true, userId: validationResult.id.toString() };
+    } catch (error) {
+      return { valid: false };
+    }
+  }
+
+  @Get('by-email/:email')
+  @ApiOperation({ summary: 'Récupérer un utilisateur par email' })
+  @ApiParam({ name: 'email', description: 'Email de l\'utilisateur' })
+  @ApiResponse({ status: 200, description: 'Utilisateur trouvé', type: UserDto })
+  @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })
+  async findByEmail(@Param('email') email: string): Promise<UserDto> {
+    return this.userService.findByEmail(email);
   }
 
   @Get()
@@ -39,7 +66,7 @@ export class UserController {
   @ApiParam({ name: 'id', description: 'ID de l\'utilisateur' })
   @ApiResponse({ status: 200, description: 'Utilisateur mis à jour', type: UserDto })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })
-  @ApiResponse({ status: 409, description: 'Email ou nom d\'utilisateur déjà existant' })
+  @ApiResponse({ status: 409, description: 'Email déjà existant' })
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto): Promise<UserDto> {
     return this.userService.update(id, updateUserDto);
   }
@@ -47,9 +74,8 @@ export class UserController {
   @Delete(':id')
   @ApiOperation({ summary: 'Supprimer un utilisateur' })
   @ApiParam({ name: 'id', description: 'ID de l\'utilisateur' })
-  @ApiResponse({ status: 200, description: 'Utilisateur supprimé', type: UserDto })
+  @ApiResponse({ status: 200, description: 'Utilisateur supprimé' })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })
-  @HttpCode(HttpStatus.OK)
   async remove(@Param('id') id: string): Promise<UserDto> {
     return this.userService.remove(id);
   }
@@ -94,11 +120,6 @@ export class UserController {
   @MessagePattern({ cmd: 'remove_user' })
   async removeUser(id: string): Promise<UserDto> {
     return this.userService.remove(id);
-  }
-
-  @MessagePattern({ cmd: 'update_last_login' })
-  async updateLastLogin(id: string): Promise<UserDto> {
-    return this.userService.updateLastLogin(id);
   }
 
   @MessagePattern({ cmd: 'create_user' })
