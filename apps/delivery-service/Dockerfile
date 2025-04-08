@@ -46,9 +46,14 @@ COPY --from=development /usr/src/app/packages/prisma/dist ./packages/prisma/dist
 COPY --from=development /usr/src/app/packages/discovery/dist ./packages/discovery/dist
 COPY --from=development /usr/src/app/node_modules/.prisma ./node_modules/.prisma
 
+# Copier notre script de démarrage
+COPY apps/delivery-service/start.sh ./apps/delivery-service/start.sh
+RUN chmod +x ./apps/delivery-service/start.sh
+
 # Configure environment and expose port
 ENV PORT=3003
 EXPOSE ${PORT}
+EXPOSE 4003
 
 # Start the application
-CMD ["node", "dist/apps/delivery-service/src/main"] 
+CMD ["sh", "./apps/delivery-service/start.sh"] 
