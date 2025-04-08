@@ -22,7 +22,7 @@ export class AuthController {
 
     try {
       let response;
-      const url = `${this.authServiceUrl}/${path}`;
+      const url = `${this.authServiceUrl}/auth/${path}`;
       
       switch (method) {
         case 'GET':
@@ -109,15 +109,20 @@ export class AuthController {
       properties: {
         email: { type: 'string', example: 'user@example.com' },
         password: { type: 'string', example: 'password123' },
-        name: { type: 'string', example: 'John Doe' }
+        firstName: { type: 'string', example: 'John' },
+        lastName: { type: 'string', example: 'Doe' },
+        role: { type: 'string', example: 'CLIENT' },
+        address: { type: 'string', example: '123 Main St' },
+        birthDate: { type: 'string', example: '01-01-1990' }
       },
-      required: ['email', 'password', 'name']
+      required: ['email', 'password', 'firstName', 'lastName']
     }
   })
   @ApiResponse({ status: 201, description: 'Inscription réussie, tokens retournés' })
   @ApiResponse({ status: 400, description: 'Données invalides' })
   @ApiResponse({ status: 409, description: 'Email déjà utilisé' })
-  async register(@Body() registerDto: { email: string; password: string; name: string }) {
+  async register(@Body() registerDto: any) {
+    // Transmettre directement les données au service d'authentification
     return this.forwardRequest('register', 'POST', undefined, registerDto);
   }
 

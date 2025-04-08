@@ -136,10 +136,10 @@ router.post('/login', async (req: Request, res: Response) => {
 // Inscription
 router.post('/register', async (req: Request, res: Response) => {
   try {
-    const { email, password, name } = req.body;
+    const { email, password, firstName, lastName, role, address, birthDate } = req.body;
     
-    if (!email || !password || !name) {
-      return res.status(400).json({ message: 'Email, mot de passe et nom requis' });
+    if (!email || !password || !firstName || !lastName) {
+      return res.status(400).json({ message: 'Email, mot de passe, prénom et nom requis' });
     }
     
     logger.info(`Tentative d'inscription pour l'email: ${email}`);
@@ -163,7 +163,11 @@ router.post('/register', async (req: Request, res: Response) => {
     const response = await axios.post<UserResponse>(`${USER_SERVICE_URL}/users`, {
       email,
       password,
-      name
+      firstName,
+      lastName,
+      role,
+      address,
+      birthDate
     });
     
     logger.info(`Utilisateur créé avec succès, ID: ${response.data.id}`);
