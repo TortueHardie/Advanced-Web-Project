@@ -140,4 +140,24 @@ export class RestaurateurOrdersService {
     
     return of(false);
   }
+
+  /**
+   * Cancel an order
+   */
+  cancelOrder(orderId: number): Observable<boolean> {
+    const orderIndex = this.currentOrders.findIndex(order => order.id === orderId);
+    
+    if (orderIndex !== -1) {
+      // Remove the order from current orders and add it to history with canceled status
+      const canceledOrder = {
+        ...this.currentOrders[orderIndex],
+        status: 'Annulée'
+      };
+      this.orderHistory.unshift(canceledOrder);
+      this.currentOrders.splice(orderIndex, 1);
+      return of(true);
+    }
+    
+    return of(false);
+  }
 } 

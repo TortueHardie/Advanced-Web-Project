@@ -9,6 +9,8 @@ import { RestaurateurOrdersService } from '../../services/restaurateur-orders.se
 import { RestaurateurOrder } from '../../models/restaurateur-order.model';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-restaurateur-orders',
@@ -20,7 +22,8 @@ import { MatDividerModule } from '@angular/material/divider';
     MatIconModule,
     MatBadgeModule,
     MatCardModule,
-    MatDividerModule
+    MatDividerModule,
+    MatDialogModule
   ],
   template: `
     <div class="orders-container">
@@ -44,7 +47,6 @@ import { MatDividerModule } from '@angular/material/divider';
             
             <div class="order-actions">
               <h3>Actions disponibles</h3>
-              <p>Selon le statut de la commande, différentes actions peuvent être effectuées.</p>
             </div>
           </mat-card-content>
           
@@ -244,7 +246,8 @@ export class RestaurateurOrdersComponent implements OnInit {
 
   constructor(
     private restaurateurOrdersService: RestaurateurOrdersService,
-    private router: Router
+    private router: Router,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -283,8 +286,42 @@ export class RestaurateurOrdersComponent implements OnInit {
   }
 
   cancelOrder(): void {
-    console.log('Order cancelled');
-    // Implementation would go here
+    if (!this.selectedOrder) return;
+
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Suppression de la commande',
+        message: 'Êtes-vous sûr de vouloir supprimer la commande ?',
+        confirmText: 'SUPPRIMER',
+        cancelText: 'ANNULER'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && this.selectedOrder) {
+        this.restaurateurOrdersService.cancelOrder(this.selectedOrder.id).subscribe({
+          next: (success) => {
+            if (success) {
+              // Refresh both lists to ensure UI is in sync
+              this.loadCurrentOrders();
+              this.loadOrderHistory();
+              this.selectedOrder = null;
+            }
+          },
+          error: (error) => {
+            console.error('Error cancelling order:', error);
+            // You might want to show an error message to the user here
+            const errorDialog = this.dialog.open(ConfirmDialogComponent, {
+              data: {
+                title: 'Erreur',
+                message: 'Une erreur est survenue lors de l\'annulation de la commande.',
+                confirmText: 'OK'
+              }
+            });
+          }
+        });
+      }
+    });
   }
   
   markAsReady(): void {
