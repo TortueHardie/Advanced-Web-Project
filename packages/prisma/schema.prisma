@@ -1,0 +1,34 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL_POSTGRES")
+}
+
+enum DeliveryStatus {
+  READY
+  ASSIGNED
+  PICKUP_IN_PROGRESS
+  ON_THE_WAY
+  DELIVERED
+}
+
+model Delivery {
+  id              Int            @id @default(autoincrement())
+  orderId         Int            @unique
+  restaurantName  String
+  pickupAddress   String
+  deliveryAddress String
+  totalAmount     Float
+  status          DeliveryStatus @default(READY)
+  deliveryPersonId Int?          // ID du livreur assigné
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@map("deliveries")
+} 

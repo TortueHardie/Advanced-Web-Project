@@ -8,6 +8,7 @@ WORKDIR /app
 # Copier les fichiers de configuration
 COPY package*.json ./
 COPY turbo.json ./
+COPY .env ./
 COPY apps/product-service/package*.json ./apps/product-service/
 COPY packages/discovery/package*.json ./packages/discovery/
 COPY packages/prisma/package*.json ./packages/prisma/
@@ -27,7 +28,8 @@ RUN npm install
 COPY packages/discovery/src ./packages/discovery/src
 COPY packages/prisma/src ./packages/prisma/src
 COPY packages/prisma/prisma ./packages/prisma/prisma
-COPY packages/prisma/.env ./packages/prisma/
+
+# Copier le code source de l'application
 COPY apps/product-service/src ./apps/product-service/src
 
 # Construire les packages partagés
@@ -52,4 +54,4 @@ RUN npm run build
 EXPOSE 3002
 
 # Démarrer l'application
-CMD ["npm", "run", "start:prod"] 
+CMD ["node", "dist/apps/product-service/src/main.js"] 
