@@ -2,58 +2,44 @@ FROM node:18-alpine As development
 
 WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json
+# Copier les fichiers package.json
 COPY package*.json ./
 COPY packages/prisma/package*.json ./packages/prisma/
-COPY packages/discovery/package*.json ./packages/discovery/
 COPY apps/delivery-service/package*.json ./apps/delivery-service/
 
-# Install dependencies
+# Installer les dépendances
 RUN npm ci
 
-# Copy source code
+# Copier le code source
 COPY packages/prisma ./packages/prisma
-COPY packages/discovery ./packages/discovery
 COPY apps/delivery-service ./apps/delivery-service
 COPY tsconfig.json ./
-COPY tsconfig.build.json ./
 
-# Generate Prisma client
+# Générer le client Prisma
 RUN cd packages/prisma && npx prisma generate
 
-# Build application
+# Build de l'application
 RUN npm run build delivery-service
 
 FROM node:18-alpine As production
 
-ARG NODE_ENV=production
-ENV NODE_ENV=${NODE_ENV}
-
 WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json
+# Copier les fichiers package.json
 COPY package*.json ./
 COPY packages/prisma/package*.json ./packages/prisma/
-COPY packages/discovery/package*.json ./packages/discovery/
 COPY apps/delivery-service/package*.json ./apps/delivery-service/
 
-# Install only production dependencies
+# Installer uniquement les dépendances de production
 RUN npm ci --only=production
 
-# Copy built application
+# Copier l'application compilée
 COPY --from=development /usr/src/app/dist ./dist
-COPY --from=development /usr/src/app/packages/prisma/dist ./packages/prisma/dist
-COPY --from=development /usr/src/app/packages/discovery/dist ./packages/discovery/dist
 COPY --from=development /usr/src/app/node_modules/.prisma ./node_modules/.prisma
 
-# Copier notre script de démarrage
-COPY apps/delivery-service/start.sh ./apps/delivery-service/start.sh
-RUN chmod +x ./apps/delivery-service/start.sh
-
-# Configure environment and expose port
-ENV PORT=3003
-EXPOSE ${PORT}
+# Exposer les ports
+EXPOSE 3003
 EXPOSE 4003
 
-# Start the application
-CMD ["sh", "./apps/delivery-service/start.sh"] 
+# Démarrer l'application
+CMD ["node", "dist/apps/delivery-service/src/main.js"] 

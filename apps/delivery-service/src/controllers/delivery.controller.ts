@@ -50,7 +50,7 @@ export class DeliveryController {
     @Param('orderId', ParseUUIDPipe) orderId: string,
     @Req() req: RequestWithUser,
   ): Promise<{ message: string; orderId: string }> {
-    const deliveryPersonId = req.user.id;
+    const deliveryPersonId = req.user.userId;
     return this.deliveryService.acceptDelivery(orderId, deliveryPersonId);
   }
 
@@ -95,7 +95,7 @@ export class DeliveryController {
     @Body() updateStatusDto: UpdateDeliveryStatusDto,
     @Req() req: RequestWithUser,
   ): Promise<DeliveryResponseDto | null> {
-    const deliveryPersonId = req.user.id;
+    const deliveryPersonId = req.user.userId;
     return this.deliveryService.updateDeliveryStatus(orderId, updateStatusDto.status, deliveryPersonId);
   }
 
@@ -110,7 +110,7 @@ export class DeliveryController {
     type: [DeliveryResponseDto],
   })
   async getMyDeliveries(@Req() req: RequestWithUser): Promise<DeliveryResponseDto[]> {
-    const deliveryPersonId = req.user.id;
+    const deliveryPersonId = req.user.userId;
     return this.deliveryService.getMyDeliveries(deliveryPersonId);
   }
 

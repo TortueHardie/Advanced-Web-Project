@@ -1,21 +1,21 @@
 # Version simplifiée avec montage des dossiers complets
 
+version: '3.8'
+
 services:
   postgres:
-    image: postgres:14
-    restart: always
-    env_file:
-      - .env
+    image: postgres:15
+    container_name: postgres-dev
     environment:
-      POSTGRES_USER: ${DATABASE_USER_POSTGRES}
-      POSTGRES_PASSWORD: ${DATABASE_MDP_POSTGRES}
-      POSTGRES_DB: ${DATABASE_NAME_POSTGRES}
+      POSTGRES_DB: advanced_web_project
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data_dev:/var/lib/postgresql/data
     networks:
-      - internal-network
+      - app-network-dev
 
   redis:
     image: redis:alpine
@@ -62,7 +62,7 @@ services:
       - user-service
       - auth-service
       - product-service
-      - delivery-service
+      - delivery-service-dev
     env_file:
       - .env
     environment:
@@ -70,7 +70,7 @@ services:
       AUTH_SERVICE_URL: http://auth-service:3001
       USER_SERVICE_URL: http://user-service:3001
       PRODUCT_SERVICE_URL: http://product-service:3002
-      DELIVERY_SERVICE_URL: http://delivery-service:3003
+      DELIVERY_SERVICE_URL: http://delivery-service-dev:3003
       NODE_ENV: development
     ports:
       - "3000:3000"
@@ -122,24 +122,28 @@ services:
       - /usr/src/app/apps/product-service/node_modules
       - ./packages:/usr/src/app/packages
 
-  delivery-service:
+  delivery-service-dev:
     build:
       context: .
       dockerfile: apps/delivery-service/Dockerfile.dev
     container_name: delivery-service-dev
-    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres-dev:5432/advanced_web_project?schema=public
+      - NODE_ENV=development
+    ports:
+      - "3003:3003"
+      - "4003:4003"
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
+      - /usr/src/app/apps/delivery-service/node_modules
     depends_on:
       - postgres
-    environment:
-      DATABASE_URL: ${DATABASE_URL_POSTGRES}
-      NODE_ENV: development
     networks:
-      - internal-network
-    volumes:
-      # Monter tout le dossier du microservice sauf node_modules
-      - ./apps/delivery-service:/usr/src/app/apps/delivery-service
-      - /usr/src/app/apps/delivery-service/node_modules
-      - ./packages:/usr/src/app/packages
+      - app-network-dev
+    tty: true
+    stdin_open: true
+    command: sh -c "chmod +x /usr/src/app/apps/delivery-service/dev-start.sh && /usr/src/app/apps/delivery-service/dev-start.sh"
 
   log-service:
     build:
@@ -198,7 +202,7 @@ services:
       NEXT_PUBLIC_API_URL: http://localhost:3000
 
 volumes:
-  postgres_data:
+  postgres_data_dev:
   redis_data:
 
 networks:
@@ -207,4 +211,7 @@ networks:
     internal: true
   
   external-network:
-    driver: bridge 
+    driver: bridge
+
+  app-network-dev:
+    driver: bridge
