@@ -1,23 +1,71 @@
 import { NestFactory } from '@nestjs/core';
-import { ProductModule } from './product.module';
+import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { DiscoveryService } from '@advanced-web/discovery';
 import { Express } from 'express';
 import { HttpExceptionFilter } from './filters/http-exception.filter';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 
 async function bootstrap() {
-  const app = await NestFactory.create(ProductModule);
+  // 🔹 Lancement du microservice TCP
+  const microservice = await NestFactory.createMicroservice<MicroserviceOptions>(
+    AppModule,
+    {
+      transport: Transport.TCP,
+      options: { host: '127.0.0.1', port: 4002 },
+    },
+  );
+  microservice.listen();
+  console.log('🚀 Microservice Product démarré sur TCP (port 4002)');
+
+  // 🔹 Instance HTTP pour Swagger et API REST
+  const app = await NestFactory.create(AppModule);
   
   // Configuration de Swagger
   const config = new DocumentBuilder()
     .setTitle('Service de Produits')
-    .setDescription('API pour la gestion des restaurants, menus et articles')
+    .setDescription(`
+      API pour la gestion des restaurants, menus et articles.
+      
+      ## Fonctionnalités
+      
+      - Gestion complète des restaurants (CRUD)
+      - Gestion des menus pour chaque restaurant
+      - Gestion des articles individuels
+      - Gestion des stocks et de la disponibilité
+      
+      ## Modèle de données
+      
+      Les données sont organisées selon la hiérarchie suivante:
+      
+      Restaurant 
+      ├── Menus
+      │   └── Articles (via relation many-to-many)
+      └── Articles (articles disponibles individuellement)
+      
+      ## Statuts
+      
+      Les restaurants peuvent avoir les statuts suivants:
+      - ACTIVE: Restaurant en activité
+      - INACTIVE: Restaurant temporairement fermé
+    `)
     .setVersion('1.0')
-    .addTag('Restaurants')
-    .addTag('Menus')
-    .addTag('Articles')
-    .addTag('Health')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'Authorization',
+        description: 'Entrez votre token JWT',
+        in: 'header',
+      },
+      'access-token',
+    )
+    .addTag('Restaurants', 'Opérations liées aux restaurants')
+    .addTag('Menus', 'Opérations liées aux menus')
+    .addTag('Articles', 'Opérations liées aux articles')
+    .addTag('Health', 'Vérification de l\'état du service')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   
@@ -34,7 +82,7 @@ async function bootstrap() {
   });
   
   // Exposer l'interface Swagger
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('docs', app, document);
 
   // Configuration globale
   app.useGlobalPipes(new ValidationPipe({
@@ -55,7 +103,7 @@ async function bootstrap() {
     swaggerUrl: 'http://localhost:3002/api-json',
   });
   console.log('✅ Service Product enregistré auprès du service de découverte');
-  console.log('📄 Swagger product-service disponible sur http://localhost:3002/api');
+  console.log('📄 Swagger product-service disponible sur http://localhost:3002/docs');
   console.log('📄 Documentation JSON disponible sur http://localhost:3002/api-json');
 }
 

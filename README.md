@@ -320,3 +320,95 @@ npm run test:cov
 ## 📄 Licence
 
 Ce projet est sous licence [MIT](LICENSE).
+
+## Architecture des services
+
+Ce projet est organisé en une architecture de microservices, comprenant plusieurs services spécialisés qui communiquent entre eux:
+
+- **api-gateway**: Point d'entrée unique pour les clients, redirige les requêtes vers les services appropriés
+- **user-service**: Gestion des utilisateurs et de l'authentification
+- **product-service**: Gestion des restaurants, menus et articles
+- **delivery-service** (anciennement location-service): Gestion des livraisons de commandes
+- **order-service**: Traitement des commandes
+- **discovery-service**: Service de découverte pour l'enregistrement des services
+
+## Conventions et standardisations
+
+### Structure des services
+
+Tous les services suivent une structure standardisée:
+
+```
+service-name/
+├── src/
+│   ├── controllers/    # Contrôleurs pour les endpoints REST
+│   ├── services/       # Logique métier
+│   ├── repositories/   # Accès aux données
+│   ├── dto/            # Objets de transfert de données
+│   ├── filters/        # Filtres d'exception
+│   ├── constants/      # Constantes et enums
+│   ├── guards/         # Guards pour l'authentification
+│   ├── app.module.ts   # Module principal
+│   └── main.ts         # Point d'entrée de l'application
+├── test/               # Tests unitaires
+└── .env.example        # Exemple de configuration
+```
+
+### Communication entre microservices
+
+Les services communiquent entre eux de deux façons:
+
+1. **Via TCP**: Pour les communications directes entre services, utilisant le framework NestJS.
+   - Ports TCP standards:
+     - user-service: 4001
+     - product-service: 4002
+     - delivery-service: 4003
+     - order-service: 4004
+
+2. **Via HTTP**: Pour les communications à travers l'API Gateway.
+
+### Types de données et validation
+
+- Tous les identifiants (IDs) utilisent le format UUID (string) conformément au schéma Prisma.
+- La validation des DTOs est effectuée avec class-validator.
+- Les statuts des entités sont définis par des enums TypeScript.
+
+### Gestion des erreurs
+
+Un filtre d'exception global standardisé traite toutes les erreurs et renvoie une réponse cohérente:
+
+```json
+{
+  "statusCode": 404,
+  "timestamp": "2023-05-07T12:34:56.789Z",
+  "path": "/path/to/resource",
+  "method": "GET",
+  "message": "Resource not found",
+  "error": "Not Found"
+}
+```
+
+### Documentation
+
+- Chaque service expose sa documentation Swagger à l'URL `/docs`.
+- Une documentation JSON est disponible à `/api-json`.
+- Les tags Swagger sont standardisés entre les services.
+
+## Installation et configuration
+
+### Configuration
+
+Chaque service nécessite un fichier `.env` basé sur le fichier `.env.example` correspondant.
+
+### Installation
+
+```bash
+# Installation des dépendances
+npm install
+
+# Génération des clients Prisma
+npm run prisma:generate
+
+# Lancement des services
+npm run start:dev
+```

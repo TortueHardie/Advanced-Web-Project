@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, Query } from '@nestjs/common';
 import { ArticleService } from '../services/article.service';
 import { CreateArticleDto, UpdateArticleDto, ArticleDto } from '../dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam, ApiQuery } from '@nestjs/swagger';
@@ -25,7 +25,7 @@ export class ArticleController {
   @ApiQuery({ 
     name: 'menuId', 
     description: 'ID du menu',
-    type: Number,
+    type: String,
     required: true
   })
   @ApiResponse({ 
@@ -33,7 +33,7 @@ export class ArticleController {
     description: 'Liste des articles récupérée avec succès',
     type: [ArticleDto]
   })
-  async findAll(@Query('menuId', ParseIntPipe) menuId: number): Promise<ArticleDto[]> {
+  async findAll(@Query('menuId', ParseUUIDPipe) menuId: string): Promise<ArticleDto[]> {
     return this.articleService.findByMenu(menuId);
   }
 
@@ -49,7 +49,7 @@ export class ArticleController {
     status: 404, 
     description: 'Article non trouvé'
   })
-  async findOne(@Param('id', ParseIntPipe) id: number): Promise<ArticleDto> {
+  async findOne(@Param('id', ParseUUIDPipe) id: string): Promise<ArticleDto> {
     return this.articleService.findOne(id);
   }
 
@@ -67,7 +67,7 @@ export class ArticleController {
     description: 'Article non trouvé'
   })
   async update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() updateArticleDto: UpdateArticleDto,
   ): Promise<ArticleDto> {
     return this.articleService.update(id, updateArticleDto);
@@ -85,7 +85,7 @@ export class ArticleController {
     status: 404, 
     description: 'Article non trouvé'
   })
-  async remove(@Param('id', ParseIntPipe) id: number): Promise<ArticleDto> {
+  async remove(@Param('id', ParseUUIDPipe) id: string): Promise<ArticleDto> {
     return this.articleService.remove(id);
   }
 
@@ -114,7 +114,7 @@ export class ArticleController {
     description: 'Article non trouvé'
   })
   async updateStock(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body('stock') stock: number,
   ): Promise<ArticleDto> {
     return this.articleService.updateStock(id, stock);
@@ -145,7 +145,7 @@ export class ArticleController {
     description: 'Article non trouvé'
   })
   async updateAvailability(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body('isAvailable') isAvailable: boolean,
   ): Promise<ArticleDto> {
     return this.articleService.updateAvailability(id, isAvailable);

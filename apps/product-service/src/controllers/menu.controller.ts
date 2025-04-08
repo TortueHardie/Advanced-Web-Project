@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, Query } from '@nestjs/common';
 import { MenuService } from '../services/menu.service';
 import { CreateMenuDto, UpdateMenuDto, MenuDto } from '../dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam, ApiQuery } from '@nestjs/swagger';
@@ -25,14 +25,14 @@ export class MenuController {
   @ApiQuery({ 
     name: 'restaurantId', 
     description: 'ID du restaurant',
-    type: Number 
+    type: String 
   })
   @ApiResponse({ 
     status: 200, 
     description: 'Liste des menus récupérée avec succès',
     type: [MenuDto]
   })
-  async findAll(@Query('restaurantId', ParseIntPipe) restaurantId: number): Promise<MenuDto[]> {
+  async findAll(@Query('restaurantId', ParseUUIDPipe) restaurantId: string): Promise<MenuDto[]> {
     return this.menuService.findAll(restaurantId);
   }
 
@@ -48,7 +48,7 @@ export class MenuController {
     status: 404, 
     description: 'Menu non trouvé'
   })
-  async findOne(@Param('id', ParseIntPipe) id: number): Promise<MenuDto> {
+  async findOne(@Param('id', ParseUUIDPipe) id: string): Promise<MenuDto> {
     return this.menuService.findOne(id);
   }
 
@@ -66,7 +66,7 @@ export class MenuController {
     description: 'Menu non trouvé'
   })
   async update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() updateMenuDto: UpdateMenuDto,
   ): Promise<MenuDto> {
     return this.menuService.update(id, updateMenuDto);
@@ -84,7 +84,7 @@ export class MenuController {
     status: 404, 
     description: 'Menu non trouvé'
   })
-  async remove(@Param('id', ParseIntPipe) id: number): Promise<MenuDto> {
+  async remove(@Param('id', ParseUUIDPipe) id: string): Promise<MenuDto> {
     return this.menuService.remove(id);
   }
 
@@ -113,7 +113,7 @@ export class MenuController {
     description: 'Menu non trouvé'
   })
   async updateAvailability(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body('isAvailable') isAvailable: boolean,
   ): Promise<MenuDto> {
     return this.menuService.updateAvailability(id, isAvailable);

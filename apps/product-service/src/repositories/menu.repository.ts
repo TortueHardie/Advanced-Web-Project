@@ -29,7 +29,7 @@ export class MenuRepository {
     });
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     return this.prisma.menu.findUnique({
       where: { id },
       include: {
@@ -38,7 +38,7 @@ export class MenuRepository {
     });
   }
 
-  async update(id: number, data: UpdateMenuDto) {
+  async update(id: string, data: UpdateMenuDto) {
     const { itemIds, ...menuData } = data;
     return this.prisma.menu.update({
       where: { id },
@@ -56,7 +56,7 @@ export class MenuRepository {
     });
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     return this.prisma.menu.delete({
       where: { id },
       include: {
@@ -65,7 +65,7 @@ export class MenuRepository {
     });
   }
 
-  async findByRestaurant(restaurantId: number) {
+  async findByRestaurant(restaurantId: string) {
     return this.prisma.menu.findMany({
       where: { restaurantId },
       include: {

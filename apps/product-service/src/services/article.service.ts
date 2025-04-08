@@ -32,7 +32,7 @@ export class ArticleService {
     return this.articleRepository.findAll();
   }
 
-  async findOne(id: number): Promise<ArticleDto> {
+  async findOne(id: string): Promise<ArticleDto> {
     const article = await this.articleRepository.findOne(id);
     if (!article) {
       throw new NotFoundException(`L'article #${id} n'existe pas`);
@@ -40,7 +40,7 @@ export class ArticleService {
     return article;
   }
 
-  async update(id: number, updateArticleDto: UpdateArticleDto): Promise<ArticleDto> {
+  async update(id: string, updateArticleDto: UpdateArticleDto): Promise<ArticleDto> {
     const article = await this.findOne(id);
 
     // Vérifier que le stock est cohérent avec la disponibilité
@@ -61,7 +61,7 @@ export class ArticleService {
     return this.articleRepository.update(id, updateArticleDto);
   }
 
-  async remove(id: number): Promise<ArticleDto> {
+  async remove(id: string): Promise<ArticleDto> {
     const article = await this.findOne(id);
 
     // Vérifier si l'article est utilisé dans des menus
@@ -82,7 +82,7 @@ export class ArticleService {
     return this.articleRepository.remove(id);
   }
 
-  async findByMenu(menuId: number): Promise<ArticleDto[]> {
+  async findByMenu(menuId: string): Promise<ArticleDto[]> {
     // Vérifier que le menu existe
     const menu = await this.prisma.menu.findUnique({
       where: { id: menuId },
@@ -95,7 +95,7 @@ export class ArticleService {
     return this.articleRepository.findByMenu(menuId);
   }
 
-  async updateStock(id: number, stock: number): Promise<ArticleDto> {
+  async updateStock(id: string, stock: number): Promise<ArticleDto> {
     const article = await this.findOne(id);
 
     // Vérifier que le stock est cohérent avec la disponibilité
@@ -106,7 +106,7 @@ export class ArticleService {
     return this.articleRepository.updateStock(id, stock);
   }
 
-  async updateAvailability(id: number, isAvailable: boolean): Promise<ArticleDto> {
+  async updateAvailability(id: string, isAvailable: boolean): Promise<ArticleDto> {
     const article = await this.findOne(id);
 
     // Vérifier que la disponibilité est cohérente avec le stock

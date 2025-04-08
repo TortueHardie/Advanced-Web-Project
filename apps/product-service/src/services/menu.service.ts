@@ -11,7 +11,7 @@ export class MenuService {
     return this.mapToDto(menu);
   }
 
-  async findAll(restaurantId?: number): Promise<MenuDto[]> {
+  async findAll(restaurantId?: string): Promise<MenuDto[]> {
     let menus;
     if (restaurantId) {
       menus = await this.menuRepository.findByRestaurant(restaurantId);
@@ -21,7 +21,7 @@ export class MenuService {
     return menus.map(menu => this.mapToDto(menu));
   }
 
-  async findOne(id: number): Promise<MenuDto> {
+  async findOne(id: string): Promise<MenuDto> {
     const menu = await this.menuRepository.findOne(id);
     if (!menu) {
       throw new NotFoundException(`Menu with ID ${id} not found`);
@@ -29,19 +29,19 @@ export class MenuService {
     return this.mapToDto(menu);
   }
 
-  async update(id: number, updateMenuDto: UpdateMenuDto): Promise<MenuDto> {
+  async update(id: string, updateMenuDto: UpdateMenuDto): Promise<MenuDto> {
     await this.findOne(id);
     const menu = await this.menuRepository.update(id, updateMenuDto);
     return this.mapToDto(menu);
   }
 
-  async remove(id: number): Promise<MenuDto> {
+  async remove(id: string): Promise<MenuDto> {
     await this.findOne(id);
     const menu = await this.menuRepository.remove(id);
     return this.mapToDto(menu);
   }
 
-  async updateAvailability(id: number, isAvailable: boolean): Promise<MenuDto> {
+  async updateAvailability(id: string, isAvailable: boolean): Promise<MenuDto> {
     await this.findOne(id);
     const menu = await this.menuRepository.update(id, { isAvailable });
     return this.mapToDto(menu);

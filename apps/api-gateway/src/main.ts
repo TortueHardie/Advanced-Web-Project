@@ -23,6 +23,8 @@ async function bootstrap() {
     .addTag('Auth', 'Endpoints d\'authentification')
     .addTag('Users', 'Gestion des utilisateurs')
     .addTag('Orders', 'Gestion des commandes')
+    .addTag('Products', 'Gestion des restaurants, menus et articles')
+    .addTag('Delivery', 'Gestion des livraisons')
     .addBearerAuth(
       {
         type: 'http',

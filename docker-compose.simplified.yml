@@ -61,12 +61,16 @@ services:
       - postgres
       - user-service
       - auth-service
+      - product-service
+      - location-service
     env_file:
       - .env
     environment:
       DATABASE_URL: ${DATABASE_URL_POSTGRES}
       AUTH_SERVICE_URL: http://auth-service:3001
       USER_SERVICE_URL: http://user-service:3001
+      PRODUCT_SERVICE_URL: http://product-service:3002
+      LOCATION_SERVICE_URL: http://location-service:3003
       NODE_ENV: development
     ports:
       - "3000:3000"
@@ -97,6 +101,44 @@ services:
       # Monter tout le dossier du microservice sauf node_modules
       - ./apps/user-service:/usr/src/app/apps/user-service
       - /usr/src/app/apps/user-service/node_modules
+      - ./packages:/usr/src/app/packages
+
+  product-service:
+    build:
+      context: .
+      dockerfile: apps/product-service/Dockerfile.dev
+    container_name: product-service-dev
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: ${DATABASE_URL_POSTGRES}
+      NODE_ENV: development
+    networks:
+      - internal-network
+    volumes:
+      # Monter tout le dossier du microservice sauf node_modules
+      - ./apps/product-service:/usr/src/app/apps/product-service
+      - /usr/src/app/apps/product-service/node_modules
+      - ./packages:/usr/src/app/packages
+
+  location-service:
+    build:
+      context: .
+      dockerfile: apps/location-service/Dockerfile.dev
+    container_name: location-service-dev
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: ${DATABASE_URL_POSTGRES}
+      NODE_ENV: development
+    networks:
+      - internal-network
+    volumes:
+      # Monter tout le dossier du microservice sauf node_modules
+      - ./apps/location-service:/usr/src/app/apps/location-service
+      - /usr/src/app/apps/location-service/node_modules
       - ./packages:/usr/src/app/packages
 
   log-service:

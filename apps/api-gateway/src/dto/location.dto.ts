@@ -1,14 +1,22 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsString, IsNumber, IsOptional, IsUUID } from 'class-validator';
-import { OrderStatus } from '../constants/order-status.enum';
+import { IsEnum, IsNumber, IsString } from 'class-validator';
+
+export enum DeliveryStatus {
+  READY = 'READY',
+  ASSIGNED = 'ASSIGNED',
+  PICKUP_IN_PROGRESS = 'PICKUP_IN_PROGRESS',
+  IN_TRANSIT = 'IN_TRANSIT',
+  DELIVERED = 'DELIVERED',
+  CANCELLED = 'CANCELLED'
+}
 
 export class DeliveryResponseDto {
   @ApiProperty({
     description: 'Identifiant unique de la commande',
-    example: 'a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6'
+    example: 1245
   })
-  @IsUUID()
-  orderId: string;
+  @IsNumber()
+  orderId: number;
 
   @ApiProperty({
     description: 'Nom du restaurant',
@@ -40,28 +48,27 @@ export class DeliveryResponseDto {
 
   @ApiProperty({
     description: 'Statut actuel de la livraison',
-    enum: OrderStatus,
-    example: OrderStatus.READY
+    enum: DeliveryStatus,
+    example: DeliveryStatus.READY
   })
-  @IsEnum(OrderStatus)
-  status: OrderStatus;
+  @IsEnum(DeliveryStatus)
+  status: DeliveryStatus;
 
   @ApiProperty({
     description: 'Identifiant du livreur assigné à cette livraison',
     required: false,
-    example: 'b1c2d3e4-f5g6-h7i8-j9k0-l1m2n3o4p5q6'
+    example: 789
   })
-  @IsUUID()
-  @IsOptional()
-  deliveryPersonId?: string;
+  @IsNumber()
+  deliveryPersonId?: number;
 }
 
 export class UpdateDeliveryStatusDto {
   @ApiProperty({
     description: 'Nouveau statut de la livraison',
-    enum: OrderStatus,
-    example: OrderStatus.IN_PROGRESS
+    enum: DeliveryStatus,
+    example: DeliveryStatus.PICKUP_IN_PROGRESS
   })
-  @IsEnum(OrderStatus)
-  status: OrderStatus;
+  @IsEnum(DeliveryStatus)
+  status: DeliveryStatus;
 } 

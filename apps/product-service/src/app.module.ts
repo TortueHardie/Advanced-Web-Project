@@ -2,17 +2,24 @@ import { Module } from '@nestjs/common';
 import { RestaurantController } from './controllers/restaurant.controller';
 import { MenuController } from './controllers/menu.controller';
 import { ArticleController } from './controllers/article.controller';
+import { HealthController } from './controllers/health.controller';
 import { RestaurantService } from './services/restaurant.service';
 import { MenuService } from './services/menu.service';
 import { ArticleService } from './services/article.service';
 import { RestaurantRepository } from './repositories/restaurant.repository';
 import { MenuRepository } from './repositories/menu.repository';
 import { ArticleRepository } from './repositories/article.repository';
-import { PrismaService } from '../../../packages/prisma/src/prisma.service';
+import { PrismaModule } from '@advanced-web/prisma';
+import { DiscoveryModule } from '@advanced-web/discovery';
 
 @Module({
-  imports: [],
-  controllers: [RestaurantController, MenuController, ArticleController],
+  imports: [PrismaModule, DiscoveryModule],
+  controllers: [
+    RestaurantController,
+    MenuController,
+    ArticleController,
+    HealthController
+  ],
   providers: [
     RestaurantService,
     MenuService,
@@ -20,7 +27,6 @@ import { PrismaService } from '../../../packages/prisma/src/prisma.service';
     RestaurantRepository,
     MenuRepository,
     ArticleRepository,
-    PrismaService,
   ],
 })
 export class AppModule {} 

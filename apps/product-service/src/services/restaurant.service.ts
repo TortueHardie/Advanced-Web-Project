@@ -39,7 +39,7 @@ export class RestaurantService {
     }
   }
 
-  async findOne(id: number): Promise<RestaurantDto> {
+  async findOne(id: string): Promise<RestaurantDto> {
     try {
       const restaurant = await this.restaurantRepository.findOne(id);
       if (!restaurant) {
@@ -54,7 +54,7 @@ export class RestaurantService {
     }
   }
 
-  async update(id: number, updateRestaurantDto: UpdateRestaurantDto): Promise<RestaurantDto> {
+  async update(id: string, updateRestaurantDto: UpdateRestaurantDto): Promise<RestaurantDto> {
     try {
       // Vérifier si le restaurant existe
       await this.findOne(id);
@@ -78,7 +78,7 @@ export class RestaurantService {
     }
   }
 
-  async remove(id: number): Promise<RestaurantDto> {
+  async remove(id: string): Promise<RestaurantDto> {
     try {
       // Vérifier si le restaurant existe
       await this.findOne(id);
@@ -92,7 +92,7 @@ export class RestaurantService {
     }
   }
 
-  async findMenus(restaurantId: number) {
+  async findMenus(restaurantId: string) {
     try {
       // Vérifier si le restaurant existe
       await this.findOne(restaurantId);

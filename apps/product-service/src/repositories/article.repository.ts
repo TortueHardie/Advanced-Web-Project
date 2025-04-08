@@ -16,26 +16,26 @@ export class ArticleRepository {
     return this.prisma.article.findMany();
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     return this.prisma.article.findUnique({
       where: { id },
     });
   }
 
-  async update(id: number, data: UpdateArticleDto) {
+  async update(id: string, data: UpdateArticleDto) {
     return this.prisma.article.update({
       where: { id },
       data,
     });
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     return this.prisma.article.delete({
       where: { id },
     });
   }
 
-  async findByMenu(menuId: number) {
+  async findByMenu(menuId: string) {
     return this.prisma.article.findMany({
       where: {
         menus: {
@@ -47,14 +47,14 @@ export class ArticleRepository {
     });
   }
 
-  async updateStock(id: number, stock: number) {
+  async updateStock(id: string, stock: number) {
     return this.prisma.article.update({
       where: { id },
       data: { stock },
     });
   }
 
-  async updateAvailability(id: number, isAvailable: boolean) {
+  async updateAvailability(id: string, isAvailable: boolean) {
     return this.prisma.article.update({
       where: { id },
       data: { isAvailable },

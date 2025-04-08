@@ -62,12 +62,16 @@ services:
       - postgres
       - user-service
       - auth-service
+      - product-service
+      - location-service
     env_file:
       - .env
     environment:
       DATABASE_URL: ${DATABASE_URL_POSTGRES}
       AUTH_SERVICE_URL: http://auth-service:3001
       USER_SERVICE_URL: http://user-service:3001
+      PRODUCT_SERVICE_URL: http://product-service:3002
+      LOCATION_SERVICE_URL: http://location-service:3003
       NODE_ENV: development
     ports:
       - "3000:3000"
@@ -101,6 +105,46 @@ services:
       - ./apps/user-service/tsconfig.json:/usr/src/app/apps/user-service/tsconfig.json
       - ./apps/user-service/tsconfig.build.json:/usr/src/app/apps/user-service/tsconfig.build.json
       - ./apps/user-service/nest-cli.json:/usr/src/app/apps/user-service/nest-cli.json
+      - ./packages:/usr/src/app/packages
+
+  product-service:
+    build:
+      context: .
+      dockerfile: apps/product-service/Dockerfile.dev
+    container_name: product-service-dev
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: ${DATABASE_URL_POSTGRES}
+      NODE_ENV: development
+    networks:
+      - internal-network
+    volumes:
+      - ./apps/product-service/src:/usr/src/app/apps/product-service/src
+      - ./apps/product-service/tsconfig.json:/usr/src/app/apps/product-service/tsconfig.json
+      - ./apps/product-service/tsconfig.build.json:/usr/src/app/apps/product-service/tsconfig.build.json
+      - ./apps/product-service/nest-cli.json:/usr/src/app/apps/product-service/nest-cli.json
+      - ./packages:/usr/src/app/packages
+
+  location-service:
+    build:
+      context: .
+      dockerfile: apps/location-service/Dockerfile.dev
+    container_name: location-service-dev
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: ${DATABASE_URL_POSTGRES}
+      NODE_ENV: development
+    networks:
+      - internal-network
+    volumes:
+      - ./apps/location-service/src:/usr/src/app/apps/location-service/src
+      - ./apps/location-service/tsconfig.json:/usr/src/app/apps/location-service/tsconfig.json
+      - ./apps/location-service/tsconfig.build.json:/usr/src/app/apps/location-service/tsconfig.build.json
+      - ./apps/location-service/nest-cli.json:/usr/src/app/apps/location-service/nest-cli.json
       - ./packages:/usr/src/app/packages
 
   log-service:

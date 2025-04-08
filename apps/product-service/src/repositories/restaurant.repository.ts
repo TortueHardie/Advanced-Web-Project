@@ -21,7 +21,7 @@ export class RestaurantRepository {
     });
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     return this.prisma.restaurant.findUnique({
       where: { id },
       include: {
@@ -41,20 +41,20 @@ export class RestaurantRepository {
     });
   }
 
-  async update(id: number, data: UpdateRestaurantDto) {
+  async update(id: string, data: UpdateRestaurantDto) {
     return this.prisma.restaurant.update({
       where: { id },
       data,
     });
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     return this.prisma.restaurant.delete({
       where: { id },
     });
   }
 
-  async findMenus(restaurantId: number) {
+  async findMenus(restaurantId: string) {
     return this.prisma.menu.findMany({
       where: { restaurantId },
       include: {

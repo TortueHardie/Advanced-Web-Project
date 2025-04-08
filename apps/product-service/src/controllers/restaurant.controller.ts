@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, NotFoundException } from '@nestjs/common';
 import { RestaurantService } from '../services/restaurant.service';
 import { CreateRestaurantDto, UpdateRestaurantDto, RestaurantDto, MenuDto } from '../dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam } from '@nestjs/swagger';
+import { MessagePattern } from '@nestjs/microservices';
 
 @ApiTags('Restaurants')
 @Controller('restaurants')
@@ -43,7 +44,7 @@ export class RestaurantController {
     status: 404, 
     description: 'Restaurant non trouvé'
   })
-  async findOne(@Param('id', ParseIntPipe) id: number): Promise<RestaurantDto> {
+  async findOne(@Param('id', ParseUUIDPipe) id: string): Promise<RestaurantDto> {
     return this.restaurantService.findOne(id);
   }
 
@@ -61,7 +62,7 @@ export class RestaurantController {
     description: 'Restaurant non trouvé'
   })
   async update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() updateRestaurantDto: UpdateRestaurantDto,
   ): Promise<RestaurantDto> {
     return this.restaurantService.update(id, updateRestaurantDto);
@@ -79,7 +80,7 @@ export class RestaurantController {
     status: 404, 
     description: 'Restaurant non trouvé'
   })
-  async remove(@Param('id', ParseIntPipe) id: number): Promise<RestaurantDto> {
+  async remove(@Param('id', ParseUUIDPipe) id: string): Promise<RestaurantDto> {
     return this.restaurantService.remove(id);
   }
 
@@ -95,7 +96,46 @@ export class RestaurantController {
     status: 404, 
     description: 'Restaurant non trouvé'
   })
-  async findMenus(@Param('id', ParseIntPipe) id: number): Promise<MenuDto[]> {
+  async findMenus(@Param('id', ParseUUIDPipe) id: string): Promise<MenuDto[]> {
+    return this.restaurantService.findMenus(id);
+  }
+
+  // Méthodes pour communication entre microservices
+  @MessagePattern({ cmd: 'find_restaurant_by_id' })
+  async findRestaurantById(id: string): Promise<RestaurantDto | null> {
+    try {
+      return await this.restaurantService.findOne(id);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        return null;
+      }
+      throw error;
+    }
+  }
+
+  @MessagePattern({ cmd: 'find_all_restaurants' })
+  async findAllRestaurants(): Promise<RestaurantDto[]> {
+    return this.restaurantService.findAll();
+  }
+
+  @MessagePattern({ cmd: 'update_restaurant' })
+  async updateRestaurant(data: { id: string, [key: string]: any }): Promise<RestaurantDto> {
+    const { id, ...updateRestaurantDto } = data;
+    return this.restaurantService.update(id, updateRestaurantDto);
+  }
+
+  @MessagePattern({ cmd: 'remove_restaurant' })
+  async removeRestaurant(id: string): Promise<RestaurantDto> {
+    return this.restaurantService.remove(id);
+  }
+
+  @MessagePattern({ cmd: 'create_restaurant' })
+  async createRestaurant(createRestaurantDto: CreateRestaurantDto): Promise<RestaurantDto> {
+    return this.restaurantService.create(createRestaurantDto);
+  }
+
+  @MessagePattern({ cmd: 'find_restaurant_menus' })
+  async findRestaurantMenus(id: string): Promise<MenuDto[]> {
     return this.restaurantService.findMenus(id);
   }
 } 

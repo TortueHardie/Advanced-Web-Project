@@ -1,113 +1,89 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { DeliveryRepository } from '../repositories/delivery.repository';
 import { DeliveryResponseDto } from '../dto/delivery.dto';
-import { DeliveryStatus } from '@prisma/client';
+import { OrderStatus } from '../constants/order-status.enum';
 
 @Injectable()
 export class DeliveryService {
   constructor(private readonly deliveryRepository: DeliveryRepository) {}
 
   async getAvailableDeliveries(): Promise<DeliveryResponseDto[]> {
-    try {
-      return await this.deliveryRepository.findByStatus(DeliveryStatus.READY);
-    } catch (error) {
-      throw new BadRequestException('Failed to fetch available deliveries');
-    }
+    return this.deliveryRepository.findByStatus(OrderStatus.READY);
   }
 
-  async acceptDelivery(orderId: number, deliveryPersonId: number) {
-    try {
-      const delivery = await this.deliveryRepository.findById(orderId);
-      if (!delivery) {
-        throw new NotFoundException(`Delivery with ID ${orderId} not found`);
-      }
-
-      if (delivery.status !== DeliveryStatus.READY) {
-        throw new BadRequestException(`Delivery with ID ${orderId} is not available for acceptance`);
-      }
-
-      if (delivery.deliveryPersonId) {
-        throw new BadRequestException(`Delivery with ID ${orderId} is already assigned`);
-      }
-
-      await this.deliveryRepository.updateStatusAndAssignee(orderId, DeliveryStatus.ASSIGNED, deliveryPersonId);
-      return {
-        message: 'Delivery accepted',
-        orderId,
-      };
-    } catch (error) {
-      if (error instanceof NotFoundException || error instanceof BadRequestException) {
-        throw error;
-      }
-      throw new BadRequestException('Failed to accept delivery');
+  async acceptDelivery(orderId: string, deliveryPersonId: string): Promise<{ message: string; orderId: string }> {
+    const delivery = await this.deliveryRepository.findById(orderId);
+    
+    if (!delivery) {
+      throw new NotFoundException(`Delivery with order ID ${orderId} not found`);
     }
+
+    if (delivery.status !== OrderStatus.READY) {
+      throw new BadRequestException(`Delivery with order ID ${orderId} is not available for acceptance`);
+    }
+
+    await this.deliveryRepository.updateStatusAndAssignee(
+      orderId,
+      OrderStatus.ACCEPTED,
+      deliveryPersonId
+    );
+
+    return {
+      message: 'Delivery accepted',
+      orderId,
+    };
   }
 
-  async refuseDelivery(orderId: number) {
-    try {
-      const delivery = await this.deliveryRepository.findById(orderId);
-      if (!delivery) {
-        throw new NotFoundException(`Delivery with ID ${orderId} not found`);
-      }
-
-      if (delivery.status !== DeliveryStatus.ASSIGNED) {
-        throw new BadRequestException(`Delivery with ID ${orderId} is not in a state that can be refused`);
-      }
-
-      await this.deliveryRepository.updateStatus(orderId, DeliveryStatus.READY);
-      return {
-        message: 'Delivery refused',
-        orderId,
-      };
-    } catch (error) {
-      if (error instanceof NotFoundException || error instanceof BadRequestException) {
-        throw error;
-      }
-      throw new BadRequestException('Failed to refuse delivery');
+  async refuseDelivery(orderId: string): Promise<{ message: string; orderId: string }> {
+    const delivery = await this.deliveryRepository.findById(orderId);
+    
+    if (!delivery) {
+      throw new NotFoundException(`Delivery with order ID ${orderId} not found`);
     }
+
+    // Si la livraison est déjà assignée, on ne peut pas la refuser
+    if (delivery.status !== OrderStatus.READY) {
+      throw new BadRequestException(`Delivery with order ID ${orderId} is not available for refusal`);
+    }
+
+    // Pas besoin de changer le statut ici car il reste READY
+
+    return {
+      message: 'Delivery refused',
+      orderId,
+    };
   }
 
-  async updateDeliveryStatus(orderId: number, status: DeliveryStatus, deliveryPersonId: number) {
-    try {
-      const delivery = await this.deliveryRepository.findById(orderId);
-      if (!delivery) {
-        throw new NotFoundException(`Delivery with ID ${orderId} not found`);
-      }
-
-      if (delivery.deliveryPersonId !== deliveryPersonId) {
-        throw new NotFoundException(`Delivery with ID ${orderId} is not assigned to you`);
-      }
-
-      if (!this.isValidStatusTransition(delivery.status, status)) {
-        throw new BadRequestException(`Invalid status transition from ${delivery.status} to ${status}`);
-      }
-
-      return await this.deliveryRepository.updateStatus(orderId, status);
-    } catch (error) {
-      if (error instanceof NotFoundException || error instanceof BadRequestException) {
-        throw error;
-      }
-      throw new BadRequestException('Failed to update delivery status');
+  async updateDeliveryStatus(
+    orderId: string,
+    status: OrderStatus,
+    deliveryPersonId: string
+  ): Promise<DeliveryResponseDto> {
+    const delivery = await this.deliveryRepository.findById(orderId);
+    
+    if (!delivery) {
+      throw new NotFoundException(`Delivery with order ID ${orderId} not found`);
     }
-  }
 
-  async getMyDeliveries(deliveryPersonId: number): Promise<DeliveryResponseDto[]> {
-    try {
-      return await this.deliveryRepository.findMyDeliveries(deliveryPersonId);
-    } catch (error) {
-      throw new BadRequestException('Failed to fetch your deliveries');
+    if (delivery.deliveryPersonId !== deliveryPersonId) {
+      throw new BadRequestException(`You are not assigned to this delivery`);
     }
-  }
 
-  private isValidStatusTransition(currentStatus: DeliveryStatus, newStatus: DeliveryStatus): boolean {
-    const validTransitions: Record<DeliveryStatus, DeliveryStatus[]> = {
-      [DeliveryStatus.READY]: [],
-      [DeliveryStatus.ASSIGNED]: [DeliveryStatus.PICKUP_IN_PROGRESS],
-      [DeliveryStatus.PICKUP_IN_PROGRESS]: [DeliveryStatus.ON_THE_WAY],
-      [DeliveryStatus.ON_THE_WAY]: [DeliveryStatus.DELIVERED],
-      [DeliveryStatus.DELIVERED]: []
+    // Vérification de la transition de statut
+    const validTransitions = {
+      [OrderStatus.ACCEPTED]: [OrderStatus.IN_PROGRESS],
+      [OrderStatus.IN_PROGRESS]: [OrderStatus.DELIVERED],
+      // Les autres statuts ne peuvent pas être modifiés par le livreur
     };
 
-    return validTransitions[currentStatus]?.includes(newStatus) ?? false;
+    if (!validTransitions[delivery.status]?.includes(status)) {
+      throw new BadRequestException(`Invalid status transition from ${delivery.status} to ${status}`);
+    }
+
+    return this.deliveryRepository.updateStatus(orderId, status);
+  }
+
+  async getMyDeliveries(deliveryPersonId: string): Promise<DeliveryResponseDto[]> {
+    return this.deliveryRepository.findMyDeliveries(deliveryPersonId);
   }
 } 

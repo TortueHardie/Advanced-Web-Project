@@ -2,16 +2,19 @@ import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from
 import { Request, Response } from 'express';
 import { Prisma } from '@prisma/client';
 import { ValidationError } from 'class-validator';
+import { Logger } from '@nestjs/common';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
+  private readonly logger = new Logger(HttpExceptionFilter.name);
+
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
-    let message = 'Une erreur interne est survenue';
+    let message = 'Une erreur inattendue s\'est produite';
     let error = 'Internal Server Error';
     let details: Record<string, unknown> | null = null;
 
@@ -71,10 +74,16 @@ export class HttpExceptionFilter implements ExceptionFilter {
       details: details
     };
 
-    // Log l'erreur
-    console.error(`[${request.method}] ${request.url} - ${status} - ${message}`);
     if (status === HttpStatus.INTERNAL_SERVER_ERROR) {
-      console.error('Stack trace:', exception instanceof Error ? exception.stack : exception);
+      this.logger.error(
+        `${request.method} ${request.url}`,
+        exception instanceof Error ? exception.stack : 'Unknown error',
+        'HttpExceptionFilter'
+      );
+    } else {
+      this.logger.warn(
+        `${request.method} ${request.url} - Status ${status} - ${message}`
+      );
     }
 
     response

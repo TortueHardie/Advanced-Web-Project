@@ -1,9 +1,10 @@
-import { Controller, Get, Patch, Param, Body, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Patch, Param, Body, UseGuards, Req, NotFoundException } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
 import { DeliveryService } from '../services/delivery.service';
 import { DeliveryResponseDto, UpdateDeliveryStatusDto } from '../dto/delivery.dto';
 import { DeliveryGuard } from '../guards/delivery.guard';
 import { RequestWithUser } from '../interfaces/request.interface';
+import { MessagePattern } from '@nestjs/microservices';
 
 @ApiTags('Delivery')
 @Controller('delivery')
@@ -106,5 +107,74 @@ export class DeliveryController {
   async getMyDeliveries(@Req() req: RequestWithUser): Promise<DeliveryResponseDto[]> {
     const deliveryPersonId = req.user.id;
     return this.deliveryService.getMyDeliveries(deliveryPersonId);
+  }
+
+  // Méthodes pour communication entre microservices
+  @MessagePattern({ cmd: 'get_available_deliveries' })
+  async getAllAvailableDeliveries(): Promise<DeliveryResponseDto[]> {
+    try {
+      return await this.deliveryService.getAvailableDeliveries();
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        return [];
+      }
+      throw error;
+    }
+  }
+
+  @MessagePattern({ cmd: 'accept_delivery' })
+  async acceptDeliveryByMicroservice(data: { orderId: number, deliveryPersonId: number }): Promise<any> {
+    try {
+      return await this.deliveryService.acceptDelivery(data.orderId, data.deliveryPersonId);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        return { success: false, message: 'Delivery not found' };
+      }
+      throw error;
+    }
+  }
+
+  @MessagePattern({ cmd: 'refuse_delivery' })
+  async refuseDeliveryByMicroservice(orderId: number): Promise<any> {
+    try {
+      return await this.deliveryService.refuseDelivery(orderId);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        return { success: false, message: 'Delivery not found' };
+      }
+      throw error;
+    }
+  }
+
+  @MessagePattern({ cmd: 'update_delivery_status' })
+  async updateDeliveryStatusByMicroservice(data: { 
+    orderId: number, 
+    status: string, 
+    deliveryPersonId: number 
+  }): Promise<DeliveryResponseDto | null> {
+    try {
+      return await this.deliveryService.updateDeliveryStatus(
+        data.orderId, 
+        data.status as any, 
+        data.deliveryPersonId
+      );
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        return null;
+      }
+      throw error;
+    }
+  }
+
+  @MessagePattern({ cmd: 'get_my_deliveries' })
+  async getDeliveriesByDeliveryPerson(deliveryPersonId: number): Promise<DeliveryResponseDto[]> {
+    try {
+      return await this.deliveryService.getMyDeliveries(deliveryPersonId);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        return [];
+      }
+      throw error;
+    }
   }
 } 
