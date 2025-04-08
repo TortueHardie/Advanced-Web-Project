@@ -2,10 +2,10 @@
   <h1>Composants</h1>
   <div class="component-grid">
 
-    <app-dev-component-card
+    <app-tech-component-card
       *ngFor="let component of composants"
       [component]="component"
-    ></app-dev-component-card>
+    ></app-tech-component-card>
 
   </div>
   <div class="no-results" *ngIf="composants.length === 0">

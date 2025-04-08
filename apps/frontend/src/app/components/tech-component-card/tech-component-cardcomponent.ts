@@ -13,13 +13,13 @@ interface DevComponent {
 }
 
 @Component({
-  selector: 'app-dev-component-card',
+  selector: 'app-tech-component-card',
   standalone: true,
   imports: [CommonModule, MatCardModule, MatButtonModule, MatIconModule],
-  templateUrl: './dev-component-card.component.html',
-  styleUrls: ['./dev-component-card.component.scss']
+  templateUrl: './tech-component-card.component.html',
+  styleUrls: ['./tech-component-card.component.scss']
 })
-export class DevComponentCardComponent {
+export class TechComponentCardComponent {
   @Input() component!: DevComponent;
   @Output() detailsClick = new EventEmitter<void>();
 

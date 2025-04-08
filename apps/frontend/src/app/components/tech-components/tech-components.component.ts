@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DevComponentCardComponent } from '../dev-component-card/dev-component-cardcomponent';
+import { TechComponentCardComponent } from '../tech-component-card/tech-component-cardcomponent';
 import { MatIconModule } from '@angular/material/icon';
 
 interface ComponentItem {
@@ -12,18 +12,18 @@ interface ComponentItem {
 }
 
 @Component({
-  selector: 'app-dev-components',
+  selector: 'app-tech-components',
   standalone: true,
   imports: [
     CommonModule, 
-    DevComponentCardComponent,
+    TechComponentCardComponent,
     MatIconModule
   ],
-  templateUrl: './dev-components.component.html',
-  styleUrls: ['./dev-components.component.scss']
+  templateUrl: './tech-components.component.html',
+  styleUrls: ['./tech-components.component.scss']
 })
 
-export class DevComponentsComponent {
+export class TechComponentsComponent {
   composants : ComponentItem[] = [
     {
       id: '1',
