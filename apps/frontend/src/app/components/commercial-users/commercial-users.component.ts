@@ -7,7 +7,10 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatSelectModule } from '@angular/material/select';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { User, UserRole } from '../../models/user.model';
 import { Injectable } from '@angular/core';
 import { DeleteUserDialogComponent } from './delete-user-dialog/delete-user-dialog.component';
@@ -20,13 +23,13 @@ export class UserFormBuilder {
 
   createForm(): FormGroup {
     return this.fb.group({
-      firstName: [''],
-      lastName: [''],
-      birthDate: [''],
-      email: [''],
-      address: [''],
-      referralCode: [''],
-      status: ['']
+      firstName: ['', Validators.required],
+      lastName: ['', Validators.required],
+      birthDate: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      address: ['', Validators.required],
+      referralCode: ['', Validators.required],
+      status: ['Actif', Validators.required]
     });
   }
 }
@@ -43,6 +46,9 @@ export class UserFormBuilder {
     MatFormFieldModule,
     MatInputModule,
     MatDialogModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatSelectModule,
     FormsModule,
     ReactiveFormsModule,
     DeleteUserDialogComponent
@@ -118,42 +124,71 @@ export class UserFormBuilder {
               <mat-form-field appearance="outline">
                 <mat-label>Prénom</mat-label>
                 <input matInput formControlName="firstName" placeholder="ex : Jhon">
+                <mat-error *ngIf="userForm.get('firstName')?.hasError('required')">
+                  Le prénom est requis
+                </mat-error>
               </mat-form-field>
 
               <mat-form-field appearance="outline">
                 <mat-label>Nom</mat-label>
                 <input matInput formControlName="lastName" placeholder="ex : Doe">
+                <mat-error *ngIf="userForm.get('lastName')?.hasError('required')">
+                  Le nom est requis
+                </mat-error>
               </mat-form-field>
 
               <mat-form-field appearance="outline">
                 <mat-label>Date de naissance</mat-label>
-                <input matInput formControlName="birthDate" placeholder="ex : 01/01/2020">
+                <input matInput formControlName="birthDate" placeholder="ex : 01/01/2020" [matDatepicker]="picker">
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+                <mat-error *ngIf="userForm.get('birthDate')?.hasError('required')">
+                  La date de naissance est requise
+                </mat-error>
               </mat-form-field>
 
               <mat-form-field appearance="outline">
                 <mat-label>E-mail</mat-label>
                 <input matInput formControlName="email" placeholder="ex : cesi@cesi.Fr">
+                <mat-error *ngIf="userForm.get('email')?.hasError('required')">
+                  L'email est requis
+                </mat-error>
+                <mat-error *ngIf="userForm.get('email')?.hasError('email')">
+                  Format d'email invalide
+                </mat-error>
               </mat-form-field>
 
               <mat-form-field appearance="outline">
                 <mat-label>Adresse</mat-label>
                 <input matInput formControlName="address" placeholder="ex : 24 Le Paquebot">
+                <mat-error *ngIf="userForm.get('address')?.hasError('required')">
+                  L'adresse est requise
+                </mat-error>
               </mat-form-field>
 
               <mat-form-field appearance="outline">
                 <mat-label>Code de parrainage</mat-label>
                 <input matInput formControlName="referralCode" placeholder="ex : 1234-5678">
+                <mat-error *ngIf="userForm.get('referralCode')?.hasError('required')">
+                  Le code de parrainage est requis
+                </mat-error>
               </mat-form-field>
 
               <mat-form-field appearance="outline">
                 <mat-label>Statut</mat-label>
-                <input matInput formControlName="status" placeholder="ex : Actif">
+                <mat-select formControlName="status">
+                  <mat-option value="Actif">Actif</mat-option>
+                  <mat-option value="Suspendu">Suspendu</mat-option>
+                </mat-select>
+                <mat-error *ngIf="userForm.get('status')?.hasError('required')">
+                  Le statut est requis
+                </mat-error>
               </mat-form-field>
             </form>
           </mat-card-content>
           
           <mat-card-actions>
-            <button mat-raised-button color="primary" (click)="saveUser()">SAUVEGARDER</button>
+            <button mat-raised-button color="primary" (click)="saveUser()" [disabled]="!userForm.valid">SAUVEGARDER</button>
             <button mat-raised-button (click)="cancelEdit()">ANNULER</button>
           </mat-card-actions>
         </mat-card>
@@ -335,19 +370,41 @@ export class CommercialUsersComponent implements OnInit {
   }
 
   saveUser(): void {
-    if (this.selectedUser) {
-      const updatedUser = { ...this.selectedUser, ...this.userForm.value };
+    if (this.selectedUser && this.userForm.valid) {
+      const formValue = this.userForm.value;
+      
+      const updatedUser: User = {
+        ...this.selectedUser,
+        firstName: formValue.firstName,
+        lastName: formValue.lastName,
+        birthDate: formValue.birthDate,
+        email: formValue.email,
+        address: formValue.address,
+        referralCode: formValue.referralCode,
+        status: formValue.status,
+        roles: [UserRole.CUSTOMER]
+      };
+
       const index = this.users.findIndex(u => u.id === this.selectedUser?.id);
       if (index !== -1) {
+        // Update existing user
         this.users[index] = updatedUser;
-        this.selectedUser = updatedUser;
+      } else {
+        // Add new user
+        this.users.push(updatedUser);
       }
+      
+      this.selectedUser = updatedUser;
       this.isEditing = false;
     }
   }
 
   cancelEdit(): void {
     this.isEditing = false;
+    if (!this.users.find(u => u.id === this.selectedUser?.id)) {
+      // If canceling a new user creation, clear selection
+      this.selectedUser = null;
+    }
   }
 
   deleteUser(): void {
@@ -369,7 +426,7 @@ export class CommercialUsersComponent implements OnInit {
   addUser(): void {
     const maxId = Math.max(...this.users.map(u => u.id), 0);
     this.selectedUser = {
-      id: maxId + 1, // Ensure unique numeric ID
+      id: maxId + 1,
       firstName: '',
       lastName: '',
       birthDate: new Date(),
@@ -379,7 +436,18 @@ export class CommercialUsersComponent implements OnInit {
       status: 'Actif',
       roles: [UserRole.CUSTOMER]
     };
-    this.userForm.reset();
+    
+    // Reset form with initial values
+    this.userForm.reset({
+      firstName: '',
+      lastName: '',
+      birthDate: new Date(),
+      email: '',
+      address: '',
+      referralCode: '',
+      status: 'Actif'
+    });
+    
     this.isEditing = true;
   }
 } 
