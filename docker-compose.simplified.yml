@@ -93,15 +93,21 @@ services:
     depends_on:
       - postgres
     environment:
-      DATABASE_URL: ${DATABASE_URL_POSTGRES}
+      DATABASE_URL: postgresql://postgres:postgres@postgres-dev:5432/advanced_web_project?schema=public
       NODE_ENV: development
+    ports:
+      - "3001:3001"
+      - "4001:4001"
     networks:
       - internal-network
+      - app-network-dev
     volumes:
-      # Monter tout le dossier du microservice sauf node_modules
-      - ./apps/user-service:/usr/src/app/apps/user-service
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
       - /usr/src/app/apps/user-service/node_modules
-      - ./packages:/usr/src/app/packages
+    tty: true
+    stdin_open: true
+    command: sh -c "chmod +x /usr/src/app/apps/user-service/dev-start.sh && /usr/src/app/apps/user-service/dev-start.sh"
 
   product-service:
     build:
