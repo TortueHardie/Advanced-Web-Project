@@ -99,12 +99,12 @@ export class RestaurateurProfileComponent implements OnInit {
       this.notificationService.addNotification({
         icon: 'local_offer',
         title: 'Parrainage validé',
-        message: 'Coupon de réduction de 10% sur votre prochaine commande !',
+        message: 'Bonus de 50€ après 50 commandes !',
         time: 'À l\'instant'
       });
 
       // Show snackbar
-      this.snackBar.open('Un coupon de réduction de 10% a été ajouté à vos notifications !', 'Fermer', {
+      this.snackBar.open('Un bonus de 50€ sera ajouté après 50 commandes', 'Fermer', {
         duration: 5000,
         horizontalPosition: 'center',
         verticalPosition: 'top',
