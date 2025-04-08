@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { DeleteConfirmationDialogComponent } from './delete-confirmation-dialog.component';
+import { TechComponentUpdateComponent } from './tech-component-update.component';
 
 interface DevComponent {
   id: string;
@@ -35,7 +36,16 @@ export class TechComponentCardComponent {
   constructor(private dialog: MatDialog) {}
 
   onEdit(): void {
-    this.edit.emit(this.component);
+    const dialogRef = this.dialog.open(TechComponentUpdateComponent, {
+      width: '600px',
+      data: { component: this.component }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.edit.emit(result);
+      }
+    });
   }
 
   onDelete(): void {
