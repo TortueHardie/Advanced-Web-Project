@@ -51,4 +51,4 @@ ENV PORT=3003
 EXPOSE ${PORT}
 
 # Start the application
-CMD ["node", "dist/apps/delivery-service/main"] 
+CMD ["node", "dist/apps/delivery-service/src/main"] 

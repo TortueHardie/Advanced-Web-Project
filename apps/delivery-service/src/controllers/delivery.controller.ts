@@ -94,7 +94,7 @@ export class DeliveryController {
     @Param('orderId', ParseUUIDPipe) orderId: string,
     @Body() updateStatusDto: UpdateDeliveryStatusDto,
     @Req() req: RequestWithUser,
-  ): Promise<DeliveryResponseDto> {
+  ): Promise<DeliveryResponseDto | null> {
     const deliveryPersonId = req.user.id;
     return this.deliveryService.updateDeliveryStatus(orderId, updateStatusDto.status, deliveryPersonId);
   }

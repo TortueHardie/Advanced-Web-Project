@@ -42,7 +42,7 @@ export class DeliveryRepository {
     }
   }
 
-  async updateStatus(orderId: string, status: OrderStatus): Promise<DeliveryResponseDto> {
+  async updateStatus(orderId: string, status: OrderStatus): Promise<DeliveryResponseDto | null> {
     try {
       // D'abord récupérer la commande existante
       const existingOrders = await this.prisma.$queryRaw`
@@ -72,7 +72,7 @@ export class DeliveryRepository {
     }
   }
 
-  async updateStatusAndAssignee(orderId: string, status: OrderStatus, deliveryPersonId: string): Promise<DeliveryResponseDto> {
+  async updateStatusAndAssignee(orderId: string, status: OrderStatus, deliveryPersonId: string): Promise<DeliveryResponseDto | null> {
     try {
       // D'abord récupérer la commande existante
       const existingOrders = await this.prisma.$queryRaw`

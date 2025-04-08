@@ -58,7 +58,7 @@ export class DeliveryService {
     orderId: string,
     status: OrderStatus,
     deliveryPersonId: string
-  ): Promise<DeliveryResponseDto> {
+  ): Promise<DeliveryResponseDto | null> {
     const delivery = await this.deliveryRepository.findById(orderId);
     
     if (!delivery) {
@@ -80,7 +80,11 @@ export class DeliveryService {
       throw new BadRequestException(`Invalid status transition from ${delivery.status} to ${status}`);
     }
 
-    return this.deliveryRepository.updateStatus(orderId, status);
+    const result = await this.deliveryRepository.updateStatus(orderId, status);
+    if (!result) {
+      throw new NotFoundException(`Failed to update delivery with order ID ${orderId}`);
+    }
+    return result;
   }
 
   async getMyDeliveries(deliveryPersonId: string): Promise<DeliveryResponseDto[]> {

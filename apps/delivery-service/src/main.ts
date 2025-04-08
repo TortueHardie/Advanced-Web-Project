@@ -13,7 +13,7 @@ async function bootstrap() {
     AppModule,
     {
       transport: Transport.TCP,
-      options: { host: '127.0.0.1', port: 4003 },
+      options: { host: '0.0.0.0', port: 4003 },
     },
   );
   microservice.listen();
@@ -85,7 +85,7 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
   app.enableCors();
 
-  await app.listen(3003);
+  await app.listen(3003, '0.0.0.0');
 
   // Enregistrement auprès du service de découverte
   const discoveryService = app.get(DiscoveryService);

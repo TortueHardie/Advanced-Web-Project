@@ -3,6 +3,9 @@ FROM node:18-slim
 # Définir le répertoire de travail
 WORKDIR /usr/src/app
 
+# Installer NestJS CLI et autres outils globalement
+RUN npm install -g @nestjs/cli typescript rimraf
+
 # Installer les dépendances de compilation
 RUN apt-get update && \
     apt-get install -y build-essential python3 && \
@@ -13,21 +16,48 @@ COPY package*.json ./
 COPY apps/delivery-service/package*.json ./apps/delivery-service/
 COPY packages/prisma/package*.json ./packages/prisma/
 COPY packages/discovery/package*.json ./packages/discovery/
+COPY tsconfig*.json ./
+COPY turbo.json ./
 
 # Installer les dépendances
 RUN npm install --legacy-peer-deps
+
+# Installer class-transformer explicitement
+WORKDIR /usr/src/app/apps/delivery-service
+RUN npm install class-transformer --legacy-peer-deps
+WORKDIR /usr/src/app
 
 # Copier le reste du code source
 COPY packages/prisma ./packages/prisma
 COPY packages/discovery ./packages/discovery
 COPY apps/delivery-service ./apps/delivery-service
-COPY tsconfig*.json ./
 
 # Générer les clients Prisma
-RUN cd packages/prisma && npx prisma generate
+RUN npx prisma generate --schema=./packages/prisma/prisma/schema.prisma
+
+# Créer un dossier prisma local si nécessaire
+RUN mkdir -p /usr/src/app/apps/delivery-service/src/prisma
+
+# Créer des fichiers symboliques et copier les fichiers nécessaires pour Prisma
+RUN ln -sf /usr/src/app/packages/prisma/src/prisma.service.ts /usr/src/app/apps/delivery-service/src/prisma/prisma.service.ts
+RUN cp /usr/src/app/packages/prisma/src/prisma.module.ts /usr/src/app/apps/delivery-service/src/prisma/prisma.module.ts
+
+# Créer un fichier index.ts local pour exporter les bonnes références
+RUN echo 'export * from "./prisma.module";\nexport * from "./prisma.service";' > /usr/src/app/apps/delivery-service/src/prisma/index.ts
+
+# Construire le projet
+WORKDIR /usr/src/app/apps/delivery-service
+
+# Nettoyer et construire à nouveau
+RUN npm run clean && npm run build 
+
+# Créer un script pour démarrer l'application avec le bon chemin
+RUN echo '#!/bin/sh\nnode dist/apps/delivery-service/src/main.js' > start.sh
+RUN chmod +x start.sh
 
 # Exposer le port du service
 EXPOSE 3003
+EXPOSE 4003
 
-# Démarrer l'application en mode développement
-CMD ["npm", "run", "--prefix", "apps/delivery-service", "start:dev"] 
+# Démarrer l'application avec notre script personnalisé
+CMD ["./start.sh"] 
