@@ -5,9 +5,13 @@
       <p class="description">{{ component.description }}</p>
     </mat-card-content>
     <mat-card-actions>
-      <a mat-button color="primary" [href]="component.githubLink" target="_blank">
-        <mat-icon>code</mat-icon>
-        GitHub
-      </a>
+      <button mat-button color="primary" (click)="onEdit()">
+        <mat-icon>edit</mat-icon>
+        Edit
+      </button>
+      <button mat-button color="warn" (click)="onDelete()">
+        <mat-icon>delete</mat-icon>
+        Delete
+      </button>
     </mat-card-actions>
   </mat-card>

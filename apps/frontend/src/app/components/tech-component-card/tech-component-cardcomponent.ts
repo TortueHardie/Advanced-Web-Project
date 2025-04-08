@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { DeleteConfirmationDialogComponent } from './delete-confirmation-dialog.component';
 
 interface DevComponent {
   id: string;
@@ -15,15 +17,37 @@ interface DevComponent {
 @Component({
   selector: 'app-tech-component-card',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatButtonModule, MatIconModule],
+  imports: [
+    CommonModule, 
+    MatCardModule, 
+    MatButtonModule, 
+    MatIconModule,
+    MatDialogModule
+  ],
   templateUrl: './tech-component-card.component.html',
   styleUrls: ['./tech-component-card.component.scss']
 })
 export class TechComponentCardComponent {
   @Input() component!: DevComponent;
-  @Output() detailsClick = new EventEmitter<void>();
+  @Output() edit = new EventEmitter<DevComponent>();
+  @Output() delete = new EventEmitter<DevComponent>();
 
-  onDetailsClick(): void {
-    this.detailsClick.emit();
+  constructor(private dialog: MatDialog) {}
+
+  onEdit(): void {
+    this.edit.emit(this.component);
+  }
+
+  onDelete(): void {
+    const dialogRef = this.dialog.open(DeleteConfirmationDialogComponent, {
+      width: '400px',
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === true) {
+        this.delete.emit(this.component);
+      }
+    });
   }
 }

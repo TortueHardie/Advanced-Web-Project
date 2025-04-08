@@ -22,6 +22,7 @@ import { CommercialUsersComponent } from './components/commercial-users/commerci
 import { DevComponentsComponent } from './components/dev-components/dev-components.component';
 import { DeveloperProfileComponent } from './components/developer-profile/developer-profile.component';
 import { DeveloperProfileUpdateComponent } from './components/developer-profile/developer-profile-update/developer-profile-update.component';
+import { TechComponentsComponent } from './components/tech-components/tech-components.component';
 
 export const routes: Routes = [
   { path: '', component: LoginComponent },
@@ -52,5 +53,7 @@ export const routes: Routes = [
   { path: 'developer/compte', component: DeveloperProfileComponent },
   { path: 'developer/compte/modifier', component: DeveloperProfileUpdateComponent },
   { path: 'dev', component: DevComponentsComponent },
+  // Tech
+  { path: 'tech', component: TechComponentsComponent },
   { path: '**', redirectTo: '' }
 ];
