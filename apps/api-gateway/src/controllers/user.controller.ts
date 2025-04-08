@@ -70,14 +70,14 @@ export class UserController {
     return this.forwardRequest(`${this.userServiceUrl}/users`, 'GET', authHeader);
   }
 
-  @Get('by-id')
+  @Get(':id')
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Récupérer un utilisateur par ID' })
-  @ApiQuery({ name: 'id', description: 'ID de l\'utilisateur', required: true })
+  @ApiParam({ name: 'id', description: 'ID de l\'utilisateur' })
   @ApiResponse({ status: 200, description: 'Utilisateur récupéré', type: UserDto })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })
-  async findOne(@AccessToken() authHeader: string, @Query('id') id: string) {
+  async findOne(@AccessToken() authHeader: string, @Param('id') id: string) {
     return this.forwardRequest(`${this.userServiceUrl}/users/${id}`, 'GET', authHeader);
   }
 
@@ -113,14 +113,14 @@ export class UserController {
     return this.forwardRequest(`${this.userServiceUrl}/users/validate`, 'POST', undefined, credentials);
   }
 
-  @Get('by-email')
+  @Get('by-email/:email')
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Récupérer un utilisateur par email' })
-  @ApiQuery({ name: 'email', description: 'Email de l\'utilisateur', required: true })
+  @ApiParam({ name: 'email', description: 'Email de l\'utilisateur', required: true })
   @ApiResponse({ status: 200, description: 'Utilisateur récupéré', type: UserDto })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })
-  async findByEmail(@AccessToken() authHeader: string, @Query('email') email: string) {
+  async findByEmail(@AccessToken() authHeader: string, @Param('email') email: string) {
     return this.forwardRequest(`${this.userServiceUrl}/users/by-email/${email}`, 'GET', authHeader);
   }
 } 

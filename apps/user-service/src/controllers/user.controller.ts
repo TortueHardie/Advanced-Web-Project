@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Delete, Put, HttpCode, HttpStatus, NotFoundException, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Put, HttpCode, HttpStatus, NotFoundException } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { UserService } from '../services/user.service';
 import { CreateUserDto, UpdateUserDto, UserDto } from '../dto';
@@ -57,7 +57,7 @@ export class UserController {
   @ApiParam({ name: 'id', description: 'ID de l\'utilisateur' })
   @ApiResponse({ status: 200, description: 'Utilisateur trouvé', type: UserDto })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })
-  async findOne(@Param('id', ParseIntPipe) id: string): Promise<UserDto> {
+  async findOne(@Param('id') id: string): Promise<UserDto> {
     return this.userService.findOne(id);
   }
 
@@ -67,17 +67,16 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'Utilisateur mis à jour', type: UserDto })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })
   @ApiResponse({ status: 409, description: 'Email déjà existant' })
-  async update(@Param('id', ParseIntPipe) id: string, @Body() updateUserDto: UpdateUserDto): Promise<UserDto> {
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto): Promise<UserDto> {
     return this.userService.update(id, updateUserDto);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Supprimer un utilisateur' })
   @ApiParam({ name: 'id', description: 'ID de l\'utilisateur' })
-  @ApiResponse({ status: 200, description: 'Utilisateur supprimé', type: UserDto })
+  @ApiResponse({ status: 200, description: 'Utilisateur supprimé' })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })
-  @HttpCode(HttpStatus.OK)
-  async remove(@Param('id', ParseIntPipe) id: string): Promise<UserDto> {
+  async remove(@Param('id') id: string): Promise<UserDto> {
     return this.userService.remove(id);
   }
 
