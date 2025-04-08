@@ -6,7 +6,6 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { Restaurant, Menu, MenuItem } from '../../models/restaurant.model';
-import { RestaurateurMenuUpdateComponent } from '../restaurateur-menu-update/restaurateur-menu-update.component';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { RestaurantService } from '../../services/restaurant.service';
 
@@ -25,8 +24,8 @@ import { RestaurantService } from '../../services/restaurant.service';
     <div class="restaurant-management">
       <div class="header">
         <h1>Gestion des menus</h1>
-        <button mat-raised-button color="primary" (click)="openMenuDialog()">+ MENU</button>
-        <button mat-raised-button color="primary" (click)="openArticleDialog()">+ ARTICLE</button>
+        <button mat-raised-button color="primary" >+ MENU</button>
+        <button mat-raised-button color="primary" >+ ARTICLE</button>
       </div>
 
       <mat-tab-group>
@@ -41,7 +40,7 @@ import { RestaurantService } from '../../services/restaurant.service';
                   <p class="description">{{menu.description}}</p>
                 </mat-card-content>
                 <mat-card-actions>
-                  <button mat-button color="primary" (click)="editMenu(menu)">MODIFIER</button>
+                  <button mat-button color="primary" >MODIFIER</button>
                   <button mat-button color="warn" (click)="deleteMenu(menu)">SUPPRIMER</button>
                 </mat-card-actions>
               </mat-card>
@@ -60,7 +59,7 @@ import { RestaurantService } from '../../services/restaurant.service';
                   <p class="description">{{item.description}}</p>
                 </mat-card-content>
                 <mat-card-actions>
-                  <button mat-button color="primary" (click)="editArticle(item)">MODIFIER</button>
+                  <button mat-button color="primary">MODIFIER</button>
                   <button mat-button color="warn" (click)="deleteArticle(item)">SUPPRIMER</button>
                 </mat-card-actions>
               </mat-card>
@@ -137,32 +136,6 @@ export class RestaurateurMenuManagementComponent implements OnInit {
     });
   }
 
-  openMenuDialog(): void {
-    const dialogRef = this.dialog.open(RestaurateurMenuUpdateComponent, {
-      width: '600px',
-      data: { mode: 'create' }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.restaurantService.addMenu(result);
-      }
-    });
-  }
-
-  editMenu(menu: Menu): void {
-    const dialogRef = this.dialog.open(RestaurateurMenuUpdateComponent, {
-      width: '600px',
-      data: { mode: 'edit', menu }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.restaurantService.updateMenu(result);
-      }
-    });
-  }
-
   deleteMenu(menu: Menu): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '400px',
@@ -177,14 +150,6 @@ export class RestaurateurMenuManagementComponent implements OnInit {
         this.restaurantService.deleteMenu(menu.id);
       }
     });
-  }
-
-  openArticleDialog(): void {
-    // TODO: Implement article creation dialog using RestaurateurItemUpdateComponent
-  }
-
-  editArticle(item: MenuItem): void {
-    // TODO: Implement article edit dialog using RestaurateurItemUpdateComponent
   }
 
   deleteArticle(item: MenuItem): void {

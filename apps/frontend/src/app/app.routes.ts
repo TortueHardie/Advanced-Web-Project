@@ -8,8 +8,6 @@ import { CartComponent } from './components/cart/cart.component';
 import { CheckoutComponent } from './components/checkout/checkout.component';
 import { OrderConfirmationComponent } from './components/order-confirmation/order-confirmation.component';
 import { RestaurantDetailComponent } from './components/restaurant-detail/restaurant-detail.component';
-import { RestaurateurItemUpdateComponent } from './components/restaurateur-item-update/restaurateur-item-update.component';
-import { RestaurateurMenuUpdateComponent } from './components/restaurateur-menu-update/restaurateur-menu-update.component';
 import { StatisticsComponent } from './components/statistics/statistics.component';
 import { RestaurateurOrdersComponent } from './components/restaurateur-orders/restaurateur-orders.component';
 import { LoginComponent } from './pages/login/login.component';
@@ -34,10 +32,6 @@ export const routes: Routes = [
   { path: 'restaurateur/compte', component: RestaurateurProfileComponent },
   { path: 'restaurateur/compte/modifier', component: RestaurateurProfileUpdateComponent },
   { path: 'restaurateur/menu-management', component: RestaurateurMenuManagementComponent },
-  { path: 'restaurateur/article/nouveau', component: RestaurateurItemUpdateComponent },
-  { path: 'restaurateur/article/:id', component: RestaurateurItemUpdateComponent },
-  { path: 'restaurateur/menu/nouveau', component: RestaurateurMenuUpdateComponent },
-  { path: 'restaurateur/menu/:id', component: RestaurateurMenuUpdateComponent },
   { path: 'restaurateur/commandes', component: RestaurateurOrdersComponent },
   { path: 'restaurateur/statistiques', component: StatisticsComponent },
   { path: '**', redirectTo: '' }
