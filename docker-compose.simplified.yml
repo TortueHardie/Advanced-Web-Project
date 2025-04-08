@@ -15,7 +15,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - app-network
+      - internal-network
 
   redis:
     image: redis:alpine
@@ -25,7 +25,7 @@ services:
     volumes:
       - redis_data:/data
     networks:
-      - app-network
+      - internal-network
 
   auth-service:
     build:
@@ -45,14 +45,12 @@ services:
       USER_SERVICE_URL: http://user-service:3001
       NODE_ENV: development
     networks:
-      - app-network
+      - internal-network
     volumes:
       # Monter tout le dossier du microservice sauf node_modules
       - ./apps/auth-service:/usr/src/app/apps/auth-service
       - /usr/src/app/apps/auth-service/node_modules
       - ./packages:/usr/src/app/packages
-    ports:
-      - "4001:3001"
 
   api-gateway:
     build:
@@ -73,7 +71,8 @@ services:
     ports:
       - "3000:3000"
     networks:
-      - app-network
+      - internal-network
+      - external-network
     restart: unless-stopped
     volumes:
       # Monter tout le dossier du microservice sauf node_modules
@@ -93,14 +92,12 @@ services:
       DATABASE_URL: ${DATABASE_URL_POSTGRES}
       NODE_ENV: development
     networks:
-      - app-network
+      - internal-network
     volumes:
       # Monter tout le dossier du microservice sauf node_modules
       - ./apps/user-service:/usr/src/app/apps/user-service
       - /usr/src/app/apps/user-service/node_modules
       - ./packages:/usr/src/app/packages
-    ports:
-      - "4002:3001"
 
   log-service:
     build:
@@ -111,14 +108,12 @@ services:
     environment:
       NODE_ENV: development
     networks:
-      - app-network
+      - internal-network
     volumes:
       # Monter tout le dossier du microservice sauf node_modules
       - ./apps/log-service:/usr/src/app/apps/log-service
       - /usr/src/app/apps/log-service/node_modules
       - ./packages:/usr/src/app/packages
-    ports:
-      - "4003:3003"
 
   order-service:
     build:
@@ -132,14 +127,12 @@ services:
       DATABASE_URL: ${DATABASE_URL_POSTGRES}
       NODE_ENV: development
     networks:
-      - app-network
+      - internal-network
     volumes:
       # Monter tout le dossier du microservice sauf node_modules
       - ./apps/order-service:/usr/src/app/apps/order-service
       - /usr/src/app/apps/order-service/node_modules
       - ./packages:/usr/src/app/packages
-    ports:
-      - "4004:3002"
 
   frontend:
     build:
@@ -151,7 +144,7 @@ services:
     ports:
       - "8080:3000"
     networks:
-      - app-network
+      - external-network
     restart: unless-stopped
     volumes:
       # Monter tout le dossier du frontend sauf node_modules
@@ -167,5 +160,9 @@ volumes:
   redis_data:
 
 networks:
-  app-network:
+  internal-network:
+    driver: bridge
+    internal: true
+  
+  external-network:
     driver: bridge 
