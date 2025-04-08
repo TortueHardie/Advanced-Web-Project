@@ -16,7 +16,7 @@ import { RestaurateurProfileComponent } from './components/restaurateur-profile/
 import { RestaurateurProfileUpdateComponent } from './components/restaurateur-profile/restaurateur-profile-update/restaurateur-profile-update.component';
 import { DelivererOrdersComponent } from './components/deliverer-orders/deliverer-orders.component';
 import { DelivererProfileComponent } from './components/deliverer-profile/deliverer-profile.component';
-
+import { DelivererProfileUpdateComponent } from './components/deliverer-profile/deliverer-profile-update/deliverer-profile-update.component';
 export const routes: Routes = [
   { path: '', component: LoginComponent },
   { path: 'login', loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent) },
@@ -38,6 +38,7 @@ export const routes: Routes = [
   { path: 'restaurateur/statistiques', component: StatisticsComponent },
   // Deliverer
   { path: 'deliverer/compte', component: DelivererProfileComponent },
+  { path: 'deliverer/compte/modifier', component: DelivererProfileUpdateComponent },
   { path: 'deliverer/commandes', component: DelivererOrdersComponent },
   { path: '**', redirectTo: '' }
 ];

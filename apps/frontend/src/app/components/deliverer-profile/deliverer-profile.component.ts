@@ -68,7 +68,7 @@ export class DelivererProfileComponent implements OnInit {
   ngOnInit(): void { }
 
   onModify(): void {
-    this.router.navigate(['/livreur/compte/modifier']);
+    this.router.navigate(['/deliverer/compte/modifier']);
   }
 
   onDelete(): void {
