@@ -34,7 +34,7 @@ export class AuthService {
     // Add a fake ID and dates to simulate a backend response
     const user: User = {
       ...userData,
-      id: 'user-' + Date.now(),
+      id: Date.now(), // Use timestamp as numeric ID
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -54,13 +54,17 @@ export class AuthService {
   login(email: string, password: string): Observable<AuthResponse> {
     // Hardcoded mock user for testing
     const user: User = {
-      id: 'user-123',
+      id: Date.now(), // Use timestamp as numeric ID
       email,
       firstName: 'Test',
       lastName: 'User',
       roles: [UserRole.CUSTOMER],
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
+      birthDate: new Date(),
+      address: '',
+      referralCode: '',
+      status: 'Actif'
     };
     
     const response: AuthResponse = {

@@ -5,14 +5,17 @@ export enum UserRole {
 }
 
 export interface User {
-  id?: string;
-  email: string;
+  id: number;
   firstName: string;
   lastName: string;
+  birthDate: Date;
+  email: string;
+  address: string;
+  referralCode: string;
+  status: 'Actif' | 'Suspendu';
   roles: UserRole[];
   password?: string;
   phoneNumber?: string;
-  address?: string;
   city?: string;
   zipCode?: string;
   profileImage?: string;
