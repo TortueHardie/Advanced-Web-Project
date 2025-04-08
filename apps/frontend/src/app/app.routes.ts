@@ -20,6 +20,9 @@ import { DelivererProfileUpdateComponent } from './components/deliverer-profile/
 import { CommercialOrdersComponent } from './components/commercial-orders/commercial-orders.component';
 import { CommercialUsersComponent } from './components/commercial-users/commercial-users.component';
 import { DevComponentsComponent } from './components/dev-components/dev-components.component';
+import { DeveloperProfileComponent } from './components/developer-profile/developer-profile.component';
+import { DeveloperProfileUpdateComponent } from './components/developer-profile/developer-profile-update/developer-profile-update.component';
+
 export const routes: Routes = [
   { path: '', component: LoginComponent },
   { path: 'login', loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent) },
@@ -45,7 +48,9 @@ export const routes: Routes = [
   { path: 'deliverer/compte', component: DelivererProfileComponent },
   { path: 'deliverer/compte/modifier', component: DelivererProfileUpdateComponent },
   { path: 'deliverer/commandes', component: DelivererOrdersComponent },
-  // Dev
+  // Developer
+  { path: 'developer/compte', component: DeveloperProfileComponent },
+  { path: 'developer/compte/modifier', component: DeveloperProfileUpdateComponent },
   { path: 'dev', component: DevComponentsComponent },
   { path: '**', redirectTo: '' }
 ];
