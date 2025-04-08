@@ -6,10 +6,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatDialogModule } from '@angular/material/dialog';
+import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { User, UserRole } from '../../models/user.model';
 import { Injectable } from '@angular/core';
+import { DeleteUserDialogComponent } from './delete-user-dialog/delete-user-dialog.component';
 
 @Injectable({
   providedIn: 'root'
@@ -43,7 +44,8 @@ export class UserFormBuilder {
     MatInputModule,
     MatDialogModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    DeleteUserDialogComponent
   ],
   template: `
     <div class="users-container">
@@ -281,7 +283,10 @@ export class CommercialUsersComponent implements OnInit {
   displayedColumns: string[] = ['id', 'name', 'birthDate', 'status', 'action'];
   userForm: FormGroup;
 
-  constructor(private formBuilder: UserFormBuilder) {
+  constructor(
+    private formBuilder: UserFormBuilder,
+    private dialog: MatDialog
+  ) {
     this.userForm = this.formBuilder.createForm();
   }
 
@@ -347,8 +352,17 @@ export class CommercialUsersComponent implements OnInit {
 
   deleteUser(): void {
     if (this.selectedUser) {
-      this.users = this.users.filter(u => u.id !== this.selectedUser?.id);
-      this.selectedUser = null;
+      const dialogRef = this.dialog.open(DeleteUserDialogComponent, {
+        width: '400px',
+        disableClose: true
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          this.users = this.users.filter(u => u.id !== this.selectedUser?.id);
+          this.selectedUser = null;
+        }
+      });
     }
   }
 
