@@ -1,17 +1,57 @@
-# Commandes Docker Compose pour le développement
+# Advanced Web Project - Architecture Microservices
 
-Ce projet utilise Docker Compose pour orchestrer plusieurs applications backend et frontend dans un monorepo. Vous pouvez instancier plusieurs services pour assurer le load balancing et la scalabilité.
+Ce projet implémente une plateforme de livraison de repas avec une architecture microservices. Il permet aux utilisateurs de commander des repas auprès de restaurants partenaires et de suivre leurs commandes en temps réel.
 
-## �� Commandes utiles
+## 🚀 Architecture globale
 
-API GATEWAY
-swagger Api Gateway : http://localhost:3000/docs
+Le projet est structuré comme une application monorepo composée de plusieurs microservices indépendants communiquant entre eux. Cette architecture permet une meilleure scalabilité, résilience et facilite le développement parallèle.
 
-USER-SEVICE
-swagger service Utilisateurs accès via proxy : http://localhost:3000/api-docs/user
-swagger service Utilisateurs accès direct : http://localhost:3001/docs
+### Microservices
+- **API Gateway** : Point d'entrée unique pour toutes les requêtes client
+- **User Service** : Gestion des utilisateurs et authentification
+- **Auth Service** : Gestion des JWT et tokens d'authentification
+- **Order Service** : Gestion des commandes
+- **Log Service** : Centralisation des logs système
+- **Frontend** : Application client
 
-## Routes API
+### Technologies principales
+- **Backend** : NestJS, TypeScript, Prisma ORM
+- **Base de données** : PostgreSQL
+- **Documentation API** : Swagger
+- **Conteneurisation** : Docker, Docker Compose
+- **Communication** : HTTP REST, TCP (microservices)
+
+## 📊 Modèle de données
+
+Le projet utilise un modèle de données qui comprend les entités principales suivantes :
+
+- **User** : Utilisateurs de la plateforme (clients, livreurs, restaurateurs, administrateurs)
+- **Restaurant** : Établissements proposant des plats à livrer
+- **Menu** : Collections d'articles proposés par les restaurants
+- **Article** : Plats individuels disponibles à la commande
+- **Order** : Commandes passées par les utilisateurs
+- **OrderItem** : Articles spécifiques inclus dans une commande
+
+## 🔐 Authentification et Autorisation
+
+Le système utilise l'authentification par JWT (JSON Web Tokens) :
+
+1. **Obtention d'un token** :
+   - Créez un compte avec `/auth/register` ou connectez-vous avec `/auth/login`
+   - Ces endpoints vous renverront un `accessToken` et un `refreshToken`
+
+2. **Utilisation des routes protégées** :
+   - Incluez le header `Authorization: Bearer {votre_access_token}` dans vos requêtes
+   - Toutes les routes des services utilisateur et commandes (sauf la création d'utilisateur) nécessitent une authentification
+
+3. **Rafraîchissement d'un token expiré** :
+   - Lorsque votre `accessToken` expire (après 15 minutes), utilisez `/auth/refresh` avec votre `refreshToken`
+   - Vous recevrez une nouvelle paire de tokens
+
+4. **Révocation d'un token** :
+   - Pour la déconnexion sécurisée, utilisez `/auth/revoke` avec votre `accessToken`
+
+## 📄 Routes API
 
 ### API Gateway
 - `GET /docs` - Documentation Swagger centralisée de l'API Gateway
@@ -44,31 +84,70 @@ swagger service Utilisateurs accès direct : http://localhost:3001/docs
 - `POST /logs` - Enregistrer un nouveau message de log
 - `GET /logs` - Récupérer les messages de logs (pagination supportée)
 
-## Authentification et Autorisation
+## 🏁 Installation et démarrage
 
-Le système utilise l'authentification par JWT (JSON Web Tokens) :
+### Prérequis
+- Docker et Docker Compose installés
+- Node.js (v16+) et npm (pour le développement local)
+- Pour les utilisateurs Windows: WSL2 recommandé pour de meilleures performances
 
-1. **Obtention d'un token** :
-   - Créez un compte avec `/auth/register` ou connectez-vous avec `/auth/login`
-   - Ces endpoints vous renverront un `accessToken` et un `refreshToken`
+### Démarrage rapide
 
-2. **Utilisation des routes protégées** :
-   - Incluez le header `Authorization: Bearer {votre_access_token}` dans vos requêtes
-   - Toutes les routes des services utilisateur et commandes (sauf la création d'utilisateur) nécessitent une authentification
-
-3. **Rafraîchissement d'un token expiré** :
-   - Lorsque votre `accessToken` expire (après 15 minutes), utilisez `/auth/refresh` avec votre `refreshToken`
-   - Vous recevrez une nouvelle paire de tokens
-
-4. **Révocation d'un token** :
-   - Pour la déconnexion sécurisée, utilisez `/auth/revoke` avec votre `accessToken`
-
-## Lancer en dev : 
 ```sh
-npm run start 
+# Cloner le dépôt
+git clone <repository-url>
+cd advanced-web-project
+
+# Configurer les variables d'environnement
+cp .env.example .env
+# Modifiez le fichier .env selon vos besoins
+
+# Lancer les services en mode développement
+npm run start
+
+# OU en utilisant les scripts shell/batch
+# Sur Linux/macOS
+./dev.sh
+
+# Sur Windows
+.\dev.bat
 ```
 
-## Lancer en mode prod :
+### Version simplifiée pour le développement
+
+Pour un démarrage rapide avec moins de services:
+
+```bash
+# Démarrer uniquement les services essentiels
+docker-compose -f docker-compose.simplified.yml up -d
+```
+
+### Reconstruction complète après modifications des Dockerfiles
+
+Si vous avez modifié les Dockerfiles ou rencontrez des problèmes de dépendances, utilisez le script de reconstruction:
+
+```bash
+# Sur Windows
+.\rebuild.bat
+
+# Sur Linux/macOS (équivalent manuel)
+docker-compose -f docker-compose.dev.yml down
+docker rmi $(docker images -q 'advanced-web-project-*:latest')
+docker-compose -f docker-compose.dev.yml up --build -d
+```
+
+## 🔍 Accès aux services
+
+Une fois les services démarrés, vous pouvez accéder aux différentes interfaces :
+
+- **API Gateway Swagger** : http://localhost:3000/docs
+- **User Service Swagger** : 
+  - Via proxy : http://localhost:3000/api-docs/user
+  - Direct : http://localhost:3001/docs
+- **Frontend** : http://localhost:3000
+
+## 🛠️ Commandes Docker utiles
+
 ```sh
 # Lancer les services en mode détaché (background)
 docker compose up -d
@@ -112,115 +191,39 @@ docker volume ls
 # Supprimer tous les volumes Docker (⚠ irréversible, supprime toutes les bases de données stockées)
 docker volume prune -f
 ```
-## 🏗️ Image Docker  
-Une image Docker est un modèle immuable utilisé pour créer des conteneurs. Elle contient tout le nécessaire pour exécuter une application : code, dépendances, runtime et configuration.  
 
-- Une image est construite à partir d'un **Dockerfile**.
-- Elle peut être stockée et partagée via **Docker Hub** ou un registre privé.  
-```sh
-### Commandes utiles :
-docker pull nginx        # Télécharger une image depuis Docker Hub
-docker images            # Lister les images locales
-docker rmi <image_id>    # Supprimer une image
-```
-📦 Volume Docker
-Un volume Docker est un espace de stockage persistant utilisé par les conteneurs. Contrairement aux fichiers stockés dans un conteneur, un volume n'est pas supprimé quand le conteneur est arrêté ou supprimé.
-
-Il permet de partager des données entre conteneurs et de préserver les données même après l'arrêt des services.
-```sh
-###Commandes utiles :
-docker volume create my_volume    # Créer un volume
-docker volume ls                  # Lister les volumes existants
-docker volume rm my_volume        # Supprimer un volume
-```
-
-🌐 Réseau Docker
-Un réseau Docker permet aux conteneurs de communiquer entre eux et avec l'extérieur.
-
-Types de réseaux :
-bridge (par défaut) : réseau privé entre les conteneurs.
-host : partage le réseau de l'hôte (pas d'isolation).
-none : pas de réseau (conteneur totalement isolé).
-overlay : pour connecter plusieurs hôtes Docker.
-
-```sh
-###Commandes utiles :
-docker network create my_network         # Créer un réseau
-docker network ls                        # Lister les réseaux
-docker network inspect my_network        # Voir les détails d'un réseau
-docker network rm my_network             # Supprimer un réseau
-```
-
-📌 Lancer plusieurs instances d'un service (load balancing)
-Docker Compose permet d'exécuter plusieurs instances d'un même service avec --scale, ce qui est utile pour la répartition de charge :
-
-Exemple :
-```sh
-docker compose up -d --scale backend=3 --scale frontend=2
-```
-Cela lance 3 instances du backend et 2 instances du frontend.
-
-Modifier le nombre d'instances à la volée :
-
-```sh
-docker compose up -d --scale backend=5
-```
-
-Ici, on passe à 5 instances du backend.
-
-⚠️ Attention : Assurez-vous que vos services utilisent un reverse proxy (ex: Nginx, Traefik) et que votre base de données gère bien les connexions simultanées.
-
-## Mode Développement avec Hot-Reload
+## 🧩 Mode Développement avec Hot-Reload
 
 Ce projet supporte le hot-reload pour tous les microservices pendant le développement. Cela signifie que vous pouvez modifier le code source de n'importe quel microservice et voir les changements instantanément, sans avoir à reconstruire les images Docker ou à redémarrer les conteneurs manuellement.
 
-### Prérequis
+## 📊 Structure du projet
 
-- Docker et Docker Compose installés
-- Pour les utilisateurs Windows: WSL2 recommandé pour de meilleures performances
-
-### Démarrage du mode développement
-
-Pour démarrer l'environnement de développement avec hot-reload:
-
-```bash
-# Sur Linux/macOS
-./dev.sh
-
-# Sur Windows
-.\dev.bat
+```
+advanced-web-project/
+├── apps/
+│   ├── api-gateway/          # Point d'entrée unique pour toutes les requêtes
+│   ├── auth-service/         # Gestion de l'authentification et des tokens
+│   ├── frontend/             # Application web cliente
+│   ├── log-service/          # Service de journalisation centralisée
+│   ├── order-service/        # Gestion des commandes et du processus de livraison
+│   └── user-service/         # Gestion des utilisateurs et des profils
+├── packages/
+│   └── prisma/               # Service partagé pour l'ORM Prisma
+├── .env                      # Variables d'environnement
+├── .env.example              # Exemple de configuration des variables d'environnement
+├── docker-compose.yml        # Configuration Docker Compose principale
+├── docker-compose.dev.yml    # Configuration pour le développement
+└── package.json              # Configuration npm racine
 ```
 
-Ou utilisez directement Docker Compose:
+## 🔄 Communication entre microservices
 
-```bash
-docker-compose -f docker-compose.dev.yml up --build
-```
+Les microservices communiquent entre eux principalement via :
 
-### Version simplifiée pour le développement
+1. **API REST** : Pour les opérations standard (API Gateway → Services)
+2. **Transport TCP** : Pour les communications spécifiques entre microservices (via `@nestjs/microservices`)
 
-Pour un démarrage rapide avec moins de services:
-
-```bash
-# Démarrer uniquement les services essentiels
-docker-compose -f docker-compose.simplified.yml up -d
-```
-
-### Reconstruction complète après modifications des Dockerfiles
-
-Si vous avez modifié les Dockerfiles ou rencontrez des problèmes de dépendances, utilisez le script de reconstruction:
-
-```bash
-# Sur Windows
-.\rebuild.bat
-
-# Sur Linux/macOS (équivalent manuel)
-docker-compose -f docker-compose.dev.yml down
-docker rmi $(docker images -q 'advanced-web-project-*:latest')
-docker-compose -f docker-compose.dev.yml up --build -d
-```
-
-### Gestion des dépendances locales
+## 📚 Gestion des dépendances locales
 
 Ce projet utilise des packages locaux (comme `@advanced-web/prisma`) qui ne sont pas publiés sur le registre npm public. Notre configuration Docker gère ces dépendances de la manière suivante:
 
@@ -234,29 +237,9 @@ Ce projet utilise des packages locaux (comme `@advanced-web/prisma`) qui ne sont
    - Nous utilisons l'option `--legacy-peer-deps` pour éviter les conflits de versions
    - Nous installons les dépendances en deux étapes (racine puis service)
 
-3. **Configuration des volumes:**
-   - Les fichiers source sont montés comme volumes pour le hot-reload
-   - Le dossier `packages/` est également monté pour permettre les modifications en direct
+## 🔧 Résolution des problèmes courants
 
-## Architecture et solutions aux problèmes communs
-
-### Structure de l'application
-
-1. **API Gateway**: Point d'entrée unique pour toutes les requêtes externes
-   - Gère le CORS et route les requêtes vers les microservices appropriés
-   - Fournit une documentation API unifiée via Swagger
-
-2. **Microservices**: Chaque service est isolé et se concentre sur une fonctionnalité spécifique
-   - Chaque service a son propre Dockerfile et peut être déployé indépendamment
-   - Communication interne via le réseau Docker (`app-network`)
-
-3. **Base de données partagée**: Dans cette configuration, tous les services utilisent la même base PostgreSQL
-   - Chaque service utilise son propre client Prisma, mais pointe vers la même BDD
-   - La migration vers des bases distinctes par service est possible pour plus d'isolation
-
-### Résolution des problèmes courants
-
-#### Problème d'injection de dépendance avec PrismaService
+### Problème d'injection de dépendance avec PrismaService
 
 Si vous rencontrez des erreurs comme `UnknownDependenciesException: Nest can't resolve dependencies of the UserRepository (?)`, c'est souvent lié à un problème d'injection du `PrismaService`. Solutions:
 
@@ -279,30 +262,7 @@ export class UserRepository {
 }
 ```
 
-Et mise à jour du module:
-
-```typescript
-// app.module.ts
-@Module({
-  imports: [],
-  controllers: [UserController],
-  providers: [UserService, UserRepository], // PrismaService retiré
-})
-export class AppModule {}
-```
-
-2. **Solution alternative**: Utilisation de liens symboliques dans le Dockerfile.dev
-
-```dockerfile
-# Création des répertoires nécessaires
-RUN mkdir -p /usr/src/app/apps/user-service/src/prisma
-
-# Création de liens symboliques pour le PrismaService
-RUN ln -sf /usr/src/app/packages/prisma/src/prisma.service.ts /usr/src/app/apps/user-service/src/prisma/prisma.service.ts
-RUN ln -sf /usr/src/app/packages/prisma/src/index.ts /usr/src/app/apps/user-service/src/prisma/index.ts
-```
-
-#### Erreur: "404 Not Found - GET https://registry.npmjs.org/@advanced-web%2fprisma"
+### Erreur: "404 Not Found - GET https://registry.npmjs.org/@advanced-web%2fprisma"
 
 Cette erreur se produit lorsque npm tente de télécharger un package local depuis le registre npm. Solution:
 
@@ -310,7 +270,7 @@ Cette erreur se produit lorsque npm tente de télécharger un package local depu
 2. Assurez-vous que `.dockerignore` n'ignore pas le dossier `packages/`
 3. Reconstruisez l'image avec `.\rebuild.bat` ou `docker-compose -f docker-compose.dev.yml up --build`
 
-#### Erreur: "Could not find TypeScript configuration file "tsconfig.json"
+### Erreur: "Could not find TypeScript configuration file "tsconfig.json"
 
 Cette erreur se produit quand les fichiers de configuration TypeScript ne sont pas correctement montés dans le conteneur. Solution:
 
@@ -324,10 +284,39 @@ Cette erreur se produit quand les fichiers de configuration TypeScript ne sont p
      - ./apps/service-name/nest-cli.json:/usr/src/app/apps/service-name/nest-cli.json
    ```
 
-2. **Option 2:** Utiliser la configuration simplifiée:
-   - Exécutez `.\rebuild.bat` et choisissez "O" pour utiliser la configuration simplifiée qui monte les dossiers complets
-   ```yaml
-   volumes:
-     - ./apps/service-name:/usr/src/app/apps/service-name
-     - /usr/src/app/apps/service-name/node_modules # Anonymous volume pour ne pas écraser node_modules
-   ```
+## 🆕 Modifications récentes
+
+### API Gateway
+
+- Correction de la configuration des routes pour la récupération d'utilisateurs par ID (`/users/:id`) et par email (`/users/by-email/:email`)
+- Remplacement du décorateur `@Headers('authorization')` par un décorateur personnalisé `@AccessToken()` pour une meilleure gestion de l'authentification
+- Amélioration de la documentation Swagger API
+
+### User Service
+
+- Suppression de `ParseIntPipe` pour permettre l'utilisation d'UUIDs dans les routes paramétrées
+- Correction des méthodes de récupération d'utilisateurs par ID et par email
+- Amélioration de la gestion des erreurs et des logs
+
+### Améliorations générales
+
+- Optimisation des mécanismes d'authentification
+- Standardisation des formats de réponse API
+- Documentation améliorée des endpoints
+
+## 🧪 Tests
+
+```bash
+# Exécuter les tests unitaires
+npm run test
+
+# Exécuter les tests e2e
+npm run test:e2e
+
+# Vérifier la couverture de code
+npm run test:cov
+```
+
+## 📄 Licence
+
+Ce projet est sous licence [MIT](LICENSE).
