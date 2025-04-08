@@ -9,7 +9,7 @@ async function bootstrap() {
     AppModule,
     {
       transport: Transport.TCP,
-      options: { host: '127.0.0.1', port: 4001 },
+      options: { host: '0.0.0.0', port: 4001 },
     },
   );
   microservice.listen();
@@ -27,7 +27,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(httpApp as any, config);
   SwaggerModule.setup('docs', httpApp as any, document);
 
-  await httpApp.listen(3001); // Serveur HTTP pour Swagger
+  await httpApp.listen(3001, '0.0.0.0'); // Serveur HTTP pour Swagger
   console.log('📄 Swagger user-service disponible sur http://localhost:3001/docs');
 }
 
