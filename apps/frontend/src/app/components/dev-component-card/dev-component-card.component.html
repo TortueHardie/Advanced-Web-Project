@@ -5,6 +5,9 @@
       <p class="description">{{ component.description }}</p>
     </mat-card-content>
     <mat-card-actions>
-      <button mat-button color="primary" (click)="onDetailsClick()">DÉTAILS</button>
+      <a mat-button color="primary" [href]="component.githubLink" target="_blank">
+        <mat-icon>code</mat-icon>
+        GitHub
+      </a>
     </mat-card-actions>
   </mat-card>
