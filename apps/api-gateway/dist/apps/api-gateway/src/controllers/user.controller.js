@@ -18,6 +18,7 @@ const swagger_1 = require("@nestjs/swagger");
 const axios_1 = require("@nestjs/axios");
 const rxjs_1 = require("rxjs");
 const dto_1 = require("../dto");
+const decorators_1 = require("../decorators");
 let UserController = class UserController {
     httpService;
     userServiceUrl = process.env.USER_SERVICE_URL || 'http://user-service:3001';
@@ -95,21 +96,21 @@ __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Récupérer tous les utilisateurs' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Liste des utilisateurs récupérée', type: [dto_1.UserDto] }),
     (0, swagger_1.ApiResponse)({ status: 401, description: 'Non autorisé' }),
-    __param(0, (0, common_1.Headers)('authorization')),
+    __param(0, (0, decorators_1.AccessToken)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "findAll", null);
 __decorate([
-    (0, common_1.Get)(':id'),
+    (0, common_1.Get)('by-id'),
     (0, swagger_1.ApiBearerAuth)('access-token'),
     (0, swagger_1.ApiOperation)({ summary: 'Récupérer un utilisateur par ID' }),
-    (0, swagger_1.ApiParam)({ name: 'id', description: 'ID de l\'utilisateur' }),
+    (0, swagger_1.ApiQuery)({ name: 'id', description: 'ID de l\'utilisateur', required: true }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Utilisateur récupéré', type: dto_1.UserDto }),
     (0, swagger_1.ApiResponse)({ status: 401, description: 'Non autorisé' }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Utilisateur non trouvé' }),
-    __param(0, (0, common_1.Headers)('authorization')),
-    __param(1, (0, common_1.Param)('id')),
+    __param(0, (0, decorators_1.AccessToken)()),
+    __param(1, (0, common_1.Query)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
@@ -123,7 +124,7 @@ __decorate([
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Utilisateur mis à jour', type: dto_1.UserDto }),
     (0, swagger_1.ApiResponse)({ status: 401, description: 'Non autorisé' }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Utilisateur non trouvé' }),
-    __param(0, (0, common_1.Headers)('authorization')),
+    __param(0, (0, decorators_1.AccessToken)()),
     __param(1, (0, common_1.Param)('id')),
     __param(2, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -138,7 +139,7 @@ __decorate([
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Utilisateur supprimé' }),
     (0, swagger_1.ApiResponse)({ status: 401, description: 'Non autorisé' }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Utilisateur non trouvé' }),
-    __param(0, (0, common_1.Headers)('authorization')),
+    __param(0, (0, decorators_1.AccessToken)()),
     __param(1, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, String]),
@@ -156,15 +157,15 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "validateUser", null);
 __decorate([
-    (0, common_1.Get)('by-email/:email'),
+    (0, common_1.Get)('by-email'),
     (0, swagger_1.ApiBearerAuth)('access-token'),
     (0, swagger_1.ApiOperation)({ summary: 'Récupérer un utilisateur par email' }),
-    (0, swagger_1.ApiParam)({ name: 'email', description: 'Email de l\'utilisateur' }),
+    (0, swagger_1.ApiQuery)({ name: 'email', description: 'Email de l\'utilisateur', required: true }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Utilisateur récupéré', type: dto_1.UserDto }),
     (0, swagger_1.ApiResponse)({ status: 401, description: 'Non autorisé' }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Utilisateur non trouvé' }),
-    __param(0, (0, common_1.Headers)('authorization')),
-    __param(1, (0, common_1.Param)('email')),
+    __param(0, (0, decorators_1.AccessToken)()),
+    __param(1, (0, common_1.Query)('email')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)

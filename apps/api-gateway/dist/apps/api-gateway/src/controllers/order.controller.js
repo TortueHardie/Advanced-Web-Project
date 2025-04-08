@@ -18,6 +18,7 @@ const swagger_1 = require("@nestjs/swagger");
 const axios_1 = require("@nestjs/axios");
 const rxjs_1 = require("rxjs");
 const dto_1 = require("../dto");
+const decorators_1 = require("../decorators");
 let OrderController = class OrderController {
     httpService;
     orderServiceUrl = process.env.ORDER_SERVICE_URL || 'http://order-service:3002';
@@ -77,7 +78,7 @@ __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Créer une nouvelle commande' }),
     (0, swagger_1.ApiResponse)({ status: 201, description: 'Commande créée avec succès', type: dto_1.OrderResponseDto }),
     (0, swagger_1.ApiResponse)({ status: 401, description: 'Non autorisé' }),
-    __param(0, (0, common_1.Headers)('authorization')),
+    __param(0, (0, decorators_1.AccessToken)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, dto_1.CreateOrderDto]),
@@ -89,7 +90,7 @@ __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Récupérer les commandes de l\'utilisateur connecté' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Liste des commandes', type: dto_1.OrderListResponseDto }),
     (0, swagger_1.ApiResponse)({ status: 401, description: 'Non autorisé' }),
-    __param(0, (0, common_1.Headers)('authorization')),
+    __param(0, (0, decorators_1.AccessToken)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
@@ -104,7 +105,7 @@ __decorate([
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Liste de toutes les commandes', type: dto_1.OrderListResponseDto }),
     (0, swagger_1.ApiResponse)({ status: 401, description: 'Non autorisé' }),
     (0, swagger_1.ApiResponse)({ status: 403, description: 'Accès interdit - rôle insuffisant' }),
-    __param(0, (0, common_1.Headers)('authorization')),
+    __param(0, (0, decorators_1.AccessToken)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
@@ -117,7 +118,7 @@ __decorate([
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Détails de la commande', type: dto_1.OrderResponseDto }),
     (0, swagger_1.ApiResponse)({ status: 401, description: 'Non autorisé' }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Commande non trouvée' }),
-    __param(0, (0, common_1.Headers)('authorization')),
+    __param(0, (0, decorators_1.AccessToken)()),
     __param(1, (0, common_1.Param)('orderId')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, String]),
@@ -131,7 +132,7 @@ __decorate([
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Commande annulée avec succès', type: dto_1.OrderResponseDto }),
     (0, swagger_1.ApiResponse)({ status: 401, description: 'Non autorisé' }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Commande non trouvée' }),
-    __param(0, (0, common_1.Headers)('authorization')),
+    __param(0, (0, decorators_1.AccessToken)()),
     __param(1, (0, common_1.Param)('orderId')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, String]),

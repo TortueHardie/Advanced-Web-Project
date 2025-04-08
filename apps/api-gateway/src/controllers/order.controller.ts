@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Param, Put, Delete, Headers, UnauthorizedException, Query } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Param, Put, Delete, UnauthorizedException, Query } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { CreateOrderDto, OrderResponseDto, OrderListResponseDto } from '../dto';
+import { AccessToken } from '../decorators';
 
 @ApiTags('Orders')
 @Controller('orders')
@@ -55,7 +56,7 @@ export class OrderController {
   @ApiOperation({ summary: 'Créer une nouvelle commande' })
   @ApiResponse({ status: 201, description: 'Commande créée avec succès', type: OrderResponseDto })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
-  async createOrder(@Headers('authorization') authHeader: string, @Body() createOrderDto: CreateOrderDto) {
+  async createOrder(@AccessToken() authHeader: string, @Body() createOrderDto: CreateOrderDto) {
     return this.forwardRequest(`${this.orderServiceUrl}`, 'POST', authHeader, createOrderDto);
   }
 
@@ -64,7 +65,7 @@ export class OrderController {
   @ApiOperation({ summary: 'Récupérer les commandes de l\'utilisateur connecté' })
   @ApiResponse({ status: 200, description: 'Liste des commandes', type: OrderListResponseDto })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
-  async getUserOrders(@Headers('authorization') authHeader: string) {
+  async getUserOrders(@AccessToken() authHeader: string) {
     return this.forwardRequest(`${this.orderServiceUrl}/me`, 'GET', authHeader);
   }
 
@@ -77,7 +78,7 @@ export class OrderController {
   @ApiResponse({ status: 200, description: 'Liste de toutes les commandes', type: OrderListResponseDto })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
   @ApiResponse({ status: 403, description: 'Accès interdit - rôle insuffisant' })
-  async getAdminOrders(@Headers('authorization') authHeader: string) {
+  async getAdminOrders(@AccessToken() authHeader: string) {
     return this.forwardRequest(`${this.orderServiceUrl}/admin`, 'GET', authHeader);
   }
 
@@ -88,7 +89,7 @@ export class OrderController {
   @ApiResponse({ status: 200, description: 'Détails de la commande', type: OrderResponseDto })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
   @ApiResponse({ status: 404, description: 'Commande non trouvée' })
-  async getOrderById(@Headers('authorization') authHeader: string, @Param('orderId') orderId: string) {
+  async getOrderById(@AccessToken() authHeader: string, @Param('orderId') orderId: string) {
     return this.forwardRequest(`${this.orderServiceUrl}/${orderId}`, 'GET', authHeader);
   }
 
@@ -99,7 +100,7 @@ export class OrderController {
   @ApiResponse({ status: 200, description: 'Commande annulée avec succès', type: OrderResponseDto })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
   @ApiResponse({ status: 404, description: 'Commande non trouvée' })
-  async cancelOrder(@Headers('authorization') authHeader: string, @Param('orderId') orderId: string) {
+  async cancelOrder(@AccessToken() authHeader: string, @Param('orderId') orderId: string) {
     return this.forwardRequest(`${this.orderServiceUrl}/${orderId}/cancel`, 'PUT', authHeader);
   }
 } 

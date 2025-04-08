@@ -1,9 +1,10 @@
-import { Controller, Post, Get, Headers, UnauthorizedException, Body, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Get, UnauthorizedException, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { AuthService } from '../services/auth.service';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { LoginDto, RegisterDto, RefreshTokenDto, TokenResponseDto } from '../dto';
+import { AccessToken } from '../decorators';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -61,7 +62,7 @@ export class AuthController {
   @ApiBearerAuth('access-token')
   @ApiResponse({ status: 200, description: 'Token valide', type: Object })
   @ApiResponse({ status: 401, description: 'Token invalide ou expiré' })
-  async verifyToken(@Headers('authorization') authHeader: string) {
+  async verifyToken(@AccessToken() authHeader: string) {
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       throw new UnauthorizedException('Token manquant ou format invalide');
     }
@@ -126,7 +127,7 @@ export class AuthController {
   @ApiBearerAuth('access-token')
   @ApiResponse({ status: 200, description: 'Token révoqué avec succès' })
   @ApiResponse({ status: 401, description: 'Token invalide' })
-  async revoke(@Headers('authorization') authHeader: string) {
+  async revoke(@AccessToken() authHeader: string) {
     return this.forwardRequest('revoke', 'POST', authHeader);
   }
 } 

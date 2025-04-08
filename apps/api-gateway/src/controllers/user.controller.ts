@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, Headers, UnauthorizedException } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Put, Param, Delete, UnauthorizedException, Query } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { CreateUserDto, UpdateUserDto, UserDto, ValidateUserDto } from '../dto';
+import { AccessToken } from '../decorators';
 
 @ApiTags('Users')
 @Controller('users')
@@ -65,18 +66,18 @@ export class UserController {
   @ApiOperation({ summary: 'Récupérer tous les utilisateurs' })
   @ApiResponse({ status: 200, description: 'Liste des utilisateurs récupérée', type: [UserDto] })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
-  async findAll(@Headers('authorization') authHeader: string) {
+  async findAll(@AccessToken() authHeader: string) {
     return this.forwardRequest(`${this.userServiceUrl}/users`, 'GET', authHeader);
   }
 
-  @Get(':id')
+  @Get('by-id')
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Récupérer un utilisateur par ID' })
-  @ApiParam({ name: 'id', description: 'ID de l\'utilisateur' })
+  @ApiQuery({ name: 'id', description: 'ID de l\'utilisateur', required: true })
   @ApiResponse({ status: 200, description: 'Utilisateur récupéré', type: UserDto })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })
-  async findOne(@Headers('authorization') authHeader: string, @Param('id') id: string) {
+  async findOne(@AccessToken() authHeader: string, @Query('id') id: string) {
     return this.forwardRequest(`${this.userServiceUrl}/users/${id}`, 'GET', authHeader);
   }
 
@@ -88,7 +89,7 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'Utilisateur mis à jour', type: UserDto })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })
-  async update(@Headers('authorization') authHeader: string, @Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  async update(@AccessToken() authHeader: string, @Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.forwardRequest(`${this.userServiceUrl}/users/${id}`, 'PUT', authHeader, updateUserDto);
   }
 
@@ -99,7 +100,7 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'Utilisateur supprimé' })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })
-  async remove(@Headers('authorization') authHeader: string, @Param('id') id: string) {
+  async remove(@AccessToken() authHeader: string, @Param('id') id: string) {
     return this.forwardRequest(`${this.userServiceUrl}/users/${id}`, 'DELETE', authHeader);
   }
 
@@ -112,14 +113,14 @@ export class UserController {
     return this.forwardRequest(`${this.userServiceUrl}/users/validate`, 'POST', undefined, credentials);
   }
 
-  @Get('by-email/:email')
+  @Get('by-email')
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Récupérer un utilisateur par email' })
-  @ApiParam({ name: 'email', description: 'Email de l\'utilisateur' })
+  @ApiQuery({ name: 'email', description: 'Email de l\'utilisateur', required: true })
   @ApiResponse({ status: 200, description: 'Utilisateur récupéré', type: UserDto })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })
-  async findByEmail(@Headers('authorization') authHeader: string, @Param('email') email: string) {
+  async findByEmail(@AccessToken() authHeader: string, @Query('email') email: string) {
     return this.forwardRequest(`${this.userServiceUrl}/users/by-email/${email}`, 'GET', authHeader);
   }
 } 

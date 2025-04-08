@@ -19,6 +19,7 @@ const swagger_1 = require("@nestjs/swagger");
 const axios_1 = require("@nestjs/axios");
 const rxjs_1 = require("rxjs");
 const dto_1 = require("../dto");
+const decorators_1 = require("../decorators");
 let AuthController = class AuthController {
     authService;
     httpService;
@@ -89,7 +90,7 @@ __decorate([
     (0, swagger_1.ApiBearerAuth)('access-token'),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Token valide', type: Object }),
     (0, swagger_1.ApiResponse)({ status: 401, description: 'Token invalide ou expiré' }),
-    __param(0, (0, common_1.Headers)('authorization')),
+    __param(0, (0, decorators_1.AccessToken)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
@@ -150,7 +151,7 @@ __decorate([
     (0, swagger_1.ApiBearerAuth)('access-token'),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Token révoqué avec succès' }),
     (0, swagger_1.ApiResponse)({ status: 401, description: 'Token invalide' }),
-    __param(0, (0, common_1.Headers)('authorization')),
+    __param(0, (0, decorators_1.AccessToken)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
