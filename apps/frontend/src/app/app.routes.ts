@@ -19,7 +19,7 @@ import { DelivererProfileComponent } from './components/deliverer-profile/delive
 import { DelivererProfileUpdateComponent } from './components/deliverer-profile/deliverer-profile-update/deliverer-profile-update.component';
 import { CommercialOrdersComponent } from './components/commercial-orders/commercial-orders.component';
 import { CommercialUsersComponent } from './components/commercial-users/commercial-users.component';
-
+import { DevComponentsComponent } from './components/dev-components/dev-components.component';
 export const routes: Routes = [
   { path: '', component: LoginComponent },
   { path: 'login', loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent) },
@@ -45,5 +45,7 @@ export const routes: Routes = [
   { path: 'deliverer/compte', component: DelivererProfileComponent },
   { path: 'deliverer/compte/modifier', component: DelivererProfileUpdateComponent },
   { path: 'deliverer/commandes', component: DelivererOrdersComponent },
+  // Dev
+  { path: 'dev', component: DevComponentsComponent },
   { path: '**', redirectTo: '' }
 ];

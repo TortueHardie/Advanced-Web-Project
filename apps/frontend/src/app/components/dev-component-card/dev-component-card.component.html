@@ -1,0 +1,10 @@
+<mat-card class="component-card">
+    <img mat-card-image [src]="component.image" [alt]="component.name">
+    <mat-card-content>
+      <h2>{{ component.name }}</h2>
+      <p class="description">{{ component.description }}</p>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-button color="primary" (click)="onDetailsClick()">DÉTAILS</button>
+    </mat-card-actions>
+  </mat-card>
