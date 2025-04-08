@@ -1,9 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ArticleDto } from './article.dto';
+import { IsString, IsArray, IsOptional } from 'class-validator';
 
 export class MenuDto {
   @ApiProperty({ description: 'ID du menu' })
-  id: number;
+  id: string;
 
   @ApiProperty({ description: 'Nom du menu' })
   name: string;
@@ -15,7 +16,7 @@ export class MenuDto {
   price: number;
 
   @ApiProperty({ description: 'ID du restaurant' })
-  restaurantId: number;
+  restaurantId: string;
 
   @ApiProperty({ description: 'Articles inclus dans le menu', type: [ArticleDto] })
   items: ArticleDto[];
@@ -35,10 +36,13 @@ export class CreateMenuDto {
   price: number;
 
   @ApiProperty({ description: 'ID du restaurant' })
-  restaurantId: number;
+  @IsString()
+  restaurantId: string;
 
-  @ApiProperty({ description: 'IDs des articles à inclure dans le menu', type: [Number] })
-  itemIds: number[];
+  @ApiProperty({ description: 'IDs des articles à inclure dans le menu', type: [String] })
+  @IsArray()
+  @IsString({ each: true })
+  itemIds: string[];
 
   @ApiProperty({ description: 'Disponibilité du menu', default: true })
   isAvailable?: boolean;
@@ -54,8 +58,11 @@ export class UpdateMenuDto {
   @ApiProperty({ description: 'Prix du menu', required: false })
   price?: number;
 
-  @ApiProperty({ description: 'IDs des articles à inclure dans le menu', type: [Number], required: false })
-  itemIds?: number[];
+  @ApiProperty({ description: 'IDs des articles à inclure dans le menu', type: [String], required: false })
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  itemIds?: string[];
 
   @ApiProperty({ description: 'Disponibilité du menu', required: false })
   isAvailable?: boolean;

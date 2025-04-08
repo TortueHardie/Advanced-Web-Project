@@ -10,7 +10,7 @@ export enum RestaurantStatus {
 
 export class RestaurantDto {
   @ApiProperty({ description: 'ID du restaurant' })
-  id: number;
+  id: string;
 
   @ApiProperty({ description: 'Nom du restaurant' })
   name: string;
@@ -28,7 +28,7 @@ export class RestaurantDto {
   status: RestaurantStatus;
 
   @ApiProperty({ description: 'ID du propriétaire', required: false })
-  ownerId?: number;
+  ownerId?: string;
 
   @ApiProperty({ description: 'Menus du restaurant', type: [MenuDto], required: false })
   menus?: MenuDto[];
@@ -59,9 +59,9 @@ export class CreateRestaurantDto {
   description: string;
 
   @ApiProperty({ description: 'ID du propriétaire', required: false })
-  @IsNumber()
+  @IsString()
   @IsOptional()
-  ownerId?: number;
+  ownerId?: string;
 }
 
 export class UpdateRestaurantDto {

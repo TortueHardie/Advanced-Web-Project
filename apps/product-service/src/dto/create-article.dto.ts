@@ -47,11 +47,11 @@ export class CreateArticleDto {
 
   @ApiProperty({ 
     description: 'ID du restaurant auquel l\'article appartient', 
-    example: 1
+    example: '123e4567-e89b-12d3-a456-426614174000'
   })
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
-  restaurantId: number;
+  restaurantId: string;
 
   @ApiProperty({ 
     description: 'Stock initial de l\'article', 

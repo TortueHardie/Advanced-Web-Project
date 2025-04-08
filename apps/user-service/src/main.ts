@@ -20,12 +20,12 @@ async function bootstrap() {
   
   const config = new DocumentBuilder()
     .setTitle('User Service API')
-    .setDescription('Documentation de l’API User Service')
+    .setDescription("Documentation de l'API User Service")
     .setVersion('1.0')
     .build();
 
-  const document = SwaggerModule.createDocument(httpApp, config);
-  SwaggerModule.setup('docs', httpApp, document);
+  const document = SwaggerModule.createDocument(httpApp as any, config);
+  SwaggerModule.setup('docs', httpApp as any, document);
 
   await httpApp.listen(3001); // Serveur HTTP pour Swagger
   console.log('📄 Swagger user-service disponible sur http://localhost:3001/docs');

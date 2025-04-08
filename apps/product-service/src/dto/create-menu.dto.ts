@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsNumber, IsArray, IsOptional, Min } from 'class-validator';
+import { IsNotEmpty, IsString, IsNumber, IsArray, IsOptional, Min, IsUUID } from 'class-validator';
 
 export class CreateMenuDto {
   @ApiProperty({ description: 'Nom du menu', example: 'Menu du Jour' })
@@ -17,13 +17,14 @@ export class CreateMenuDto {
   @Min(0)
   price: number;
 
-  @ApiProperty({ description: 'ID du restaurant', example: 1 })
-  @IsNumber()
+  @ApiProperty({ description: 'ID du restaurant', example: '123e4567-e89b-12d3-a456-426614174000' })
+  @IsString()
   @IsNotEmpty()
-  restaurantId: number;
+  restaurantId: string;
 
-  @ApiProperty({ description: 'IDs des articles du menu', example: [1, 2, 3] })
+  @ApiProperty({ description: 'IDs des articles du menu', example: ['123e4567-e89b-12d3-a456-426614174001', '123e4567-e89b-12d3-a456-426614174002'] })
   @IsArray()
+  @IsString({ each: true })
   @IsNotEmpty()
-  articleIds: number[];
+  itemIds: string[];
 } 

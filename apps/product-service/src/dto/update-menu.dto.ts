@@ -17,8 +17,9 @@ export class UpdateMenuDto {
   @IsOptional()
   price?: number;
 
-  @ApiProperty({ description: 'IDs des articles du menu', example: [1, 2, 3], required: false })
+  @ApiProperty({ description: 'IDs des articles du menu', example: ['123e4567-e89b-12d3-a456-426614174001', '123e4567-e89b-12d3-a456-426614174002'], required: false })
   @IsArray()
+  @IsString({ each: true })
   @IsOptional()
-  articleIds?: number[];
+  itemIds?: string[];
 } 

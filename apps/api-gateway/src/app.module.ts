@@ -9,6 +9,7 @@ import { OrderController } from './controllers/order.controller';
 import { ProductController } from './controllers/product.controller';
 import { DeliveryController } from './controllers/delivery.controller';
 import { GlobalExceptionFilter } from '../../../packages/common/src/error-handling/http-exception.filter';
+import { AuthService } from './services/auth.service';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { GlobalExceptionFilter } from '../../../packages/common/src/error-handli
       provide: APP_FILTER,
       useClass: GlobalExceptionFilter,
     },
+    AuthService,
   ],
 })
 export class AppModule {}

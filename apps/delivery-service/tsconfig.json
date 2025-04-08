@@ -2,7 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "declaration": true,
-    "outDir": "./dist",
+    "outDir": "../../dist/apps/delivery-service",
     "baseUrl": "./",
     "paths": {
       "@advanced-web/prisma": ["../../packages/prisma/src"],

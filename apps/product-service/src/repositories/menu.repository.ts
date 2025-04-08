@@ -12,7 +12,7 @@ export class MenuRepository {
       data: {
         ...menuData,
         items: {
-          connect: itemIds.map(id => ({ id })),
+          connect: itemIds.map(id => ({ id: String(id) })),
         },
       },
       include: {

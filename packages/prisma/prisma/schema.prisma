@@ -27,6 +27,8 @@ model User {
   deliveries     Order[]      @relation("DeliveryAssigned")
   notifications  Notification[]
   createdAt      DateTime     @default(now())
+  
+  @@map("user")
 }
 
 enum Role {
@@ -53,6 +55,8 @@ model Restaurant {
   owner          User?         @relation(fields: [ownerId], references: [id])
   ownerId        String?       @unique
   orders         Order[]
+  
+  @@map("restaurant")
 }
 
 enum RestaurantStatus {
@@ -70,6 +74,8 @@ model Menu {
   restaurantId   String
   restaurant     Restaurant  @relation(fields: [restaurantId], references: [id])
   items          Article[]   @relation("MenuItems")
+  
+  @@map("menu")
 }
 
 model Article {
@@ -84,6 +90,8 @@ model Article {
   restaurant     Restaurant  @relation(fields: [restaurantId], references: [id])
   menus          Menu[]      @relation("MenuItems")
   orderItems     OrderItem[]
+  
+  @@map("article")
 }
 
 model Order {
@@ -103,6 +111,8 @@ model Order {
   deliveryPerson User?       @relation("DeliveryAssigned", fields: [deliveryPersonId], references: [id])
   deliveryPersonId String?
   createdAt      DateTime    @default(now())
+  
+  @@map("order")
 }
 
 model OrderItem {
@@ -112,6 +122,8 @@ model OrderItem {
   quantity       Int
   order          Order       @relation(fields: [orderId], references: [id])
   article        Article     @relation(fields: [articleId], references: [id])
+  
+  @@map("orderItem")
 }
 
 enum OrderStatus {
@@ -133,6 +145,8 @@ model Log {
   orderId        String?
   metadata       Json?
   timestamp      DateTime    @default(now())
+  
+  @@map("log")
 }
 
 model Notification {
@@ -143,10 +157,14 @@ model Notification {
   content        Json
   sentAt         DateTime    @default(now())
   user           User        @relation(fields: [userId], references: [id])
+  
+  @@map("notification")
 }
 
 model Config {
   id             String      @id @default(uuid())
   key            String      @unique
   value          String
+  
+  @@map("config")
 }

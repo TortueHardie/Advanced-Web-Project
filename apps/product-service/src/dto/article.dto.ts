@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class ArticleDto {
   @ApiProperty({ description: 'ID de l\'article' })
-  id: number;
+  id: string;
 
   @ApiProperty({ description: 'Nom de l\'article' })
   name: string;
@@ -17,7 +17,7 @@ export class ArticleDto {
   type: string;
 
   @ApiProperty({ description: 'ID du restaurant' })
-  restaurantId: number;
+  restaurantId: string;
 
   @ApiProperty({ description: 'Stock actuel de l\'article' })
   stock: number;
@@ -40,7 +40,7 @@ export class CreateArticleDto {
   type: string;
 
   @ApiProperty({ description: 'ID du restaurant' })
-  restaurantId: number;
+  restaurantId: string;
 
   @ApiProperty({ description: 'Stock initial de l\'article' })
   stock: number;

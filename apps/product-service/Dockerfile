@@ -1,54 +1,57 @@
-FROM node:18-alpine As development
+FROM node:20.11.0 as builder
 
-WORKDIR /usr/src/app
+# Set working directory
+WORKDIR /app
 
-# Copy package.json and package-lock.json
+# Copy package files first for better caching
 COPY package*.json ./
 COPY packages/prisma/package*.json ./packages/prisma/
-COPY packages/discovery/package*.json ./packages/discovery/
 COPY apps/product-service/package*.json ./apps/product-service/
+
+# Copy essential files
+COPY tsconfig*.json ./
+COPY turbo.json ./
+COPY ./packages/prisma/ ./packages/prisma/
 
 # Install dependencies
-RUN npm ci
+RUN npm install --legacy-peer-deps
 
-# Copy source code
-COPY packages/prisma ./packages/prisma
-COPY packages/discovery ./packages/discovery
-COPY apps/product-service ./apps/product-service
-COPY tsconfig.json ./
-COPY tsconfig.build.json ./
+# Copy only the product service
+COPY ./apps/product-service/ ./apps/product-service/
 
 # Generate Prisma client
-RUN cd packages/prisma && npx prisma generate
+RUN npx prisma generate --schema=./packages/prisma/prisma/schema.prisma
 
-# Build application
+# Create symbolic links for Prisma
+RUN mkdir -p /app/apps/product-service/src/prisma
+RUN ln -sf /app/packages/prisma/src/prisma.service.ts /app/apps/product-service/src/prisma/prisma.service.ts
+RUN ln -sf /app/packages/prisma/src/index.ts /app/apps/product-service/src/prisma/index.ts
+
+# Build the product service
 RUN npm run build product-service
 
-FROM node:18-alpine As production
+# Production stage
+FROM node:20.11.0-slim
 
-ARG NODE_ENV=production
-ENV NODE_ENV=${NODE_ENV}
+WORKDIR /app
 
-WORKDIR /usr/src/app
+# Copy Prisma client and schema
+COPY --from=builder /app/packages/prisma/prisma ./packages/prisma/prisma
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
-# Copy package.json and package-lock.json
-COPY package*.json ./
-COPY packages/prisma/package*.json ./packages/prisma/
-COPY packages/discovery/package*.json ./packages/discovery/
-COPY apps/product-service/package*.json ./apps/product-service/
-
-# Install only production dependencies
-RUN npm ci --only=production
+# Copy package files
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/apps/product-service/package*.json ./apps/product-service/
 
 # Copy built application
-COPY --from=development /usr/src/app/dist ./dist
-COPY --from=development /usr/src/app/packages/prisma/dist ./packages/prisma/dist
-COPY --from=development /usr/src/app/packages/discovery/dist ./packages/discovery/dist
-COPY --from=development /usr/src/app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/dist/apps/product-service ./dist
 
-# Configure environment and expose port
-ENV PORT=3002
-EXPOSE ${PORT}
+# Install only production dependencies
+RUN npm install --only=production --legacy-peer-deps
 
-# Start the application
-CMD ["node", "dist/apps/product-service/main"] 
+# Expose service ports
+EXPOSE 3002
+EXPOSE 4002
+
+# Start the service
+CMD ["node", "dist/main.js"] 
