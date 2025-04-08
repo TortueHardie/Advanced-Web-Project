@@ -364,7 +364,16 @@ export class CommercialUsersComponent implements OnInit {
 
   editUser(): void {
     if (this.selectedUser) {
-      this.userForm.patchValue(this.selectedUser);
+      // Initialize form with the selected user's data
+      this.userForm.patchValue({
+        firstName: this.selectedUser.firstName,
+        lastName: this.selectedUser.lastName,
+        birthDate: this.selectedUser.birthDate,
+        email: this.selectedUser.email,
+        address: this.selectedUser.address,
+        referralCode: this.selectedUser.referralCode,
+        status: this.selectedUser.status
+      });
       this.isEditing = true;
     }
   }
@@ -386,12 +395,17 @@ export class CommercialUsersComponent implements OnInit {
       };
 
       const index = this.users.findIndex(u => u.id === this.selectedUser?.id);
+      
       if (index !== -1) {
         // Update existing user
-        this.users[index] = updatedUser;
+        this.users = [
+          ...this.users.slice(0, index),
+          updatedUser,
+          ...this.users.slice(index + 1)
+        ];
       } else {
         // Add new user
-        this.users = [...this.users, updatedUser]; // Create new array to trigger change detection
+        this.users = [...this.users, updatedUser];
       }
       
       this.selectedUser = null; // Clear selection after save
