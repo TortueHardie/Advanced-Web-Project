@@ -39,16 +39,6 @@
       <span matListItemTitle>Gestion Livraisons</span>
     </a>
 
-    <a mat-list-item>Commercial</a>
-    <a mat-list-item routerLink="/restaurateur/commercial-orders">
-      <mat-icon matListItemIcon>point_of_sale</mat-icon>
-      <span matListItemTitle>Commandes Commerciales</span>
-    </a>
-    <a mat-list-item routerLink="/restaurateur/commercial-users">
-      <mat-icon matListItemIcon>people</mat-icon>
-      <span matListItemTitle>Gestion Clients</span>
-    </a>
-
     <a mat-list-item>Développeur</a>
     <a mat-list-item routerLink="/developer/compte">
       <mat-icon matListItemIcon>account_circle</mat-icon>
@@ -58,10 +48,21 @@
       <mat-icon matListItemIcon>developer_mode</mat-icon>
       <span matListItemTitle>Composants</span>
     </a>
+
+    <a mat-list-item>Service Commercial</a>
+    <a mat-list-item routerLink="/restaurateur/commercial-orders">
+      <mat-icon matListItemIcon>point_of_sale</mat-icon>
+      <span matListItemTitle>Gestion Commandes</span>
+    </a>
+    <a mat-list-item routerLink="/restaurateur/commercial-users">
+      <mat-icon matListItemIcon>people</mat-icon>
+      <span matListItemTitle>Gestion Clients</span>
+    </a>
+    
     <a mat-list-item>Service Technique</a>
     <a mat-list-item routerLink="/tech">
       <mat-icon matListItemIcon>code</mat-icon>
-      <span matListItemTitle>Gestion des Composants</span>
+      <span matListItemTitle>Gestion Composants</span>
     </a>
     <a mat-list-item class="logout" (click)="logout()">
       <mat-icon matListItemIcon>logout</mat-icon>
