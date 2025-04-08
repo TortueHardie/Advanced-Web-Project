@@ -1,36 +1,21 @@
-FROM node:20-alpine as build
+FROM node:18-slim
 
 WORKDIR /app
 
-# Copier les fichiers package.json
-COPY package*.json ./
-COPY apps/log-service/package*.json ./apps/log-service/
+# Copier le package.json du log-service
+COPY apps/log-service/package.json .
 
 # Installer les dépendances
-RUN npm ci --only=production --ignore-scripts
+RUN npm install
 
 # Copier le code source
-COPY apps/log-service ./apps/log-service
+COPY apps/log-service/src ./src
+COPY apps/log-service/tsconfig*.json .
+COPY apps/log-service/nest-cli.json .
 
-# Compiler le code TypeScript
-WORKDIR /app/apps/log-service
+# Construire l'application
 RUN npm run build
 
-# Image finale
-FROM node:20-alpine
+EXPOSE 3002
 
-WORKDIR /app
-
-# Copier les dépendances et le code compilé
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/apps/log-service/dist ./dist
-COPY --from=build /app/apps/log-service/package*.json ./
-
-# Exposition du port
-EXPOSE 3004
-
-# Définir les variables d'environnement
-ENV NODE_ENV=production
-
-# Commande pour démarrer l'application
-CMD ["node", "dist/index.js"] 
+CMD ["node", "dist/main.js"] 

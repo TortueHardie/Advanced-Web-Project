@@ -145,6 +145,28 @@ services:
       timeout: 5s
       retries: 3
       start_period: 10s
+    volumes:
+      - api_gateway_logs:/var/log/nginx
+
+  # user-service:
+  #   build:
+  #     context: .
+  #     dockerfile: apps/user-service/Dockerfile
+  #   container_name: user-service
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - postgres
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     REDIS_HOST: redis
+  #     REDIS_PORT: 6379
+  #     JWT_SECRET: ${JWT_SECRET}
+  #     JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+  #     USER_SERVICE_URL: http://user-service:3001
+  #   networks:
+  #     - app-network
+
 
   frontend:
     build:
@@ -191,12 +213,42 @@ services:
       retries: 3
       start_period: 10s
 
+  mongodb:
+    image: mongo:latest
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - app-network
+
+  log-service:
+    build:
+      context: .
+      dockerfile: apps/log-service/Dockerfile
+    container_name: log-service
+    restart: unless-stopped
+    depends_on:
+      - mongodb
+    environment:
+      MONGODB_URI: mongodb://mongodb:27017/logs
+    ports:
+      - "3002:3002"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3002/api/v1/logs"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
 volumes:
   postgres_data:
   redis_data:
   api_gateway_logs:
-  log_service_data:
-  ssl_certs:
+  mongodb_data:
 
 networks:
   internal-network:
