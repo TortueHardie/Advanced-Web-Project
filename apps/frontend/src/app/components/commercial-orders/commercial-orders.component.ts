@@ -8,6 +8,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatInputModule } from '@angular/material/input';
 import { Order } from '../../models/order.model';
+import { Statistics } from '../../models/statistics.model';
 
 @Component({
   selector: 'app-commercial-orders',
@@ -24,13 +25,27 @@ import { Order } from '../../models/order.model';
   ],
   template: `
     <div class="orders-container">
+      <div>
+      <div class="stats-cards">
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <h2>Chiffre d'affaire en cours</h2>
+        <p class="stat-value">+ {{statistics.currentMonth.revenue | number:'1.2-2'}} €</p>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <h2>Nombre de commandes en cours</h2>
+        <p class="stat-value">{{statistics.currentMonth.orderCount}}</p>
+      </mat-card-content>
+    </mat-card>
+      </div>
+
+
+
       <div class="header">
         <h1>Commandes</h1>
-        <mat-form-field appearance="outline" class="search-field">
-          <mat-label>Rechercher une commande</mat-label>
-          <input matInput placeholder="Rechercher...">
-          <mat-icon matSuffix>search</mat-icon>
-        </mat-form-field>
       </div>
 
       <!-- Order Details Section -->
@@ -91,6 +106,34 @@ import { Order } from '../../models/order.model';
     </div>
   `,
   styles: [`
+    .stats-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+    margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: #f5f5f5;
+      border-radius: 8px;
+
+      mat-card-content {
+        padding: 16px;
+
+        h2 {
+          color: #666;
+          font-size: 16px;
+          margin-bottom: 8px;
+        }
+
+        .stat-value {
+          color: #333;
+          font-size: 24px;
+          font-weight: bold;
+          margin: 0;
+        }
+      }
+    }
     .orders-container {
       padding: 20px;
       max-width: 1200px;
@@ -178,6 +221,15 @@ export class CommercialOrdersComponent implements OnInit {
   orders: Order[] = [];
   selectedOrder: Order | null = null;
   displayedColumns: string[] = ['id', 'date', 'articles', 'status', 'action'];
+  
+  statistics: Statistics = {
+    currentMonth: {
+      revenue: 12349.59,
+      orderCount: 835,
+      averageTicket: 0
+    },
+    revenueAnalysis: []
+  };
 
   constructor() {}
 
