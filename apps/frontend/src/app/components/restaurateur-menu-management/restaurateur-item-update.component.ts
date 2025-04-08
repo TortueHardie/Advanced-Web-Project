@@ -44,14 +44,17 @@ import { MenuItem } from '../../models/restaurant.model';
         <div class="photo-upload">
           <label>Photo</label>
           <div class="upload-container">
-            <button mat-raised-button color="primary">
+            <input type="file" #fileInput style="display: none" 
+                   accept="image/*" (change)="onFileSelected($event)">
+            <button mat-raised-button color="primary" (click)="fileInput.click()">
               <mat-icon>upload</mat-icon>
               PARCOURIR LES FICHIERS
             </button>
             @if (item.image) {
               <div class="image-preview">
                 <img [src]="item.image" [alt]="item.name">
-                <button mat-icon-button color="warn" class="remove-image">
+                <button mat-icon-button color="warn" class="remove-image"
+                        (click)="removeImage()">
                   <mat-icon>delete</mat-icon>
                 </button>
               </div>
@@ -195,5 +198,23 @@ export class RestaurateurItemUpdateComponent implements OnInit {
 
   onCancel(): void {
     this.dialogRef.close();
+  }
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      const reader = new FileReader();
+      
+      reader.onload = (e) => {
+        this.item.image = e.target?.result as string;
+      };
+      
+      reader.readAsDataURL(file);
+    }
+  }
+
+  removeImage(): void {
+    this.item.image = undefined;
   }
 } 

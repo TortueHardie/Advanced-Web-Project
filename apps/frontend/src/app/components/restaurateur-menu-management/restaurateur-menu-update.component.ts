@@ -46,14 +46,17 @@ import { Menu, MenuItem } from '../../models/restaurant.model';
         <div class="photo-upload">
           <label>Photo</label>
           <div class="upload-container">
-            <button mat-raised-button color="primary">
+            <input type="file" #fileInput style="display: none" 
+                   accept="image/*" (change)="onFileSelected($event)">
+            <button mat-raised-button color="primary" (click)="fileInput.click()">
               <mat-icon>upload</mat-icon>
               PARCOURIR LES FICHIERS
             </button>
             @if (menu.image) {
               <div class="image-preview">
                 <img [src]="menu.image" [alt]="menu.name">
-                <button mat-icon-button color="warn" class="remove-image">
+                <button mat-icon-button color="warn" class="remove-image"
+                        (click)="removeImage()">
                   <mat-icon>delete</mat-icon>
                 </button>
               </div>
@@ -157,6 +160,7 @@ import { Menu, MenuItem } from '../../models/restaurant.model';
         height: 100px;
         border-radius: 4px;
         overflow: hidden;
+        border: 2px solid #e0e0e0;
 
         img {
           width: 100%;
@@ -172,6 +176,10 @@ import { Menu, MenuItem } from '../../models/restaurant.model';
           
           &:hover {
             background: rgba(0, 0, 0, 0.7);
+          }
+
+          mat-icon {
+            color: white;
           }
         }
       }
@@ -257,6 +265,24 @@ export class RestaurateurMenuUpdateComponent implements OnInit {
       { id: '3', name: 'Coca', price: 2.50, selected: true },
       { id: '4', name: 'Glace', price: 3.50, selected: false }
     ];
+  }
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      const reader = new FileReader();
+      
+      reader.onload = (e) => {
+        this.menu.image = e.target?.result as string;
+      };
+      
+      reader.readAsDataURL(file);
+    }
+  }
+
+  removeImage(): void {
+    this.menu.image = undefined;
   }
 
   onSave(): void {
