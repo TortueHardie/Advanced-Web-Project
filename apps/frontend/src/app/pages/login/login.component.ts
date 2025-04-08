@@ -50,7 +50,7 @@ export class LoginComponent implements OnInit {
       )
       .subscribe({
         next: () => {
-          this.router.navigate(['/']);
+          this.router.navigate(['/landing']);
         },
         error: (error) => {
           this.errorMessage = error?.message || 'An error occurred during login. Please try again.';

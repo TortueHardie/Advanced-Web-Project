@@ -23,9 +23,11 @@ import { DevComponentsComponent } from './components/dev-components/dev-componen
 import { DeveloperProfileComponent } from './components/developer-profile/developer-profile.component';
 import { DeveloperProfileUpdateComponent } from './components/developer-profile/developer-profile-update/developer-profile-update.component';
 import { TechComponentsComponent } from './components/tech-components/tech-components.component';
+import { LandingComponent } from './pages/landing/landing.component';
 
 export const routes: Routes = [
   { path: '', component: LoginComponent },
+  { path: 'landing', component: LandingComponent },
   { path: 'login', loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent) },
   { path: 'register', loadComponent: () => import('./pages/register/register.component').then(m => m.RegisterComponent) },
   // Customer
