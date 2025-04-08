@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, HttpException, HttpStatus, Headers, UnauthorizedException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, Headers, UnauthorizedException } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
+import { CreateUserDto, UpdateUserDto, UserDto, ValidateUserDto } from '../dto';
 
-@ApiTags('Utilisateurs')
+@ApiTags('Users')
 @Controller('users')
 export class UserController {
   private readonly userServiceUrl = process.env.USER_SERVICE_URL || 'http://user-service:3001';
@@ -51,28 +52,28 @@ export class UserController {
 
   @Post()
   @ApiOperation({ summary: 'Créer un nouvel utilisateur' })
-  @ApiBody({ description: 'Informations de l\'utilisateur à créer' })
-  @ApiResponse({ status: 201, description: 'Utilisateur créé avec succès' })
+  @ApiBody({ type: CreateUserDto })
+  @ApiResponse({ status: 201, description: 'Utilisateur créé avec succès', type: UserDto })
   @ApiResponse({ status: 400, description: 'Données invalides' })
   @ApiResponse({ status: 409, description: 'Email déjà existant' })
-  async create(@Body() createUserDto: any) {
+  async create(@Body() createUserDto: CreateUserDto) {
     return this.forwardRequest(`${this.userServiceUrl}/users`, 'POST', undefined, createUserDto);
   }
 
   @Get()
-  @ApiBearerAuth()
+  @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Récupérer tous les utilisateurs' })
-  @ApiResponse({ status: 200, description: 'Liste des utilisateurs récupérée' })
+  @ApiResponse({ status: 200, description: 'Liste des utilisateurs récupérée', type: [UserDto] })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
   async findAll(@Headers('authorization') authHeader: string) {
     return this.forwardRequest(`${this.userServiceUrl}/users`, 'GET', authHeader);
   }
 
   @Get(':id')
-  @ApiBearerAuth()
+  @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Récupérer un utilisateur par ID' })
   @ApiParam({ name: 'id', description: 'ID de l\'utilisateur' })
-  @ApiResponse({ status: 200, description: 'Utilisateur récupéré' })
+  @ApiResponse({ status: 200, description: 'Utilisateur récupéré', type: UserDto })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })
   async findOne(@Headers('authorization') authHeader: string, @Param('id') id: string) {
@@ -80,19 +81,19 @@ export class UserController {
   }
 
   @Put(':id')
-  @ApiBearerAuth()
+  @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Mettre à jour un utilisateur' })
   @ApiParam({ name: 'id', description: 'ID de l\'utilisateur' })
-  @ApiBody({ description: 'Informations à mettre à jour' })
-  @ApiResponse({ status: 200, description: 'Utilisateur mis à jour' })
+  @ApiBody({ type: UpdateUserDto })
+  @ApiResponse({ status: 200, description: 'Utilisateur mis à jour', type: UserDto })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })
-  async update(@Headers('authorization') authHeader: string, @Param('id') id: string, @Body() updateUserDto: any) {
+  async update(@Headers('authorization') authHeader: string, @Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.forwardRequest(`${this.userServiceUrl}/users/${id}`, 'PUT', authHeader, updateUserDto);
   }
 
   @Delete(':id')
-  @ApiBearerAuth()
+  @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Supprimer un utilisateur' })
   @ApiParam({ name: 'id', description: 'ID de l\'utilisateur' })
   @ApiResponse({ status: 200, description: 'Utilisateur supprimé' })
@@ -104,18 +105,18 @@ export class UserController {
 
   @Post('validate')
   @ApiOperation({ summary: 'Valider les identifiants utilisateur (utilisé par le service d\'authentification)' })
-  @ApiBody({ description: 'Email et mot de passe à valider' })
-  @ApiResponse({ status: 200, description: 'Identifiants validés' })
+  @ApiBody({ type: ValidateUserDto })
+  @ApiResponse({ status: 200, description: 'Identifiants validés', type: UserDto })
   @ApiResponse({ status: 401, description: 'Identifiants invalides' })
-  async validateUser(@Body() credentials: { email: string, password: string }) {
+  async validateUser(@Body() credentials: ValidateUserDto) {
     return this.forwardRequest(`${this.userServiceUrl}/users/validate`, 'POST', undefined, credentials);
   }
 
   @Get('by-email/:email')
-  @ApiBearerAuth()
+  @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Récupérer un utilisateur par email' })
   @ApiParam({ name: 'email', description: 'Email de l\'utilisateur' })
-  @ApiResponse({ status: 200, description: 'Utilisateur récupéré' })
+  @ApiResponse({ status: 200, description: 'Utilisateur récupéré', type: UserDto })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })
   async findByEmail(@Headers('authorization') authHeader: string, @Param('email') email: string) {

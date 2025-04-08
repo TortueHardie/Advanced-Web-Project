@@ -14,15 +14,15 @@ COPY turbo.json ./
 # Copier les packages locaux avant l'installation
 COPY ./packages/ ./packages/
 
-# Installer les dépendances à la racine
-RUN npm install
+# Installer les dépendances à la racine avec legacy-peer-deps
+RUN npm install --legacy-peer-deps
 
 # Copy user-service
 COPY ./apps/user-service ./apps/user-service
 
-# Installer les dépendances manquantes manuellement dans le service utilisateur
+# Installer les dépendances manquantes manuellement dans le service utilisateur avec legacy-peer-deps
 WORKDIR /usr/src/app/apps/user-service
-RUN npm install @nestjs/swagger bcrypt @types/bcrypt class-validator swagger-ui-express
+RUN npm install @nestjs/swagger bcrypt @types/bcrypt class-validator swagger-ui-express --legacy-peer-deps
 
 # Retourner à la racine pour générer Prisma
 WORKDIR /usr/src/app

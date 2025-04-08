@@ -1,5 +1,6 @@
 import { AuthService } from '../services/auth.service';
 import { HttpService } from '@nestjs/axios';
+import { LoginDto, RegisterDto, RefreshTokenDto } from '../dto';
 export declare class AuthController {
     private readonly authService;
     private readonly httpService;
@@ -10,17 +11,8 @@ export declare class AuthController {
         isValid: boolean;
         user: any;
     }>;
-    login(loginDto: {
-        email: string;
-        password: string;
-    }): Promise<any>;
-    register(registerDto: {
-        email: string;
-        password: string;
-        name: string;
-    }): Promise<any>;
-    refresh(refreshDto: {
-        refreshToken: string;
-    }): Promise<any>;
+    login(loginDto: LoginDto): Promise<any>;
+    register(registerDto: RegisterDto): Promise<any>;
+    refresh(refreshDto: RefreshTokenDto): Promise<any>;
     revoke(authHeader: string): Promise<any>;
 }

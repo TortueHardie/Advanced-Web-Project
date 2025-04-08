@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 import { ConfigModule } from '@nestjs/config';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_PIPE } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthService } from './services/auth.service';
@@ -24,6 +25,10 @@ import { GlobalExceptionFilter } from '../../../packages/common/src/error-handli
     {
       provide: APP_FILTER,
       useClass: GlobalExceptionFilter,
+    },
+    {
+      provide: APP_PIPE,
+      useClass: ValidationPipe,
     }
   ],
 })

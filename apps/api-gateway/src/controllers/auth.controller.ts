@@ -1,10 +1,11 @@
 import { Controller, Post, Get, Headers, UnauthorizedException, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { AuthService } from '../services/auth.service';
-import { ApiTags, ApiOperation, ApiHeader, ApiResponse, ApiBody } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
+import { LoginDto, RegisterDto, RefreshTokenDto, TokenResponseDto } from '../dto';
 
-@ApiTags('Authentification')
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   private readonly authServiceUrl = process.env.AUTH_SERVICE_URL || 'http://auth-service:3001';
@@ -57,12 +58,8 @@ export class AuthController {
 
   @Post('verify')
   @ApiOperation({ summary: 'Vérifie si le token JWT est valide' })
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Token JWT (format: Bearer [token])',
-    required: true,
-  })
-  @ApiResponse({ status: 200, description: 'Token valide' })
+  @ApiBearerAuth('access-token')
+  @ApiResponse({ status: 200, description: 'Token valide', type: Object })
   @ApiResponse({ status: 401, description: 'Token invalide ou expiré' })
   async verifyToken(@Headers('authorization') authHeader: string) {
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -82,46 +79,29 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Connexion utilisateur' })
-  @ApiBody({
-    description: 'Identifiants de connexion',
-    schema: {
-      type: 'object',
-      properties: {
-        email: { type: 'string', example: 'user@example.com' },
-        password: { type: 'string', example: 'password123' }
-      },
-      required: ['email', 'password']
-    }
+  @ApiBody({ type: LoginDto })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Connexion réussie, tokens retournés',
+    type: TokenResponseDto 
   })
-  @ApiResponse({ status: 200, description: 'Connexion réussie, tokens retournés' })
   @ApiResponse({ status: 401, description: 'Identifiants invalides' })
-  async login(@Body() loginDto: { email: string; password: string }) {
+  async login(@Body() loginDto: LoginDto) {
     return this.forwardRequest('login', 'POST', undefined, loginDto);
   }
 
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Inscription utilisateur' })
-  @ApiBody({
-    description: 'Informations d\'inscription',
-    schema: {
-      type: 'object',
-      properties: {
-        email: { type: 'string', example: 'user@example.com' },
-        password: { type: 'string', example: 'password123' },
-        firstName: { type: 'string', example: 'John' },
-        lastName: { type: 'string', example: 'Doe' },
-        role: { type: 'string', example: 'CLIENT' },
-        address: { type: 'string', example: '123 Main St' },
-        birthDate: { type: 'string', example: '01-01-1990' }
-      },
-      required: ['email', 'password', 'firstName', 'lastName']
-    }
+  @ApiBody({ type: RegisterDto })
+  @ApiResponse({ 
+    status: 201, 
+    description: 'Inscription réussie, tokens retournés',
+    type: TokenResponseDto 
   })
-  @ApiResponse({ status: 201, description: 'Inscription réussie, tokens retournés' })
   @ApiResponse({ status: 400, description: 'Données invalides' })
   @ApiResponse({ status: 409, description: 'Email déjà utilisé' })
-  async register(@Body() registerDto: any) {
+  async register(@Body() registerDto: RegisterDto) {
     // Transmettre directement les données au service d'authentification
     return this.forwardRequest('register', 'POST', undefined, registerDto);
   }
@@ -129,30 +109,21 @@ export class AuthController {
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Rafraîchir les tokens' })
-  @ApiBody({
-    description: 'Token de rafraîchissement',
-    schema: {
-      type: 'object',
-      properties: {
-        refreshToken: { type: 'string', example: 'eyJhbGciOiJIUzI1...' }
-      },
-      required: ['refreshToken']
-    }
+  @ApiBody({ type: RefreshTokenDto })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Tokens rafraîchis avec succès',
+    type: TokenResponseDto 
   })
-  @ApiResponse({ status: 200, description: 'Tokens rafraîchis avec succès' })
   @ApiResponse({ status: 401, description: 'Token de rafraîchissement invalide' })
-  async refresh(@Body() refreshDto: { refreshToken: string }) {
+  async refresh(@Body() refreshDto: RefreshTokenDto) {
     return this.forwardRequest('refresh', 'POST', undefined, refreshDto);
   }
 
   @Post('revoke')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Révoquer un token' })
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Token JWT à révoquer (format: Bearer [token])',
-    required: true,
-  })
+  @ApiBearerAuth('access-token')
   @ApiResponse({ status: 200, description: 'Token révoqué avec succès' })
   @ApiResponse({ status: 401, description: 'Token invalide' })
   async revoke(@Headers('authorization') authHeader: string) {

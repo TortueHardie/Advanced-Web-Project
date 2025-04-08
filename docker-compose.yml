@@ -116,7 +116,7 @@ services:
   user-service:
     build:
       context: .
-      dockerfile: apps/user-service/Dockerfile
+      dockerfile: apps/user-service/Dockerfile.dev
     container_name: user-service
     restart: unless-stopped
     depends_on:
@@ -133,6 +133,12 @@ services:
       resources:
         limits:
           memory: 256M
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3001/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
   frontend:
     build:

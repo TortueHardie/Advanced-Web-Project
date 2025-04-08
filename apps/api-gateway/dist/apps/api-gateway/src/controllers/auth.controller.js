@@ -18,6 +18,7 @@ const auth_service_1 = require("../services/auth.service");
 const swagger_1 = require("@nestjs/swagger");
 const axios_1 = require("@nestjs/axios");
 const rxjs_1 = require("rxjs");
+const dto_1 = require("../dto");
 let AuthController = class AuthController {
     authService;
     httpService;
@@ -33,7 +34,7 @@ let AuthController = class AuthController {
         }
         try {
             let response;
-            const url = `${this.authServiceUrl}/${path}`;
+            const url = `${this.authServiceUrl}/auth/${path}`;
             switch (method) {
                 case 'GET':
                     response = await (0, rxjs_1.firstValueFrom)(this.httpService.get(url, { headers }));
@@ -85,12 +86,8 @@ exports.AuthController = AuthController;
 __decorate([
     (0, common_1.Post)('verify'),
     (0, swagger_1.ApiOperation)({ summary: 'Vérifie si le token JWT est valide' }),
-    (0, swagger_1.ApiHeader)({
-        name: 'Authorization',
-        description: 'Token JWT (format: Bearer [token])',
-        required: true,
-    }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Token valide' }),
+    (0, swagger_1.ApiBearerAuth)('access-token'),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Token valide', type: Object }),
     (0, swagger_1.ApiResponse)({ status: 401, description: 'Token invalide ou expiré' }),
     __param(0, (0, common_1.Headers)('authorization')),
     __metadata("design:type", Function),
@@ -101,78 +98,56 @@ __decorate([
     (0, common_1.Post)('login'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     (0, swagger_1.ApiOperation)({ summary: 'Connexion utilisateur' }),
-    (0, swagger_1.ApiBody)({
-        description: 'Identifiants de connexion',
-        schema: {
-            type: 'object',
-            properties: {
-                email: { type: 'string', example: 'user@example.com' },
-                password: { type: 'string', example: 'password123' }
-            },
-            required: ['email', 'password']
-        }
+    (0, swagger_1.ApiBody)({ type: dto_1.LoginDto }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Connexion réussie, tokens retournés',
+        type: dto_1.TokenResponseDto
     }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Connexion réussie, tokens retournés' }),
     (0, swagger_1.ApiResponse)({ status: 401, description: 'Identifiants invalides' }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [dto_1.LoginDto]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "login", null);
 __decorate([
     (0, common_1.Post)('register'),
     (0, common_1.HttpCode)(common_1.HttpStatus.CREATED),
     (0, swagger_1.ApiOperation)({ summary: 'Inscription utilisateur' }),
-    (0, swagger_1.ApiBody)({
-        description: 'Informations d\'inscription',
-        schema: {
-            type: 'object',
-            properties: {
-                email: { type: 'string', example: 'user@example.com' },
-                password: { type: 'string', example: 'password123' },
-                name: { type: 'string', example: 'John Doe' }
-            },
-            required: ['email', 'password', 'name']
-        }
+    (0, swagger_1.ApiBody)({ type: dto_1.RegisterDto }),
+    (0, swagger_1.ApiResponse)({
+        status: 201,
+        description: 'Inscription réussie, tokens retournés',
+        type: dto_1.TokenResponseDto
     }),
-    (0, swagger_1.ApiResponse)({ status: 201, description: 'Inscription réussie, tokens retournés' }),
     (0, swagger_1.ApiResponse)({ status: 400, description: 'Données invalides' }),
     (0, swagger_1.ApiResponse)({ status: 409, description: 'Email déjà utilisé' }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [dto_1.RegisterDto]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "register", null);
 __decorate([
     (0, common_1.Post)('refresh'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     (0, swagger_1.ApiOperation)({ summary: 'Rafraîchir les tokens' }),
-    (0, swagger_1.ApiBody)({
-        description: 'Token de rafraîchissement',
-        schema: {
-            type: 'object',
-            properties: {
-                refreshToken: { type: 'string', example: 'eyJhbGciOiJIUzI1...' }
-            },
-            required: ['refreshToken']
-        }
+    (0, swagger_1.ApiBody)({ type: dto_1.RefreshTokenDto }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Tokens rafraîchis avec succès',
+        type: dto_1.TokenResponseDto
     }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Tokens rafraîchis avec succès' }),
     (0, swagger_1.ApiResponse)({ status: 401, description: 'Token de rafraîchissement invalide' }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [dto_1.RefreshTokenDto]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "refresh", null);
 __decorate([
     (0, common_1.Post)('revoke'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     (0, swagger_1.ApiOperation)({ summary: 'Révoquer un token' }),
-    (0, swagger_1.ApiHeader)({
-        name: 'Authorization',
-        description: 'Token JWT à révoquer (format: Bearer [token])',
-        required: true,
-    }),
+    (0, swagger_1.ApiBearerAuth)('access-token'),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Token révoqué avec succès' }),
     (0, swagger_1.ApiResponse)({ status: 401, description: 'Token invalide' }),
     __param(0, (0, common_1.Headers)('authorization')),
@@ -181,7 +156,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "revoke", null);
 exports.AuthController = AuthController = __decorate([
-    (0, swagger_1.ApiTags)('Authentification'),
+    (0, swagger_1.ApiTags)('Auth'),
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService,
         axios_1.HttpService])

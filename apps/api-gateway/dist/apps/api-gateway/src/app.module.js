@@ -11,6 +11,7 @@ const common_1 = require("@nestjs/common");
 const axios_1 = require("@nestjs/axios");
 const config_1 = require("@nestjs/config");
 const core_1 = require("@nestjs/core");
+const common_2 = require("@nestjs/common");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const auth_service_1 = require("./services/auth.service");
@@ -36,6 +37,10 @@ exports.AppModule = AppModule = __decorate([
             {
                 provide: core_1.APP_FILTER,
                 useClass: http_exception_filter_1.GlobalExceptionFilter,
+            },
+            {
+                provide: core_1.APP_PIPE,
+                useClass: common_2.ValidationPipe,
             }
         ],
     })
