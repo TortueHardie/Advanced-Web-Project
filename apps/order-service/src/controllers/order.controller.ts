@@ -4,7 +4,7 @@ import { CreateOrderDto } from '../dto/create-order.dto';
 import { UpdateOrderStatusDto } from '../dto/update-order-status.dto';
 import { MessagePattern } from '@nestjs/microservices';
 import { OrderStatus } from '../dto/update-order-status.dto';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiHeader, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 import { OrderCreatedDto, OrderSummaryDto, OrderDetailDto, MessageResponseDto, AdminOrderSummaryDto } from '../dto/response.dto';
 
 @ApiTags('Orders')
@@ -103,7 +103,6 @@ export class OrderController {
   @HttpCode(HttpStatus.CREATED)
   @ApiBearerAuth('Authorization')
   @ApiOperation({ summary: 'Create a new order', description: 'Create a new order with the given items, delivery address, and payment method' })
-  @ApiHeader({ name: 'authorization', description: 'Auth token (Bearer) - Use the Authorize button at the top for authentication', required: false })
   @ApiBody({ type: CreateOrderDto, description: 'Order details including restaurant, items, delivery address, and payment method' })
   @ApiResponse({ status: 201, description: 'Order created successfully', type: OrderCreatedDto })
   @ApiResponse({ status: 400, description: 'Invalid input data' })
@@ -129,7 +128,6 @@ export class OrderController {
   @HttpCode(HttpStatus.OK)
   @ApiBearerAuth('Authorization')
   @ApiOperation({ summary: 'Get current user orders', description: 'Retrieve order history for the authenticated user' })
-  @ApiHeader({ name: 'authorization', description: 'Auth token (Bearer) - Use the Authorize button at the top for authentication', required: false })
   @ApiResponse({ status: 200, description: 'List of user orders', type: [OrderSummaryDto] })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async getUserOrders(@Headers('authorization') auth: string) {
@@ -141,7 +139,6 @@ export class OrderController {
   @HttpCode(HttpStatus.OK)
   @ApiBearerAuth('Authorization')
   @ApiOperation({ summary: 'Get all orders (Admin/Restaurant)', description: 'Retrieve all orders for administration purposes. Reserved for restaurant owners and admins.' })
-  @ApiHeader({ name: 'authorization', description: 'Auth token (Bearer with admin/restaurant role) - Use the Authorize button at the top for authentication', required: false })
   @ApiResponse({ status: 200, description: 'List of all orders', type: [AdminOrderSummaryDto] })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden - requires admin/restaurant role' })
@@ -159,7 +156,6 @@ export class OrderController {
   @ApiBearerAuth('Authorization')
   @ApiOperation({ summary: 'Get order details', description: 'Retrieve detailed information about a specific order' })
   @ApiParam({ name: 'orderId', description: 'Order ID', example: '1245' })
-  @ApiHeader({ name: 'authorization', description: 'Auth token (Bearer) - Use the Authorize button at the top for authentication', required: false })
   @ApiResponse({ status: 200, description: 'Order details', type: OrderDetailDto })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden - not your order' })
@@ -197,7 +193,6 @@ export class OrderController {
   @ApiBearerAuth('Authorization')
   @ApiOperation({ summary: 'Cancel an order', description: 'Cancel an order if it is in pending or accepted state' })
   @ApiParam({ name: 'orderId', description: 'Order ID to cancel', example: '1245' })
-  @ApiHeader({ name: 'authorization', description: 'Auth token (Bearer) - Use the Authorize button at the top for authentication', required: false })
   @ApiResponse({ status: 200, description: 'Order canceled successfully', type: MessageResponseDto })
   @ApiResponse({ status: 400, description: 'Cannot cancel order in current state' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -216,7 +211,6 @@ export class OrderController {
   @ApiBearerAuth('Authorization')
   @ApiOperation({ summary: 'Update order status', description: 'Update the status of an order. Reserved for restaurant owners and admins.' })
   @ApiParam({ name: 'orderId', description: 'Order ID to update', example: '1245' })
-  @ApiHeader({ name: 'authorization', description: 'Auth token (Bearer with admin/restaurant role) - Use the Authorize button at the top for authentication', required: false })
   @ApiBody({ type: UpdateOrderStatusDto, description: 'New status for the order' })
   @ApiResponse({ status: 200, description: 'Order status updated', type: MessageResponseDto })
   @ApiResponse({ status: 400, description: 'Invalid status transition' })
