@@ -7,32 +7,40 @@
     &:hover {
       transform: translateY(-4px);
     }
+
+    mat-card-content {
+      padding: 16px;
+    }
   }
 
   img {
     height: 200px;
     object-fit: cover;
+    margin-bottom: 8px;
   }
 
   h2 {
-    margin: 0;
+    margin: 0 0 12px 0;
     font-size: 20px;
     font-weight: 500;
   }
 
   .location {
     color: rgba(0, 0, 0, 0.6);
-    margin: 4px 0;
+    margin: 0 0 16px 0;
+    font-size: 14px;
   }
 
   .description {
-    margin: 8px 0;
+    margin: 0 0 16px 0;
+    line-height: 1.5;
   }
 
   .delivery-info {
     font-weight: 500;
     color: #1976d2;
-    margin: 8px 0 0;
+    margin: 0;
+    font-size: 14px;
   }
 
   mat-card-actions {
