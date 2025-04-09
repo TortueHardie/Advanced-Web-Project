@@ -1,0 +1,66 @@
+FROM node:18-slim as builder
+
+# Définir le répertoire de travail
+WORKDIR /app
+
+# Installer les dépendances de compilation
+RUN apt-get update && \
+    apt-get install -y build-essential python3 && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copier package.json du service utilisateur
+COPY apps/user-service/package.json ./package.json
+
+# Modifier temporairement la dépendance locale de prisma pour utiliser la version npm
+RUN sed -i 's/"@advanced-web\/prisma": "\*"/"@nestjs\/common": "^11.0.1"/' ./package.json
+
+# Installer les dépendances, y compris prisma et bcrypt directement à partir de npm
+RUN npm install
+RUN npm install --save @prisma/client@5.6.0 prisma@5.6.0
+
+# Copier le schéma et le service Prisma
+RUN mkdir -p ./prisma
+COPY packages/prisma/prisma/schema.prisma ./prisma/
+COPY packages/prisma/src ./src/prisma/
+
+# Copier les fichiers sources du service utilisateur
+COPY apps/user-service/src ./src/
+COPY apps/user-service/tsconfig.json ./
+COPY apps/user-service/tsconfig.build.json ./
+COPY apps/user-service/nest-cli.json ./
+
+# Modifier les imports pour pointer vers le service Prisma local
+RUN find ./src -type f -name "*.ts" -exec sed -i 's|\.\./\.\./\.\./packages/prisma/src/prisma\.service|./src/prisma/prisma\.service|g' {} \;
+RUN find ./src -type f -name "*.ts" -exec sed -i 's|\.\./\.\./\.\./\.\./packages/prisma/src/prisma\.service|./src/prisma/prisma\.service|g' {} \;
+
+# Générer le client Prisma
+RUN npx prisma generate
+
+# Compiler l'application
+RUN npm run build
+
+# Étape de production
+FROM node:18-slim
+
+WORKDIR /app
+
+# Installer les dépendances de compilation (nécessaires pour bcrypt)
+RUN apt-get update && \
+    apt-get install -y build-essential python3 && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copier les fichiers compilés et les dépendances de production
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+
+# Installer uniquement les dépendances de production
+RUN npm install --omit=dev
+
+# Exposer le port du service
+EXPOSE 3001
+
+# Démarrer l'application
+CMD ["node", "dist/src/main.js"]
+

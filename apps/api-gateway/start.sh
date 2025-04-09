@@ -1,69 +1,76 @@
-#!/bin/bash
+#!/bin/sh
 
-# Script de démarrage pour l'API Gateway
-# - Génère les certificats SSL si nécessaire
-# - Démarre l'application NestJS
-# - Démarre NGINX comme proxy inverse
+# Créer le répertoire pour les fichiers PID si nécessaire
+mkdir -p /run/nginx
 
-set -e
-
-# Vérifier si les certificats SSL existent déjà
-if [ ! -f /etc/nginx/ssl/server.crt ] || [ ! -f /etc/nginx/ssl/server.key ] || [ ! -f /etc/nginx/ssl/dhparam.pem ]; then
-    echo "Certificats SSL ou paramètres DH manquants. Génération en cours..."
-    /usr/local/bin/generate-ssl-certs.sh
+# Vérifier si node_modules existe et contient les dépendances essentielles de NestJS
+if [ ! -d "/app/node_modules/@nestjs/core" ] || [ ! -d "/app/node_modules/express" ]; then
+  echo "Dépendances NestJS manquantes. Installation complète des dépendances..."
+  cd /app && npm install --legacy-peer-deps
+  
+  # Vérifier si l'installation a réussi
+  if [ ! -d "/app/node_modules/@nestjs/core" ]; then
+    echo "Échec de l'installation des dépendances NestJS. Vérifiez votre package.json."
+    exit 1
+  fi
 fi
 
-# Vérifier si nous sommes en mode production ou développement
-if [ "$NODE_ENV" = "production" ]; then
-    echo "Démarrage en mode PRODUCTION"
-    
-    # Copier les fichiers d'application et compiler si nécessaire (en mode production)
-    if [ ! -d "/usr/src/app/apps/api-gateway/dist" ]; then
-        echo "Compilation de l'application en mode production..."
-        cd /usr/src/app
-        npm run build --workspace=apps/api-gateway
-    fi
-    
-    # Démarrer NGINX en arrière-plan
-    echo "Démarrage de NGINX..."
-    nginx -g "daemon off;" &
-    NGINX_PID=$!
-    
-    # Démarrer l'application NestJS en mode production
-    echo "Démarrage de l'application NestJS en mode production..."
-    cd /usr/src/app/apps/api-gateway
-    node dist/main.js &
-    APP_PID=$!
-else
-    echo "Démarrage en mode DÉVELOPPEMENT"
-    
-    # Démarrer NGINX en arrière-plan
-    echo "Démarrage de NGINX..."
-    nginx -g "daemon off;" &
-    NGINX_PID=$!
-    
-    # Démarrer l'application NestJS en mode développement
-    echo "Démarrage de l'application NestJS en mode développement..."
-    cd /usr/src/app/apps/api-gateway
-    npx ts-node-dev --respawn --transpile-only src/main.ts &
-    APP_PID=$!
+# Démarrer Nginx avec vérification de la configuration
+echo "Vérification de la configuration Nginx..."
+nginx -t
+
+if [ $? -ne 0 ]; then
+  echo "Configuration Nginx invalide. Arrêt du conteneur."
+  exit 1
 fi
 
-# Fonction pour arrêter proprement les processus
-cleanup() {
-    echo "Arrêt des services..."
-    kill -TERM $APP_PID
-    kill -TERM $NGINX_PID
-    wait $APP_PID
-    wait $NGINX_PID
-    echo "Services arrêtés."
-    exit 0
-}
+echo "Démarrage de Nginx..."
+nginx -g "daemon off;" &
+NGINX_PID=$!
 
-# Capturer les signaux pour arrêter proprement
-trap cleanup SIGINT SIGTERM
+# Attendre un peu que Nginx démarre
+sleep 2
+
+# Vérifier si Nginx est en cours d'exécution
+if ! kill -0 $NGINX_PID 2>/dev/null; then
+  echo "Nginx n'a pas démarré correctement. Arrêt du conteneur."
+  exit 1
+fi
+
+echo "Nginx démarré sur le port 80 (PID: $NGINX_PID)"
+
+# Aller dans le répertoire de l'application
+cd /app
+
+echo "Démarrage de l'application NestJS..."
+# Démarrer l'application NestJS
+node main.js &
+NODE_PID=$!
+
+# Attendre un moment pour s'assurer que l'application démarre
+sleep 5
+
+# Vérifier si l'application est en cours d'exécution
+if ! kill -0 $NODE_PID 2>/dev/null; then
+  echo "Application NestJS n'a pas démarré correctement. Arrêt du conteneur."
+  kill $NGINX_PID 2>/dev/null || true
+  exit 1
+fi
+
+echo "Application NestJS démarrée avec succès (PID: $NODE_PID)"
+echo "API Gateway prête à recevoir des requêtes"
 
 # Attendre que l'un des processus se termine
 wait -n
-# Si l'un des processus se termine, arrêter l'autre aussi
-cleanup 
+
+# Si l'un des processus se termine, terminer l'autre proprement
+if kill -0 $NGINX_PID 2>/dev/null; then
+  echo "L'application NestJS s'est arrêtée, arrêt de Nginx..."
+  kill $NGINX_PID 2>/dev/null || true
+else
+  echo "Nginx s'est arrêté, arrêt de l'application NestJS..."
+  kill $NODE_PID 2>/dev/null || true
+fi
+
+echo "API Gateway arrêtée"
+exit 1 

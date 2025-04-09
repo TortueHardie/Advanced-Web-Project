@@ -1,0 +1,23 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copier les fichiers de configuration
+COPY package*.json ./
+COPY turbo.json ./
+COPY apps/api-gateway/package*.json ./apps/api-gateway/
+
+# Installer les dépendances
+RUN npm install
+
+# Copier le code source
+COPY apps/api-gateway ./apps/api-gateway
+COPY packages ./packages
+
+# Construire l'application
+WORKDIR /app/apps/api-gateway
+RUN npm run build
+
+EXPOSE 3000
+
+CMD ["npm", "run", "start"] 

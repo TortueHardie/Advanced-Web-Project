@@ -9,12 +9,7 @@
     "packages/*"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npm run build --workspaces --if-present",
-    "build:api-gateway": "cd apps/api-gateway && npm run build",
-    "build:user-service": "cd apps/user-service && npm run build",
-    "install:deps": "npm install --legacy-peer-deps && npm run install:deps:workspaces",
-    "install:deps:workspaces": "npm run install:deps --workspaces --if-present"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
