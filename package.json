@@ -32,6 +32,7 @@
     "turbo": "^2.4.4"
   },
   "dependencies": {
+    "@angular/router": "19.2.5",
     "@nestjs/microservices": "^11.0.11"
   }
 }
