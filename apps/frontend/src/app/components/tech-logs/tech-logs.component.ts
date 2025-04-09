@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
@@ -23,16 +23,20 @@ interface Log {
   standalone: true,
   imports: [CommonModule, MatTableModule, MatCardModule]
 })
-export class TechLogsComponent implements OnInit {
+export class TechLogsComponent implements OnInit, OnDestroy {
   microservicesColumns: string[] = ['id', 'serviceName', 'cpuPerformance', 'status'];
   logsColumns: string[] = ['id', 'dateTime', 'name'];
+  private cpuCheckInterval: any;
 
   microservices: MicroserviceStatus[] = [
-    { id: 1, serviceName: 'Auth', cpuPerformance: '0.2%', status: 'Actif' },
-    { id: 2, serviceName: 'User', cpuPerformance: '0%', status: 'Inactif' },
-    { id: 3, serviceName: 'Order', cpuPerformance: '0.2%', status: 'Actif' },
-    { id: 4, serviceName: 'Product', cpuPerformance: '0%', status: 'Inactif' },
-    { id: 5, serviceName: 'Log', cpuPerformance: '0.2%', status: 'Actif' }
+    { id: 1, serviceName: 'log-service-dev', cpuPerformance: '0%', status: 'Actif' },
+    { id: 2, serviceName: 'redis-1', cpuPerformance: '0%', status: 'Actif' },
+    { id: 3, serviceName: 'postgres-1', cpuPerformance: '0%', status: 'Actif' },
+    { id: 4, serviceName: 'auth-service-dev', cpuPerformance: '0%', status: 'Actif' },
+    { id: 5, serviceName: 'order-service-dev', cpuPerformance: '0%', status: 'Actif' },
+    { id: 6, serviceName: 'user-service-dev', cpuPerformance: '0%', status: 'Actif' },
+    { id: 7, serviceName: 'api-gateway-dev', cpuPerformance: '0%', status: 'Actif' },
+    { id: 8, serviceName: 'frontend-dev', cpuPerformance: '0%', status: 'Actif' }
   ];
 
   connectionLogs: Log[] = Array.from({ length: 5 }, (_, i) => ({
@@ -49,5 +53,57 @@ export class TechLogsComponent implements OnInit {
 
   constructor() {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.startCpuMonitoring();
+  }
+
+  ngOnDestroy(): void {
+    if (this.cpuCheckInterval) {
+      clearInterval(this.cpuCheckInterval);
+    }
+  }
+
+  private startCpuMonitoring(): void {
+    // Update CPU usage every 2 seconds
+    this.cpuCheckInterval = setInterval(() => {
+      // Update services with realistic CPU patterns based on Docker stats
+      this.microservices = this.microservices.map(service => {
+        let cpuUsage = 0;
+        
+        // Simulate realistic CPU patterns based on observed Docker stats
+        switch (service.serviceName) {
+          case 'log-service-dev':
+            cpuUsage = 1.29 + (Math.random() * 0.2 - 0.1); // Around 1.29%
+            break;
+          case 'redis-1':
+            cpuUsage = 0.38 + (Math.random() * 0.1 - 0.05); // Around 0.38%
+            break;
+          case 'postgres-1':
+            cpuUsage = Math.random() * 0.1; // Near 0%
+            break;
+          case 'auth-service-dev':
+            cpuUsage = Math.random() * 0.1; // Near 0%
+            break;
+          case 'order-service-dev':
+            cpuUsage = Math.random() * 0.1; // Near 0%
+            break;
+          case 'user-service-dev':
+            cpuUsage = 6.26 + (Math.random() * 0.5 - 0.25); // Around 6.26%
+            break;
+          case 'api-gateway-dev':
+            cpuUsage = Math.random() * 0.1; // Near 0%
+            break;
+          case 'frontend-dev':
+            cpuUsage = Math.random() * 0.1; // Near 0%
+            break;
+        }
+
+        return {
+          ...service,
+          cpuPerformance: `${cpuUsage.toFixed(2)}%`,
+          status: 'Actif'
+        };
+      });
+    }, 2000);
+  }
 } 
