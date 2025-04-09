@@ -19,3 +19,11 @@ coverage
 
 # Ne pas ignorer les packages locaux
 !packages/ 
+**/node_modules
+**/dist
+**/.turbo
+**/.next
+packages/**/.env
+packages/**/.env.*
+!.env
+!**/.env.example 
