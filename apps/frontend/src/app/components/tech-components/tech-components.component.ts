@@ -2,6 +2,9 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TechComponentCardComponent } from '../tech-component-card/tech-component-cardcomponent';
 import { MatIconModule } from '@angular/material/icon';
+import { MatDialog } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
+import { TechComponentUpdateComponent } from '../tech-component-card/tech-component-update.component';
 
 interface ComponentItem {
   id: string;
@@ -17,7 +20,8 @@ interface ComponentItem {
   imports: [
     CommonModule, 
     TechComponentCardComponent,
-    MatIconModule
+    MatIconModule,
+    MatButtonModule
   ],
   templateUrl: './tech-components.component.html',
   styleUrls: ['./tech-components.component.scss']
@@ -54,4 +58,24 @@ export class TechComponentsComponent {
       githubLink: 'https://github.com/TortueHardie/Advanced-Web-Project/tree/main'
     },
   ];
+
+  constructor(private dialog: MatDialog) {}
+
+  openAddComponentDialog(): void {
+    const dialogRef = this.dialog.open(TechComponentUpdateComponent, {
+      width: '600px',
+      data: {}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // Generate a new ID (you might want to implement a more robust ID generation)
+        const newComponent: ComponentItem = {
+          ...result,
+          id: (this.composants.length + 1).toString()
+        };
+        this.composants.push(newComponent);
+      }
+    });
+  }
 }

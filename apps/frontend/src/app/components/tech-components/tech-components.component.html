@@ -1,5 +1,11 @@
 <div class="container">
-  <h1>Gestion des composants</h1>
+  <div class="header">
+    <h1>Gestion des composants</h1>
+    <button mat-raised-button color="primary" (click)="openAddComponentDialog()">
+      <mat-icon>add</mat-icon>
+      Ajouter un composant
+    </button>
+  </div>
   <div class="component-grid">
 
     <app-tech-component-card

@@ -4,17 +4,28 @@
   padding: 20px;
 }
 
-h1 {
-  font-size: 24px;
-  font-weight: 500;
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 24px;
+
+  h1 {
+    margin: 0;
+  }
+
+  button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
 }
 
 .component-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, 300px);
-  gap: 24px;
-  justify-content: center;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
 }
 
 .no-results {
@@ -24,24 +35,22 @@ h1 {
   justify-content: center;
   padding: 40px;
   text-align: center;
-}
 
-.no-results-icon {
-  font-size: 48px;
-  width: 48px;
-  height: 48px;
-  color: rgba(0, 0, 0, 0.54);
-  margin-bottom: 16px;
-}
+  .no-results-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+    color: #666;
+  }
 
-.no-results h2 {
-  font-size: 20px;
-  font-weight: 500;
-  margin-bottom: 8px;
-  color: rgba(0, 0, 0, 0.87);
-}
+  h2 {
+    margin: 0 0 8px 0;
+    color: #333;
+  }
 
-.no-results p {
-  color: rgba(0, 0, 0, 0.6);
-  margin: 0;
+  p {
+    margin: 0;
+    color: #666;
+  }
 }
