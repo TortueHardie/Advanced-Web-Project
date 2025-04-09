@@ -23,6 +23,7 @@ import { DevComponentsComponent } from './components/dev-components/dev-componen
 import { DeveloperProfileComponent } from './components/developer-profile/developer-profile.component';
 import { DeveloperProfileUpdateComponent } from './components/developer-profile/developer-profile-update/developer-profile-update.component';
 import { TechComponentsComponent } from './components/tech-components/tech-components.component';
+import { TechLogsComponent } from './components/tech-logs/tech-logs.component';
 import { LandingComponent } from './pages/landing/landing.component';
 
 export const routes: Routes = [
@@ -57,5 +58,6 @@ export const routes: Routes = [
   { path: 'dev', component: DevComponentsComponent },
   // Tech
   { path: 'tech', component: TechComponentsComponent },
+  { path: 'tech/logs', component: TechLogsComponent },
   { path: '**', redirectTo: '' }
 ];
