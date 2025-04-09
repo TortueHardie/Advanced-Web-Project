@@ -1,22 +1,29 @@
 FROM node:20-slim
 
-# Create app directory
 WORKDIR /usr/src/app
 
-# Installation des dépendances système nécessaires pour Prisma et le diagnostic
-RUN apt-get update -y && apt-get install -y openssl netcat-openbsd iproute2 iputils-ping
+# Installation des dépendances système nécessaires
+RUN apt-get update && \
+    apt-get install -y build-essential python3 && \
+    rm -rf /var/lib/apt/lists/*
 
-# Installation globale des outils nécessaires
-RUN npm install -g typescript ts-node @nestjs/cli rimraf
+# Copie des fichiers de configuration
+COPY package*.json ./
+COPY packages/prisma/package*.json ./packages/prisma/
+COPY apps/user-service/package*.json ./apps/user-service/
 
-# Installation de tsconfig-paths globalement pour résoudre les problèmes de chemins
-RUN npm install -g tsconfig-paths
+# Installation des dépendances
+RUN npm install --legacy-peer-deps
 
-# Les dépendances seront installées à partir des volumes montés
-# et la commande d'exécution sera fournie par docker-compose
+# Copie des fichiers source
+COPY packages/prisma ./packages/prisma
+COPY apps/user-service ./apps/user-service
+COPY tsconfig.json ./
+COPY turbo.json ./
 
-# Exposer les ports
+# Génération du client Prisma
+RUN npx prisma generate --schema=./packages/prisma/prisma/schema.prisma
+
 EXPOSE 3001
-EXPOSE 4001
 
-# Pas de CMD ici, il sera fourni par docker-compose 
+CMD ["sh", "-c", "cd apps/user-service && npm install && npx nest start --watch"] 

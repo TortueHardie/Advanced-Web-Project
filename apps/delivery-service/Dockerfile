@@ -1,41 +1,26 @@
-FROM node:18-alpine As development
+FROM node:18-alpine
 
 WORKDIR /usr/src/app
 
 # Copier les fichiers package.json
 COPY package*.json ./
 COPY packages/prisma/package*.json ./packages/prisma/
-COPY apps/delivery-service/package*.json ./apps/delivery-service/
+COPY apps/delivery-service/package*.json ./
 
 # Installer les dépendances
-RUN npm ci
+RUN npm install --legacy-peer-deps
 
 # Copier le code source
 COPY packages/prisma ./packages/prisma
 COPY apps/delivery-service ./apps/delivery-service
 COPY tsconfig.json ./
+COPY turbo.json ./
 
 # Générer le client Prisma
-RUN cd packages/prisma && npx prisma generate
+RUN npx prisma generate --schema=./packages/prisma/prisma/schema.prisma
 
 # Build de l'application
 RUN npm run build delivery-service
-
-FROM node:18-alpine As production
-
-WORKDIR /usr/src/app
-
-# Copier les fichiers package.json
-COPY package*.json ./
-COPY packages/prisma/package*.json ./packages/prisma/
-COPY apps/delivery-service/package*.json ./apps/delivery-service/
-
-# Installer uniquement les dépendances de production
-RUN npm ci --only=production
-
-# Copier l'application compilée
-COPY --from=development /usr/src/app/dist ./dist
-COPY --from=development /usr/src/app/node_modules/.prisma ./node_modules/.prisma
 
 # Exposer les ports
 EXPOSE 3003

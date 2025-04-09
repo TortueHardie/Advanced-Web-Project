@@ -1,219 +1,92 @@
 # La version est supprimée car obsolète dans les dernières versions de Docker Compose
 
+version: '3.8'
+
 services:
   postgres:
-    image: postgres:14
-    restart: always
-    env_file:
-      - .env
+    image: postgres:15
+    container_name: advanced-web-project-postgres
     environment:
-      POSTGRES_USER: ${DATABASE_USER_POSTGRES}
-      POSTGRES_PASSWORD: ${DATABASE_MDP_POSTGRES}
-      POSTGRES_DB: ${DATABASE_NAME_POSTGRES}
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=user_service
     ports:
-      - "5433:5432"
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - internal-network
 
   redis:
-    image: redis:alpine
-    restart: always
+    image: redis:7
+    container_name: advanced-web-project-redis
     ports:
-      - "127.0.0.1:6379:6379"
-    volumes:
-      - redis_data:/data
+      - "6379:6379"
     networks:
       - internal-network
-
-  auth-service:
-    build:
-      context: .
-      dockerfile: apps/auth-service/Dockerfile.dev
-    container_name: auth-service-dev
-    restart: unless-stopped
-    depends_on:
-      - redis
-    env_file:
-      - .env
-    environment:
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      JWT_SECRET: ${JWT_SECRET}
-      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
-      USER_SERVICE_URL: http://user-service:3001
-      NODE_ENV: development
-    networks:
-      - internal-network
-    volumes:
-      - ./apps/auth-service/src:/usr/src/app/apps/auth-service/src
-      - ./apps/auth-service/tsconfig.json:/usr/src/app/apps/auth-service/tsconfig.json
-      - ./apps/auth-service/tsconfig.build.json:/usr/src/app/apps/auth-service/tsconfig.build.json
-      - ./apps/auth-service/nest-cli.json:/usr/src/app/apps/auth-service/nest-cli.json
-      - ./packages:/usr/src/app/packages
-
-  api-gateway:
-    build:
-      context: .
-      dockerfile: apps/api-gateway/Dockerfile.dev
-    container_name: api-gateway-dev
-    depends_on:
-      - postgres
-      - user-service
-      - auth-service
-      - product-service
-      - delivery-service
-    env_file:
-      - .env
-    environment:
-      DATABASE_URL: ${DATABASE_URL_POSTGRES}
-      AUTH_SERVICE_URL: http://auth-service:3001
-      USER_SERVICE_URL: http://user-service:3001
-      PRODUCT_SERVICE_URL: http://product-service:3002
-      DELIVERY_SERVICE_URL: http://delivery-service:3003
-      NODE_ENV: development
-    ports:
-      - "3000:3000"
-    networks:
-      - internal-network
-      - external-network
-    restart: unless-stopped
-    volumes:
-      - ./apps/api-gateway/src:/usr/src/app/apps/api-gateway/src
-      - ./apps/api-gateway/tsconfig.json:/usr/src/app/apps/api-gateway/tsconfig.json
-      - ./apps/api-gateway/tsconfig.build.json:/usr/src/app/apps/api-gateway/tsconfig.build.json
-      - ./apps/api-gateway/nest-cli.json:/usr/src/app/apps/api-gateway/nest-cli.json
-      - ./packages:/usr/src/app/packages
 
   user-service:
     build:
       context: .
       dockerfile: apps/user-service/Dockerfile.dev
     container_name: user-service-dev
-    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/user_service?schema=public
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - ./apps/user-service:/app/apps/user-service
+      - /app/apps/user-service/node_modules
     depends_on:
       - postgres
-    environment:
-      DATABASE_URL_POSTGRES: ${DATABASE_URL_POSTGRES}
-      DATABASE_URL: ${DATABASE_URL_POSTGRES}
-      NODE_ENV: development
+      - redis
     networks:
       - internal-network
-    volumes:
-      - ./apps/user-service/src:/usr/src/app/apps/user-service/src
-      - ./apps/user-service/tsconfig.json:/usr/src/app/apps/user-service/tsconfig.json
-      - ./apps/user-service/tsconfig.build.json:/usr/src/app/apps/user-service/tsconfig.build.json
-      - ./apps/user-service/nest-cli.json:/usr/src/app/apps/user-service/nest-cli.json
-      - ./packages:/usr/src/app/packages
+    command: sh -c "cd apps/user-service && npm install && npx nest start --watch"
 
   product-service:
     build:
       context: .
       dockerfile: apps/product-service/Dockerfile.dev
     container_name: product-service-dev
-    restart: unless-stopped
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/user_service?schema=public
+    volumes:
+      - ./apps/product-service:/app/apps/product-service
+      - /app/apps/product-service/node_modules
     depends_on:
       - postgres
-    environment:
-      DATABASE_URL: ${DATABASE_URL_POSTGRES}
-      NODE_ENV: development
     networks:
       - internal-network
-    volumes:
-      - ./apps/product-service/src:/usr/src/app/apps/product-service/src
-      - ./apps/product-service/tsconfig.json:/usr/src/app/apps/product-service/tsconfig.json
-      - ./apps/product-service/tsconfig.build.json:/usr/src/app/apps/product-service/tsconfig.build.json
-      - ./apps/product-service/nest-cli.json:/usr/src/app/apps/product-service/nest-cli.json
-      - ./packages:/usr/src/app/packages
+    command: sh -c "cd apps/product-service && npm install && npx nest start --watch"
 
   delivery-service:
     build:
       context: .
       dockerfile: apps/delivery-service/Dockerfile.dev
     container_name: delivery-service-dev
-    restart: unless-stopped
-    depends_on:
-      - postgres
-    environment:
-      DATABASE_URL: ${DATABASE_URL_POSTGRES}
-      NODE_ENV: development
-    networks:
-      - internal-network
-    volumes:
-      - ./apps/delivery-service/src:/usr/src/app/apps/delivery-service/src
-      - ./apps/delivery-service/tsconfig.json:/usr/src/app/apps/delivery-service/tsconfig.json
-      - ./apps/delivery-service/tsconfig.build.json:/usr/src/app/apps/delivery-service/tsconfig.build.json
-      - ./apps/delivery-service/nest-cli.json:/usr/src/app/apps/delivery-service/nest-cli.json
-      - ./packages:/usr/src/app/packages
-
-  log-service:
-    build:
-      context: .
-      dockerfile: apps/log-service/Dockerfile.dev
-    container_name: log-service-dev
-    restart: unless-stopped
-    environment:
-      NODE_ENV: development
-    networks:
-      - internal-network
-    volumes:
-      - ./apps/log-service/src:/usr/src/app/apps/log-service/src
-      - ./apps/log-service/tsconfig.json:/usr/src/app/apps/log-service/tsconfig.json
-      - ./apps/log-service/tsconfig.build.json:/usr/src/app/apps/log-service/tsconfig.build.json
-      - ./apps/log-service/nest-cli.json:/usr/src/app/apps/log-service/nest-cli.json
-      - ./packages:/usr/src/app/packages
-
-  order-service:
-    build:
-      context: .
-      dockerfile: apps/order-service/Dockerfile.dev
-    container_name: order-service-dev
-    restart: unless-stopped
-    depends_on:
-      - postgres
-    environment:
-      DATABASE_URL: ${DATABASE_URL_POSTGRES}
-      NODE_ENV: development
-    networks:
-      - internal-network
-    volumes:
-      - ./apps/order-service/src:/usr/src/app/apps/order-service/src
-      - ./apps/order-service/tsconfig.json:/usr/src/app/apps/order-service/tsconfig.json
-      - ./apps/order-service/tsconfig.build.json:/usr/src/app/apps/order-service/tsconfig.build.json
-      - ./apps/order-service/nest-cli.json:/usr/src/app/apps/order-service/nest-cli.json
-      - ./packages:/usr/src/app/packages
-
-  frontend:
-    build:
-      context: .
-      dockerfile: apps/frontend/Dockerfile.dev
-    container_name: frontend-dev
-    depends_on:
-      - api-gateway
     ports:
-      - "8080:3000"
-    networks:
-      - external-network
-    restart: unless-stopped
-    volumes:
-      - ./apps/frontend/src:/usr/src/app/apps/frontend/src
-      - ./apps/frontend/public:/usr/src/app/apps/frontend/public
-      - ./apps/frontend/tsconfig.json:/usr/src/app/apps/frontend/tsconfig.json
-      - ./apps/frontend/next.config.js:/usr/src/app/apps/frontend/next.config.js
-      - ./packages:/usr/src/app/packages
+      - "3003:3003"
     environment:
-      NODE_ENV: development
-      NEXT_PUBLIC_API_URL: http://localhost:3000
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/user_service?schema=public
+    volumes:
+      - ./apps/delivery-service:/app/apps/delivery-service
+      - /app/apps/delivery-service/node_modules
+    depends_on:
+      - postgres
+    networks:
+      - internal-network
+    command: sh -c "cd apps/delivery-service && npm install && npx nest start --watch"
 
 volumes:
   postgres_data:
-  redis_data:
 
 networks:
   internal-network:
-    driver: bridge
-    internal: true
-  
-  external-network:
     driver: bridge 

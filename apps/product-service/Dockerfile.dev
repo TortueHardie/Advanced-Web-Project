@@ -1,43 +1,29 @@
-FROM node:20.11.0 as development
+FROM node:20-slim
 
-# Create app directory
 WORKDIR /usr/src/app
 
-# Copy package files first for better caching
+# Installation des dépendances système nécessaires
+RUN apt-get update && \
+    apt-get install -y build-essential python3 && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copie des fichiers de configuration
 COPY package*.json ./
 COPY packages/prisma/package*.json ./packages/prisma/
 COPY apps/product-service/package*.json ./apps/product-service/
 
-# Copy essential files
-COPY tsconfig*.json ./
-COPY turbo.json ./
-COPY ./packages/prisma/ ./packages/prisma/
-
-# Install dependencies
+# Installation des dépendances
 RUN npm install --legacy-peer-deps
 
-# Copy only the product service
-COPY ./apps/product-service/ ./apps/product-service/
+# Copie des fichiers source
+COPY packages/prisma ./packages/prisma
+COPY apps/product-service ./apps/product-service
+COPY tsconfig.json ./
+COPY turbo.json ./
 
-# Generate Prisma client
+# Génération du client Prisma
 RUN npx prisma generate --schema=./packages/prisma/prisma/schema.prisma
 
-# Make sure the application listens on the correct host
-RUN sed -i 's/await app\.listen(3002)/await app\.listen(3002, "0.0.0.0")/' ./apps/product-service/src/main.ts
-
-# Create directory for PrismaService if not exists
-RUN mkdir -p /usr/src/app/apps/product-service/src/prisma
-
-# Create a symbolic link for the PrismaService
-RUN ln -sf /usr/src/app/packages/prisma/src/prisma.service.ts /usr/src/app/apps/product-service/src/prisma/prisma.service.ts
-RUN ln -sf /usr/src/app/packages/prisma/src/index.ts /usr/src/app/apps/product-service/src/prisma/index.ts
-
-# Change to product-service directory
-WORKDIR /usr/src/app/apps/product-service
-
-# Expose ports
 EXPOSE 3002
-EXPOSE 4002
 
-# Run the service in development mode
-CMD ["npx", "ts-node-dev", "--respawn", "--transpile-only", "src/main.ts"] 
+CMD ["sh", "-c", "cd apps/product-service && npm install && npx nest start --watch"] 
