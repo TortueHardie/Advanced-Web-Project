@@ -3,12 +3,12 @@ version: '3.8'
 services:
   # Base de données PostgreSQL
   postgres:
-    image: postgres:15
+    image: postgres:16
     container_name: postgres
     environment:
-      POSTGRES_DB: advanced_web_project
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
@@ -24,8 +24,8 @@ services:
   # API Gateway - Point d'entrée unique
   api-gateway:
     build:
-      context: .
-      dockerfile: apps/api-gateway/Dockerfile
+      context: ./apps/api-gateway
+      dockerfile: Dockerfile.dev
     container_name: api-gateway
     env_file:
       - .env
@@ -52,13 +52,14 @@ services:
   # Service Utilisateurs
   user-service:
     build:
-      context: .
-      dockerfile: apps/user-service/Dockerfile
+      context: ./apps/user-service
+      dockerfile: Dockerfile.dev
     container_name: user-service
     env_file:
       - .env
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/advanced_web_project?schema=public
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
     ports:
       - "3001:3001"
       - "4001:4001"
@@ -72,14 +73,15 @@ services:
   # Service Produits (Restaurants, Menus, Articles)
   product-service:
     build:
-      context: .
-      dockerfile: apps/product-service/Dockerfile
+      context: ./apps/product-service
+      dockerfile: Dockerfile.dev
     container_name: product-service
     env_file:
       - .env
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/advanced_web_project?schema=public
-      - USER_SERVICE_URL=http://user-service:3001
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - RABBITMQ_URL=${RABBITMQ_URL}
     ports:
       - "3002:3002"
       - "4002:4002"
@@ -88,6 +90,8 @@ services:
         condition: service_healthy
       user-service:
         condition: service_started
+      rabbitmq:
+        condition: service_started
     restart: unless-stopped
     networks:
       - app-network
@@ -95,15 +99,15 @@ services:
   # Service Livraison
   delivery-service:
     build:
-      context: .
-      dockerfile: apps/delivery-service/Dockerfile
+      context: ./apps/delivery-service
+      dockerfile: Dockerfile.dev
     container_name: delivery-service
     env_file:
       - .env
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/advanced_web_project?schema=public
-      - USER_SERVICE_URL=http://user-service:3001
-      - PRODUCT_SERVICE_URL=http://product-service:3002
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - RABBITMQ_URL=${RABBITMQ_URL}
     ports:
       - "3003:3003"
       - "4003:4003"
@@ -114,6 +118,8 @@ services:
         condition: service_started
       product-service:
         condition: service_started
+      rabbitmq:
+        condition: service_started
     restart: unless-stopped
     networks:
       - app-network
@@ -121,13 +127,14 @@ services:
   # Service Commandes
   order-service:
     build:
-      context: .
-      dockerfile: apps/order-service/Dockerfile
+      context: ./apps/order-service
+      dockerfile: Dockerfile.dev
     container_name: order-service
     env_file:
       - .env
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/advanced_web_project?schema=public
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
       - USER_SERVICE_URL=http://user-service:3001
       - PRODUCT_SERVICE_URL=http://product-service:3002
       - DELIVERY_SERVICE_URL=http://delivery-service:3003
@@ -144,6 +151,17 @@ services:
       delivery-service:
         condition: service_started
     restart: unless-stopped
+    networks:
+      - app-network
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
     networks:
       - app-network
 

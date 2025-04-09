@@ -10,13 +10,18 @@ RUN apt-get update && \
 # Copie des fichiers de configuration
 COPY package*.json ./
 COPY packages/prisma/package*.json ./packages/prisma/
+COPY packages/discovery/package*.json ./packages/discovery/
 COPY apps/product-service/package*.json ./apps/product-service/
 
 # Installation des dépendances
 RUN npm install --legacy-peer-deps
 
+# Installation des dépendances globales nécessaires
+RUN npm install -g @nestjs/cli
+
 # Copie des fichiers source
 COPY packages/prisma ./packages/prisma
+COPY packages/discovery ./packages/discovery
 COPY apps/product-service ./apps/product-service
 COPY tsconfig.json ./
 COPY turbo.json ./
@@ -24,6 +29,9 @@ COPY turbo.json ./
 # Génération du client Prisma
 RUN npx prisma generate --schema=./packages/prisma/prisma/schema.prisma
 
+# Compilation du code TypeScript
+RUN cd apps/product-service && npm install && npx nest build
+
 EXPOSE 3002
 
-CMD ["sh", "-c", "cd apps/product-service && npm install && npx nest start --watch"] 
+CMD ["sh", "-c", "cd apps/product-service && npx ts-node src/main.ts"] 

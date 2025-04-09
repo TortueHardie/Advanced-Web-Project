@@ -37,14 +37,13 @@ services:
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/user_service?schema=public
       - REDIS_URL=redis://redis:6379
     volumes:
-      - ./apps/user-service:/app/apps/user-service
-      - /app/apps/user-service/node_modules
+      - ./apps/user-service:/usr/src/app/apps/user-service
+      - /usr/src/app/apps/user-service/node_modules
     depends_on:
       - postgres
       - redis
     networks:
       - internal-network
-    command: sh -c "cd apps/user-service && npm install && npx nest start --watch"
 
   product-service:
     build:
@@ -57,13 +56,12 @@ services:
       - NODE_ENV=development
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/user_service?schema=public
     volumes:
-      - ./apps/product-service:/app/apps/product-service
-      - /app/apps/product-service/node_modules
+      - ./apps/product-service:/usr/src/app/apps/product-service
+      - /usr/src/app/apps/product-service/node_modules
     depends_on:
       - postgres
     networks:
       - internal-network
-    command: sh -c "cd apps/product-service && npm install && npx nest start --watch"
 
   delivery-service:
     build:
@@ -76,13 +74,12 @@ services:
       - NODE_ENV=development
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/user_service?schema=public
     volumes:
-      - ./apps/delivery-service:/app/apps/delivery-service
-      - /app/apps/delivery-service/node_modules
+      - ./apps/delivery-service:/usr/src/app/apps/delivery-service
+      - /usr/src/app/apps/delivery-service/node_modules
     depends_on:
       - postgres
     networks:
       - internal-network
-    command: sh -c "cd apps/delivery-service && npm install && npx nest start --watch"
 
 volumes:
   postgres_data:
