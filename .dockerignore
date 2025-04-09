@@ -1,4 +1,3 @@
-
 **/node_modules
 **/dist
 **/.turbo
@@ -7,24 +6,3 @@ packages/**/.env
 packages/**/.env.*
 !.env
 !**/.env.example 
-node_modules
-npm-debug.log
-yarn-debug.log
-yarn-error.log
-.git
-.gitignore
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-README.md
-.next
-dist
-build
-.DS_Store
-coverage
-.turbo
-
-# Ne pas ignorer les packages locaux
-!packages/ 

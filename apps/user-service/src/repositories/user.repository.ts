@@ -1,55 +1,56 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
-import { User, Prisma } from '@prisma/client';
+import { PrismaService } from '../../../../packages/prisma/src/prisma.service';
+import { CreateUserDto, UpdateUserDto } from '../dto';
 
 @Injectable()
 export class UserRepository {
-  private prisma: PrismaClient;
+  constructor(private prisma: PrismaService) {}
 
-  constructor() {
-    this.prisma = new PrismaClient();
-  }
-
-  async create(data: Prisma.UserCreateInput): Promise<User> {
+  async create(data: CreateUserDto): Promise<any> {
     return this.prisma.user.create({
       data,
     });
   }
 
-  async findAll(): Promise<User[]> {
+  async findAll(): Promise<any[]> {
     return this.prisma.user.findMany();
   }
 
-  async findOne(id: string): Promise<User | null> {
+  async findOne(id: string): Promise<any | null> {
     return this.prisma.user.findUnique({
       where: { id },
     });
   }
 
-  async findByEmail(email: string): Promise<User | null> {
+  async findByEmail(email: string): Promise<any | null> {
     return this.prisma.user.findUnique({
       where: { email },
     });
   }
 
-  async update(id: string, data: Prisma.UserUpdateInput): Promise<User> {
+  async findByUsername(username: string): Promise<any | null> {
+    return this.prisma.user.findUnique({
+      where: { username },
+    });
+  }
+
+  async update(id: string, data: UpdateUserDto): Promise<any> {
     return this.prisma.user.update({
       where: { id },
       data,
     });
   }
 
-  async remove(id: string): Promise<User> {
-    return this.prisma.user.delete({
+  async updateLastLogin(id: string): Promise<any> {
+    return this.prisma.user.update({
       where: { id },
+      data: { lastLogin: new Date() },
     });
   }
 
-  async updateLastLogin(id: string): Promise<User> {
-    return this.prisma.user.update({
+  async remove(id: string): Promise<any> {
+    return this.prisma.user.delete({
       where: { id },
-      data: {
-      }
     });
   }
 } 

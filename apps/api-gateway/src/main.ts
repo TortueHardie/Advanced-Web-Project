@@ -1,62 +1,75 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-// import * as express from 'express';
-// import { createProxyMiddleware } from 'http-proxy-middleware';
+import * as express from 'express';
+import { createProxyMiddleware } from 'http-proxy-middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Configuration CORS
-  app.enableCors({
-    origin: true, // Permet toutes les origines en développement
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    credentials: true,
-    allowedHeaders: 'Authorization,Content-Type,Accept',
-  });
-
-  // 🔹 Swagger pour la Gateway - Configuration améliorée
+  // 🔹 Swagger pour la Gateway
   const config = new DocumentBuilder()
     .setTitle('API Gateway')
     .setDescription('Documentation centralisée des microservices')
     .setVersion('1.0')
-    .addTag('Auth', 'Endpoints d\'authentification')
-    .addTag('Users', 'Gestion des utilisateurs')
-    .addTag('Orders', 'Gestion des commandes')
-    .addBearerAuth(
-      {
-        type: 'http',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
-        name: 'Authorization',
-        description: 'Entrez votre token JWT ici',
-        in: 'header',
-      },
-      'access-token', // Identifiant unique pour ce schéma de sécurité
-    )
-    .addServer('http://localhost:3000', 'Serveur de développement')
-    .addServer('https://api.votredomaine.com', 'Serveur de production')
+    .addBearerAuth()
+    .addTag('Restaurants', 'Gestion des restaurants')
+    .addTag('Menus', 'Gestion des menus')
+    .addTag('Articles', 'Gestion des articles')
     .build();
 
-  const document = SwaggerModule.createDocument(app, config, {
-    deepScanRoutes: true,
-    ignoreGlobalPrefix: false,
-  });
-  
+  const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document, {
+    customSiteTitle: 'Advanced Web Project API',
+    customfavIcon: 'https://nestjs.com/img/favicon.png',
+    customJs: [
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-bundle.min.js',
+    ],
+    customCssUrl: [
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.min.css',
+    ],
     swaggerOptions: {
       persistAuthorization: true,
       docExpansion: 'none',
       filter: true,
-      tagsSorter: 'alpha',
-      operationsSorter: 'alpha',
+      showExtensions: true,
+      showCommonExtensions: true,
+      deepLinking: true,
+      displayRequestDuration: true,
     },
   });
 
-  // 🔹 Le routage est maintenant entièrement géré par NGINX
-  // Les proxys Express ont été supprimés pour éviter les redondances et
-  // les incohérences potentielles dans la configuration de sécurité.
-  // Toutes les routes sont configurées dans le fichier nginx.conf
+  // 🔹 Proxy Express pour les services
+  const proxyApp = express();
+  
+  // Endpoint de santé
+  proxyApp.get('/health', (req, res) => {
+    res.status(200).json({ status: 'ok' });
+  });
+
+  // Proxy pour le service utilisateur
+  proxyApp.use('/user', createProxyMiddleware({
+    target: process.env.USER_SERVICE_URL || 'http://user-service:3001',
+    changeOrigin: true,
+    pathRewrite: { '^/user': '/' }
+  }));
+
+  // Proxy pour le service d'authentification
+  proxyApp.use('/auth', createProxyMiddleware({
+    target: process.env.AUTH_SERVICE_URL || 'http://auth-service:3001',
+    changeOrigin: true,
+    pathRewrite: { '^/auth': '/' }
+  }));
+
+  // Proxy pour le service de produits
+  proxyApp.use('/product', createProxyMiddleware({
+    target: process.env.PRODUCT_SERVICE_URL || 'http://product-service:3002',
+    changeOrigin: true,
+    pathRewrite: { '^/product': '/' }
+  }));
+
+  // Ajout du proxy à NestJS
+  app.use('/api', proxyApp);
 
   // Démarrer l'application sur localhost:3000 pour que Nginx puisse y accéder
   await app.listen(3000, '0.0.0.0');

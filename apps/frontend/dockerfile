@@ -1,0 +1,17 @@
+# Étape 1 : Construire l'application Angular
+FROM node:18-alpine as build
+
+WORKDIR /app
+COPY package.json package-lock.json ./
+COPY apps/frontend ./apps/frontend
+COPY packages ./packages
+COPY turbo.json ./
+
+RUN npm install
+RUN npm run build --workspace=apps/frontend
+
+# Étape 2 : Utiliser Nginx pour servir l'application
+FROM nginx:1.21.0-alpine
+COPY --from=build /app/apps/frontend/dist/frontend /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
