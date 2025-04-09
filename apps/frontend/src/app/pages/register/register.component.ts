@@ -62,11 +62,10 @@ export class RegisterComponent implements OnInit {
       deliveryFee: [''],
       
       // Deliverer specific fields
-      vehicleType: [''],
-      licensePlate: [''],
-      insuranceNumber: [''],
-      deliveryArea: [''],
-      availableHours: ['']
+      delivererPhoneNumber: ['', [Validators.required, Validators.pattern(/^\+?[0-9]{10,12}$/)]],
+      delivererSiretNumber: ['', [Validators.required, Validators.pattern(/^[0-9]{14}$/)]],
+      accountHolderName: ['', [Validators.required]],
+      iban: ['', [Validators.required, Validators.pattern(/^[A-Z]{2}[0-9]{2}[A-Z0-9]{1,30}$/)]]
     }, {
       validators: this.passwordMatchValidator
     });
@@ -119,7 +118,7 @@ export class RegisterComponent implements OnInit {
     
     // Update validators for deliverer fields
     const delivererFields = [
-      'vehicleType', 'licensePlate', 'insuranceNumber', 'deliveryArea'
+      'delivererPhoneNumber', 'delivererSiretNumber', 'accountHolderName', 'iban'
     ];
     
     delivererFields.forEach(field => {
@@ -208,7 +207,7 @@ export class RegisterComponent implements OnInit {
     
     if (!this.showDelivererFields) {
       const delivererFields = [
-        'vehicleType', 'licensePlate', 'insuranceNumber', 'deliveryArea', 'availableHours'
+        'delivererPhoneNumber', 'delivererSiretNumber', 'accountHolderName', 'iban'
       ];
       delivererFields.forEach(field => delete formValue[field]);
     }

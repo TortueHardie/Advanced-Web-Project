@@ -236,30 +236,8 @@
           </div>
         </div>
         
-        <div class="form-row">
-          <div class="form-group">
-            <label for="restaurantCity">Ville du restaurant</label>
-            <input 
-              type="text" 
-              id="restaurantCity" 
-              formControlName="restaurantCity" 
-              placeholder="Entrez la ville du restaurant"
-            >
-          </div>
-          
-          <div class="form-group">
-            <label for="restaurantZipCode">Code postal du restaurant</label>
-            <input 
-              type="text" 
-              id="restaurantZipCode" 
-              formControlName="restaurantZipCode" 
-              placeholder="Entrez le code postal du restaurant"
-            >
-          </div>
-        </div>
-        
         <div class="form-group">
-          <label for="restaurantPhone">Restaurant Phone</label>
+          <label for="restaurantPhone">Téléphone du restaurant</label>
           <input 
             type="tel" 
             id="restaurantPhone" 
@@ -271,33 +249,10 @@
             <span *ngIf="registerForm.get('restaurantPhone')?.errors?.['required']">Restaurant phone is required</span>
           </div>
         </div>
+
         
         <div class="form-group">
-          <label for="cuisineType">Cuisine Type</label>
-          <select 
-            id="cuisineType" 
-            formControlName="cuisineType"
-            [ngClass]="{'is-invalid': registerForm.get('cuisineType')?.invalid && registerForm.get('cuisineType')?.touched}"
-          >
-            <option value="">Select cuisine type</option>
-            <option value="ITALIAN">Italian</option>
-            <option value="FRENCH">French</option>
-            <option value="AMERICAN">American</option>
-            <option value="JAPANESE">Japanese</option>
-            <option value="CHINESE">Chinese</option>
-            <option value="MEXICAN">Mexican</option>
-            <option value="INDIAN">Indian</option>
-            <option value="THAI">Thai</option>
-            <option value="MEDITERRANEAN">Mediterranean</option>
-            <option value="OTHER">Other</option>
-          </select>
-          <div class="error-message" *ngIf="registerForm.get('cuisineType')?.invalid && registerForm.get('cuisineType')?.touched">
-            <span *ngIf="registerForm.get('cuisineType')?.errors?.['required']">Cuisine type is required</span>
-          </div>
-        </div>
-        
-        <div class="form-group">
-          <label for="deliveryFee">Delivery Fee (€)</label>
+          <label for="deliveryFee">Frais de livraison (€)</label>
           <input 
             type="number" 
             id="deliveryFee" 
@@ -318,72 +273,62 @@
         <h3>Informations du livreur</h3>
         
         <div class="form-group">
-          <label for="vehicleType">Type de véhicule</label>
-          <select 
-            id="vehicleType" 
-            formControlName="vehicleType"
-            [ngClass]="{'is-invalid': registerForm.get('vehicleType')?.invalid && registerForm.get('vehicleType')?.touched}"
+          <label for="delivererPhoneNumber">Numéro de téléphone professionnel</label>
+          <input 
+            type="tel" 
+            id="delivererPhoneNumber" 
+            formControlName="delivererPhoneNumber" 
+            placeholder="Entrez votre numéro de téléphone professionnel"
+            [ngClass]="{'is-invalid': registerForm.get('delivererPhoneNumber')?.invalid && registerForm.get('delivererPhoneNumber')?.touched}"
           >
-            <option value="">Sélectionnez un type de véhicule</option>
-            <option value="bike">Vélo</option>
-            <option value="scooter">Scooter</option>
-            <option value="car">Voiture</option>
-          </select>
-          <div class="error-message" *ngIf="registerForm.get('vehicleType')?.invalid && registerForm.get('vehicleType')?.touched">
-            <span *ngIf="registerForm.get('vehicleType')?.errors?.['required']">Le type de véhicule est requis</span>
+          <div class="error-message" *ngIf="registerForm.get('delivererPhoneNumber')?.invalid && registerForm.get('delivererPhoneNumber')?.touched">
+            <span *ngIf="registerForm.get('delivererPhoneNumber')?.errors?.['required']">Le numéro de téléphone est requis</span>
+            <span *ngIf="registerForm.get('delivererPhoneNumber')?.errors?.['pattern']">Veuillez entrer un numéro de téléphone valide</span>
           </div>
         </div>
-        
+
         <div class="form-group">
-          <label for="licensePlate">Numéro d'immatriculation</label>
+          <label for="delivererSiretNumber">Numéro SIRET</label>
           <input 
             type="text" 
-            id="licensePlate" 
-            formControlName="licensePlate" 
-            placeholder="Entrez votre numéro d'immatriculation"
-            [ngClass]="{'is-invalid': registerForm.get('licensePlate')?.invalid && registerForm.get('licensePlate')?.touched}"
+            id="delivererSiretNumber" 
+            formControlName="delivererSiretNumber" 
+            placeholder="Entrez votre numéro SIRET"
+            [ngClass]="{'is-invalid': registerForm.get('delivererSiretNumber')?.invalid && registerForm.get('delivererSiretNumber')?.touched}"
           >
-          <div class="error-message" *ngIf="registerForm.get('licensePlate')?.invalid && registerForm.get('licensePlate')?.touched">
-            <span *ngIf="registerForm.get('licensePlate')?.errors?.['required']">Le numéro d'immatriculation est requis</span>
+          <div class="error-message" *ngIf="registerForm.get('delivererSiretNumber')?.invalid && registerForm.get('delivererSiretNumber')?.touched">
+            <span *ngIf="registerForm.get('delivererSiretNumber')?.errors?.['required']">Le numéro SIRET est requis</span>
+            <span *ngIf="registerForm.get('delivererSiretNumber')?.errors?.['pattern']">Le numéro SIRET doit contenir 14 chiffres</span>
           </div>
         </div>
-        
+
         <div class="form-group">
-          <label for="insuranceNumber">Insurance Number</label>
+          <label for="accountHolderName">Nom du titulaire du compte</label>
           <input 
             type="text" 
-            id="insuranceNumber" 
-            formControlName="insuranceNumber" 
-            placeholder="Enter your insurance number"
-            [ngClass]="{'is-invalid': registerForm.get('insuranceNumber')?.invalid && registerForm.get('insuranceNumber')?.touched}"
+            id="accountHolderName" 
+            formControlName="accountHolderName" 
+            placeholder="Entrez le nom du titulaire du compte"
+            [ngClass]="{'is-invalid': registerForm.get('accountHolderName')?.invalid && registerForm.get('accountHolderName')?.touched}"
           >
-          <div class="error-message" *ngIf="registerForm.get('insuranceNumber')?.invalid && registerForm.get('insuranceNumber')?.touched">
-            <span *ngIf="registerForm.get('insuranceNumber')?.errors?.['required']">Insurance number is required</span>
+          <div class="error-message" *ngIf="registerForm.get('accountHolderName')?.invalid && registerForm.get('accountHolderName')?.touched">
+            <span *ngIf="registerForm.get('accountHolderName')?.errors?.['required']">Le nom du titulaire du compte est requis</span>
           </div>
         </div>
-        
+
         <div class="form-group">
-          <label for="deliveryArea">Delivery Area</label>
+          <label for="iban">IBAN</label>
           <input 
             type="text" 
-            id="deliveryArea" 
-            formControlName="deliveryArea" 
-            placeholder="Enter your delivery area"
-            [ngClass]="{'is-invalid': registerForm.get('deliveryArea')?.invalid && registerForm.get('deliveryArea')?.touched}"
+            id="iban" 
+            formControlName="iban" 
+            placeholder="Entrez votre IBAN"
+            [ngClass]="{'is-invalid': registerForm.get('iban')?.invalid && registerForm.get('iban')?.touched}"
           >
-          <div class="error-message" *ngIf="registerForm.get('deliveryArea')?.invalid && registerForm.get('deliveryArea')?.touched">
-            <span *ngIf="registerForm.get('deliveryArea')?.errors?.['required']">Delivery area is required</span>
+          <div class="error-message" *ngIf="registerForm.get('iban')?.invalid && registerForm.get('iban')?.touched">
+            <span *ngIf="registerForm.get('iban')?.errors?.['required']">L'IBAN est requis</span>
+            <span *ngIf="registerForm.get('iban')?.errors?.['pattern']">Veuillez entrer un IBAN valide</span>
           </div>
-        </div>
-        
-        <div class="form-group">
-          <label for="availableHours">Available Hours</label>
-          <input 
-            type="text" 
-            id="availableHours" 
-            formControlName="availableHours" 
-            placeholder="e.g. Mon-Fri: 9AM-5PM, Sat: 10AM-3PM"
-          >
         </div>
       </div>
       
@@ -394,11 +339,6 @@
       <div class="terms-agreement">
         By creating an account, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
       </div>
-      
-      <!-- Debug button for development purposes -->
-      <button type="button" class="btn-debug" (click)="debugForm()" *ngIf="isDevelopmentMode">
-        Debug Form
-      </button>
       
       <div class="form-actions">
         <button type="submit" class="btn-register" [disabled]="registerForm.invalid || isLoading">
