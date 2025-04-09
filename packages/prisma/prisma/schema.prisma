@@ -5,7 +5,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL_POSTGRES")
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -65,8 +65,6 @@ model Menu {
   name           String
   description    String
   price          Float
-
-  isAvailable    Boolean     @default(true)
   restaurantId   String
   restaurant     Restaurant  @relation(fields: [restaurantId], references: [id])
   items          Article[]   @relation("MenuItems")
@@ -78,8 +76,6 @@ model Article {
   description    String
   price          Float
   type           String      // Burger, Tacos, Frites...
-  stock          Int         @default(0)
-  isAvailable    Boolean     @default(true)
   restaurantId   String
   restaurant     Restaurant  @relation(fields: [restaurantId], references: [id])
   menus          Menu[]      @relation("MenuItems")

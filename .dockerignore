@@ -1,12 +1,3 @@
-
-**/node_modules
-**/dist
-**/.turbo
-**/.next
-packages/**/.env
-packages/**/.env.*
-!.env
-!**/.env.example 
 node_modules
 npm-debug.log
 yarn-debug.log
