@@ -16,72 +16,8 @@ import { RestaurateurOrder } from '../../../models/restaurateur-order.model';
     MatButtonModule,
     MatDividerModule
   ],
-  template: `
-    <div class="order-details-container" *ngIf="order">
-      <mat-card>
-        <mat-card-header>
-          <mat-card-title>Détails de la commande #{{ order.id }}</mat-card-title>
-          <mat-card-subtitle>{{ order.date | date:'dd/MM/yyyy HH:mm:ss' }}</mat-card-subtitle>
-        </mat-card-header>
-        
-        <mat-card-content>
-          <div class="order-info">
-            <p><strong>Articles:</strong> {{ order.articles }}</p>
-            <p><strong>Statut:</strong> {{ order.status }}</p>
-            <p *ngIf="order.amount"><strong>Montant:</strong> {{ order.amount | currency:'EUR' }}</p>
-          </div>
-          
-          <mat-divider></mat-divider>
-          
-          <div class="order-actions">
-            <h3>Actions disponibles</h3>
-            <p>Selon le statut de la commande, différentes actions peuvent être effectuées.</p>
-          </div>
-        </mat-card-content>
-        
-        <mat-card-actions>
-          <button mat-raised-button color="primary" *ngIf="order.status === 'En attente'" (click)="validateOrder()">VALIDER</button>
-          <button mat-raised-button color="warn" *ngIf="['En attente', 'Préparation en cours'].includes(order.status)" (click)="cancelOrder()">ANNULER</button>
-          <button mat-raised-button color="accent" *ngIf="order.status === 'Préparation en cours'" (click)="markAsReady()">MARQUER COMME PRÊT</button>
-          <button mat-raised-button (click)="goBack()">RETOUR</button>
-        </mat-card-actions>
-      </mat-card>
-    </div>
-  `,
-  styles: [`
-    .order-details-container {
-      padding: 24px;
-      max-width: 800px;
-      margin: 0 auto;
-    }
-    
-    mat-card {
-      padding: 16px;
-    }
-    
-    mat-card-title {
-      color: #3f51b5;
-      font-size: 1.5rem;
-    }
-    
-    .order-info {
-      margin: 16px 0;
-    }
-    
-    .order-actions {
-      margin-top: 16px;
-    }
-    
-    mat-card-actions {
-      display: flex;
-      gap: 8px;
-      padding: 16px;
-    }
-    
-    button {
-      margin-right: 8px;
-    }
-  `]
+  templateUrl: './order-details.component.html',
+  styleUrls: ['./order-details.component.scss']
 })
 export class RestaurateurOrderDetailsComponent implements OnInit {
   order: RestaurateurOrder | null = null;

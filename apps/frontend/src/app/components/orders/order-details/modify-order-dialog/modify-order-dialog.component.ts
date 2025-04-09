@@ -13,49 +13,8 @@ import { OrderService } from '../../../../services/order.service';
         MatDialogModule,
         MatButtonModule
     ],
-    template: `
-        <div class="dialog-container">
-            <h2 mat-dialog-title>Modification de la commande</h2>
-            <mat-dialog-content>
-                <p>Êtes-vous sûr de vouloir modifier votre commande ?</p>
-                <p class="info-text">Vos articles seront remis dans votre panier.</p>
-            </mat-dialog-content>
-            <mat-dialog-actions align="start">
-                <button mat-button color="basic" (click)="onCancel()">ANNULER</button>
-                <button mat-raised-button color="primary" (click)="onConfirm()">CONFIRMER</button>
-            </mat-dialog-actions>
-        </div>
-    `,
-    styles: [`
-        .dialog-container {
-            padding: 32px;
-            width: 480px;
-            box-sizing: border-box;
-        }
-        h2 {
-            margin: 0;
-            font-size: 24px;
-            font-weight: 500;
-        }
-        mat-dialog-content {
-            margin: 32px 0;
-            p {
-                font-size: 16px;
-                margin: 0;
-                
-                &.info-text {
-                    color: rgba(0, 0, 0, 0.6);
-                    margin-top: 12px;
-                    font-size: 14px;
-                }
-            }
-        }
-        mat-dialog-actions {
-            margin: 0;
-            padding: 0;
-            gap: 16px;
-        }
-    `]
+    templateUrl: './modify-order-dialog.component.html',
+    styleUrls: ['./modify-order-dialog.component.scss']
 })
 export class ModifyOrderDialogComponent {
     constructor(

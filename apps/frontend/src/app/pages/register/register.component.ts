@@ -22,7 +22,6 @@ export class RegisterComponent implements OnInit {
   // Track which role-specific sections to show
   showRestaurantOwnerFields = false;
   showDelivererFields = false;
-  showDeveloperFields = false;
   
   // Flag for development features
   isDevelopmentMode = isDevMode();
@@ -94,14 +93,6 @@ export class RegisterComponent implements OnInit {
     const isRestaurantOwner = roles.includes(UserRole.RESTAURANT_OWNER);
     this.showRestaurantOwnerFields = isRestaurantOwner;
     
-    // Check if roles contains deliverer
-    const isDeliverer = roles.includes(UserRole.DELIVERER);
-    this.showDelivererFields = isDeliverer;
-
-    // Check if roles contains developer
-    const isDeveloper = roles.includes(UserRole.DEVELOPER);
-    this.showDeveloperFields = isDeveloper;
-    
     // Update validators for restaurant owner fields
     const restaurantFields = [
       'restaurantName', 'siretNumber', 'restaurantAddress', 
@@ -120,6 +111,10 @@ export class RegisterComponent implements OnInit {
         control.updateValueAndValidity();
       }
     });
+    
+    // Check if roles contains deliverer
+    const isDeliverer = roles.includes(UserRole.DELIVERER);
+    this.showDelivererFields = isDeliverer;
     
     // Update validators for deliverer fields
     const delivererFields = [
@@ -142,8 +137,7 @@ export class RegisterComponent implements OnInit {
     // Log which sections are displayed
     console.log('Display sections:', {
       showRestaurantOwnerFields: this.showRestaurantOwnerFields,
-      showDelivererFields: this.showDelivererFields,
-      showDeveloperFields: this.showDeveloperFields
+      showDelivererFields: this.showDelivererFields
     });
   }
 
@@ -252,7 +246,6 @@ export class RegisterComponent implements OnInit {
     console.log('Roles array:', this.rolesFormArray.value);
     console.log('Is Restaurant Owner:', this.showRestaurantOwnerFields);
     console.log('Is Deliverer:', this.showDelivererFields);
-    console.log('Is Developer:', this.showDeveloperFields);
     console.groupEnd();
     
     console.group('Validation Errors');

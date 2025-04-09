@@ -175,19 +175,6 @@
               <span class="role-description">Livrer la nourriture aux clients</span>
             </label>
           </div>
-
-          <div class="role-option" *ngIf="isDevelopmentMode">
-            <input 
-              type="checkbox" 
-              id="role-developer" 
-              [checked]="isRoleSelected(userRoles[3])" 
-              (change)="onRoleChange(userRoles[3], $any($event.target).checked)"
-            >
-            <label for="role-developer">
-              <span class="role-name">Développeur</span>
-              <span class="role-description">Accès aux fonctionnalités de développement</span>
-            </label>
-          </div>
         </div>
       </div>
       

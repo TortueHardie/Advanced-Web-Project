@@ -11,7 +11,6 @@ import { RestaurantDetailComponent } from './components/restaurant-detail/restau
 import { StatisticsComponent } from './components/statistics/statistics.component';
 import { RestaurateurOrdersComponent } from './components/restaurateur-orders/restaurateur-orders.component';
 import { LoginComponent } from './pages/login/login.component';
-import { RestaurateurMenuManagementComponent } from './components/restaurateur-menu-management/restaurateur-menu-management.component';
 import { RestaurateurProfileComponent } from './components/restaurateur-profile/restaurateur-profile.component';
 import { RestaurateurProfileUpdateComponent } from './components/restaurateur-profile/restaurateur-profile-update/restaurateur-profile-update.component';
 import { DelivererOrdersComponent } from './components/deliverer-orders/deliverer-orders.component';
@@ -25,6 +24,7 @@ import { DeveloperProfileUpdateComponent } from './components/developer-profile/
 import { TechComponentsComponent } from './components/tech-components/tech-components.component';
 import { TechLogsComponent } from './components/tech-logs/tech-logs.component';
 import { LandingComponent } from './pages/landing/landing.component';
+import { RestaurateurMenuManagementComponent } from './components/restaurateur-menu-management/restaurateur-menu-management/restaurateur-menu-management.component';
 
 export const routes: Routes = [
   { path: '', component: LoginComponent },
