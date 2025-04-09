@@ -63,7 +63,6 @@ export class UserFormBuilder {
             <input matInput placeholder="Rechercher...">
             <mat-icon matSuffix>search</mat-icon>
           </mat-form-field>
-          <button mat-raised-button color="primary" (click)="addUser()">+ COMPTE</button>
         </div>
       </div>
 
