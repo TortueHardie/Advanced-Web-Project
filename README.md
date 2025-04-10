@@ -1,140 +1,178 @@
-# Commandes Docker Compose pour le développement
+# Advanced Web Project
 
-Ce projet utilise Docker Compose pour orchestrer plusieurs applications backend et frontend dans un monorepo. Vous pouvez instancier plusieurs services pour assurer le load balancing et la scalabilité.
+## 🏗 Architecture du Projet
 
-## 📌 Commandes utiles
+Ce projet est une application web moderne basée sur une architecture microservices. Il utilise un monorepo géré par Turborepo et est conteneurisé avec Docker.
 
+### Structure du Projet
 
+```
+.
+├── apps/                    # Applications principales
+│   ├── api-gateway/        # Point d'entrée API
+│   ├── auth-service/       # Service d'authentification
+│   ├── user-service/       # Gestion des utilisateurs
+│   ├── product-service/    # Gestion des produits
+│   ├── location-service/   # Service de géolocalisation
+│   ├── log-service/        # Service de logging
+│   ├── order-service/      # Gestion des commandes
+│   └── frontend/           # Interface utilisateur
+│
+├── packages/               # Packages partagés
+│   ├── prisma/            # Configuration Prisma
+│   ├── discovery/         # Service discovery
+│   ├── auth/              # Logique d'authentification
+│   └── common/            # Utilitaires communs
+│
+└── docker/                # Configuration Docker
+```
 
-API GATEWAY
-swagger Api Gateway : http://localhost:3000/docs
+### Technologies Principales
 
-USER-SEVICE
-swagger service Utilisateurs accès via proxy : http://localhost:3000/api-docs/user
-swagger service Utilisateurs accès direct : http://localhost:3001/docs
+- **Frontend**: Angular, Angular Material
+- **Backend**: NestJS (microservices)
+- **Base de données**: PostgreSQL, MongoDB, Redis
+- **Conteneurisation**: Docker & Docker Compose
+- **Gestion de Monorepo**: Turborepo
+- **ORM**: Prisma
 
-## Routes API
+## 🚀 Installation et Démarrage
+
+### Prérequis
+
+- Node.js (v18 ou supérieur)
+- npm (v10.9.2 ou supérieur)
+- Docker et Docker Compose
+- Git
+
+### Configuration
+
+1. Cloner le repository :
+```bash
+git clone https://github.com/TortueHardie/Advanced-Web-Project.git
+cd Advanced-Web-Project
+```
+
+2. Copier le fichier d'environnement :
+```bash
+cp .env.example .env
+```
+
+3. Configurer les variables d'environnement dans le fichier `.env` :
+```env
+DATABASE_USER_POSTGRES=votre_utilisateur
+DATABASE_MDP_POSTGRES=votre_mot_de_passe
+DATABASE_NAME_POSTGRES=votre_base
+DATABASE_URL_POSTGRES=postgresql://votre_utilisateur:votre_mot_de_passe@postgres-db:5432/votre_base
+JWT_SECRET=votre_secret_jwt
+JWT_REFRESH_SECRET=votre_secret_refresh
+REDIS_PASSWORD=votre_mot_de_passe_redis
+```
+
+### Installation des Dépendances
+
+```bash
+npm run install:deps
+```
+
+### Démarrage du front
+
+```bash
+npm run start
+```
+
+### Démarrage du backend
+```bash
+docker-compose up -d
+```
+
+## 🌐 Accès aux Services
+
+Une fois démarré, les services sont accessibles aux adresses suivantes :
+
+- **API Gateway** (Swagger): http://localhost:3000
+- **Auth Service**: http://localhost:3001
+- **User Service**: http://localhost:3001
+- **Product Service**: http://localhost:3002
+- **Location Service**: http://localhost:3003
+- **Log Service**: http://localhost:3004
+- **Frontend**: http://localhost:4200
+- **Prisma**: http://localhost:5555
+
+## 🔧 Scripts Disponibles
+
+- `npm run build`: Construction de tous les services
+- `npm run build:api-gateway`: Construction du service API Gateway
+- `npm run build:user-service`: Construction du service utilisateur
+- `npm run install:deps`: Installation des dépendances pour tous les services
+
+## 📦 Structure des Services
 
 ### API Gateway
-- `GET /docs` - Documentation Swagger de l'API Gateway
-- Proxy routes:
-  - `/api/user/*` - Redirige vers le service utilisateur
-  - `/api/auth/*` - Redirige vers le service d'authentification
+- Point d'entrée unique pour toutes les requêtes API
+- Gestion du routage et de l'authentification
+- Rate limiting et sécurité
 
-### Service d'Authentification (Auth Service)
-- `POST /auth/login` - Connexion utilisateur
-- `POST /auth/register` - Inscription utilisateur
-- `POST /auth/verify` - Vérification de la validité d'un token JWT
-- `POST /auth/refresh` - Rafraîchissement d'un token expiré
-- `POST /auth/revoke` - Révocation d'un token
+### Auth Service
+- Gestion de l'authentification
+- Génération et validation des JWT
+- Gestion des sessions
 
-### Service Utilisateur (User Service)
-- `GET /docs` - Documentation Swagger du service utilisateur
-- Microservice TCP disponible sur le port 4001
+### User Service
+- Gestion des utilisateurs
+- Profils et préférences
+- Authentification
 
-## Lancer en dev : 
-```sh
-npm run start 
-```
+### Product Service
+- Gestion du catalogue produits
+- Catégorisation et recherche
+- Gestion des stocks
 
-## Lancer en mode prod :
-```sh
-# Lancer les services en mode détaché (background)
-docker compose up -d
+### Location Service
+- Services de géolocalisation
+- Gestion des adresses
+- Calcul de distances
 
-# Lancer avec rebuild des images (utile après des modifications Dockerfile)
-docker compose up -d --build
+### Log Service
+- Centralisation des logs
+- Monitoring et alerting
+- Analyse des performances
 
-# Arrêter les services
-docker compose down
+## 🔍 Monitoring et Maintenance
 
-# Arrêter et supprimer les volumes (reset complet des données)
-docker compose down -v
+### Logs
+Les logs sont disponibles dans les volumes Docker suivants :
+- `api_gateway_logs`
+- `log_service_data`
 
-# Vérifier les logs d'un service spécifique
-docker compose logs -f <nom_du_service>
+### Health Checks
+Chaque service dispose d'un endpoint de santé accessible à `/health`
 
-# Vérifier les logs de tous les services
-docker compose logs -f
+## 🛠 Développement
 
-# Voir l'état des containers
-docker compose ps
+### Ajout d'un Nouveau Service
 
-# Redémarrer un service spécifique
-docker compose restart <nom_du_service>
+1. Créer un nouveau dossier dans `apps/`
+2. Configurer le Dockerfile
+3. Ajouter le service dans `docker-compose.yml`
+4. Mettre à jour les variables d'environnement
 
-# Exécuter une commande dans un conteneur en cours d'exécution
-docker compose exec <nom_du_service> <commande>
+### Modification d'un Service Existant
 
-# Accéder à un shell interactif dans un conteneur
-docker compose exec <nom_du_service> sh  # (ou bash si disponible)
+1. Arrêter le service concerné
+2. Effectuer les modifications
+3. Reconstruire le service
+4. Redémarrer le service
 
-# Mettre à l'échelle un service pour le load balancing
-docker compose up -d --scale <nom_du_service>=<nombre_instances>
+## 📚 Documentation
 
-# Nettoyer les images non utilisées
-docker system prune -af
+Pour plus d'informations sur chaque service, consulter la documentation dans les dossiers respectifs :
+- `/apps/[service-name]/README.md`
 
-# Lister les volumes
-docker volume ls
+## 🤝 Contribution
 
-# Supprimer tous les volumes Docker (⚠ irréversible, supprime toutes les bases de données stockées)
-docker volume prune -f
-```
-## 🏗️ Image Docker  
-Une image Docker est un modèle immuable utilisé pour créer des conteneurs. Elle contient tout le nécessaire pour exécuter une application : code, dépendances, runtime et configuration.  
-
-- Une image est construite à partir d'un **Dockerfile**.
-- Elle peut être stockée et partagée via **Docker Hub** ou un registre privé.  
-```sh
-### Commandes utiles :
-docker pull nginx        # Télécharger une image depuis Docker Hub
-docker images            # Lister les images locales
-docker rmi <image_id>    # Supprimer une image
-```
-📦 Volume Docker
-Un volume Docker est un espace de stockage persistant utilisé par les conteneurs. Contrairement aux fichiers stockés dans un conteneur, un volume n'est pas supprimé quand le conteneur est arrêté ou supprimé.
-
-Il permet de partager des données entre conteneurs et de préserver les données même après l'arrêt des services.
-```sh
-###Commandes utiles :
-docker volume create my_volume    # Créer un volume
-docker volume ls                  # Lister les volumes existants
-docker volume rm my_volume        # Supprimer un volume
-```
-
-🌐 Réseau Docker
-Un réseau Docker permet aux conteneurs de communiquer entre eux et avec l'extérieur.
-
-Types de réseaux :
-bridge (par défaut) : réseau privé entre les conteneurs.
-host : partage le réseau de l'hôte (pas d'isolation).
-none : pas de réseau (conteneur totalement isolé).
-overlay : pour connecter plusieurs hôtes Docker.
-
-```sh
-###Commandes utiles :
-docker network create my_network         # Créer un réseau
-docker network ls                        # Lister les réseaux
-docker network inspect my_network        # Voir les détails d'un réseau
-docker network rm my_network             # Supprimer un réseau
-```
-
-📌 Lancer plusieurs instances d'un service (load balancing)
-Docker Compose permet d'exécuter plusieurs instances d'un même service avec --scale, ce qui est utile pour la répartition de charge :
-
-Exemple :
-```sh
-docker compose up -d --scale backend=3 --scale frontend=2
-```
-Cela lance 3 instances du backend et 2 instances du frontend.
-
-Modifier le nombre d'instances à la volée :
-
-```sh
-docker compose up -d --scale backend=5
-```
-
-Ici, on passe à 5 instances du backend.
-
-⚠️ Attention : Assurez-vous que vos services utilisent un reverse proxy (ex: Nginx, Traefik) et que votre base de données gère bien les connexions simultanées.
+1. Fork le projet
+2. Créer une branche (`git checkout -b feature/AmazingFeature`)
+3. Commit les changements (`git commit -m 'Add some AmazingFeature'`)
+4. Push vers la branche (`git push origin feature/AmazingFeature`)
+5. Ouvrir une Pull Request
